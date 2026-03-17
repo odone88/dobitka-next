@@ -1,0 +1,5 @@
+{
+  "env": {
+    "FOOTBALL_DATA_KEY": "@football-data-key"
+  }
+}
