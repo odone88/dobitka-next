@@ -1,5 +1,5 @@
 // ─── MATCHES ────────────────────────────────────────────────────────────────
-export type MatchStatus = 'LIVE' | 'PAUSED' | 'SCHEDULED' | 'FINISHED' | 'POSTPONED' | 'CANCELLED';
+export type MatchStatus = 'LIVE' | 'IN_PLAY' | 'PAUSED' | 'SCHEDULED' | 'TIMED' | 'FINISHED' | 'POSTPONED' | 'CANCELLED';
 
 export interface Match {
   id: number;
@@ -54,13 +54,14 @@ export interface NewsItem {
   id: string;
   title: string;
   url: string;
-  source: 'reddit' | 'youtube' | 'weszlo' | 'editorial';
+  source: 'reddit' | 'youtube' | 'weszlo' | 'editorial' | 'bbc' | 'guardian';
   subreddit?: string;
   score?: number;
   comments?: number;
   publishedAt: string;
   thumbnail?: string;
   isHot?: boolean;
+  description?: string;
 }
 
 // ─── TRANSFERS ──────────────────────────────────────────────────────────────

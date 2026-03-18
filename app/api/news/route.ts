@@ -1,21 +1,22 @@
 import { NextResponse } from 'next/server';
-import { getRedditFeed } from '@/lib/data-sources/reddit';
+import { getNewsFeeds } from '@/lib/data-sources/news-rss';
 import { getTifoVideos } from '@/lib/data-sources/youtube-rss';
-import { getWeszloFeed } from '@/lib/data-sources/weszlo';
 
-export const revalidate = 900; // 15 min
+export const revalidate = 900;
 
 export async function GET() {
-  const [reddit, tifo, weszlo] = await Promise.allSettled([
-    getRedditFeed(),
-    getTifoVideos(4),
-    getWeszloFeed(6),
+  const [feeds, tifo] = await Promise.allSettled([
+    getNewsFeeds(),
+    getTifoVideos(5),
   ]);
 
+  const f = feeds.status === 'fulfilled' ? feeds.value : { bbc: [], guardian: [], weszlo: [] };
+
   return NextResponse.json({
-    reddit: reddit.status === 'fulfilled' ? reddit.value : [],
+    bbc: f.bbc,
+    guardian: f.guardian,
+    weszlo: f.weszlo,
     tifo: tifo.status === 'fulfilled' ? tifo.value : [],
-    weszlo: weszlo.status === 'fulfilled' ? weszlo.value : [],
     updatedAt: new Date().toISOString(),
   });
 }
