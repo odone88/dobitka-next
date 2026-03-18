@@ -1,10 +1,20 @@
 // ─── MATCHES ────────────────────────────────────────────────────────────────
 export type MatchStatus = 'LIVE' | 'IN_PLAY' | 'PAUSED' | 'SCHEDULED' | 'TIMED' | 'FINISHED' | 'POSTPONED' | 'CANCELLED';
 
+export interface MatchGoal {
+  minute: number;
+  scorer: string;
+  assist?: string;
+  type: 'REGULAR' | 'OWN_GOAL' | 'PENALTY';
+  teamId: number;
+}
+
 export interface Match {
   id: number;
   homeTeam: string;
   awayTeam: string;
+  homeTeamId: number;
+  awayTeamId: number;
   homeScore: number | null;
   awayScore: number | null;
   status: MatchStatus;
@@ -12,6 +22,8 @@ export interface Match {
   utcDate: string;
   competition: string;
   competitionCode: string;
+  goals: MatchGoal[];
+  halfTime?: string;
 }
 
 // ─── STANDINGS ───────────────────────────────────────────────────────────────
@@ -27,7 +39,7 @@ export interface StandingRow {
   goalsAgainst: number;
   goalDiff: number;
   points: number;
-  form?: string; // "WWDLL"
+  form?: string;
   xG?: number | null;
   xGA?: number | null;
 }
@@ -80,7 +92,7 @@ export interface Transfer {
 // ─── INSIGHTS ────────────────────────────────────────────────────────────────
 export interface ScenarioInsight {
   teamName: string;
-  probability: number; // 0-100
+  probability: number;
   label: string;
   color: 'green' | 'amber' | 'red' | 'blue';
 }
