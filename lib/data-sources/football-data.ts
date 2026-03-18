@@ -1,13 +1,13 @@
-import type { Match, StandingRow, LeagueStandings, Scorer } from '@/types';
+import type { Match, MatchGoal, StandingRow, LeagueStandings, Scorer } from '@/types';
 import { FOOTBALL_DATA_KEY } from '@/config/sources';
 
 const BASE = 'https://api.football-data.org/v4';
 const HEADERS = { 'X-Auth-Token': FOOTBALL_DATA_KEY };
 
-async function fdFetch(path: string) {
+async function fdFetch(path: string, cacheSec = 120) {
   const res = await fetch(`${BASE}${path}`, {
     headers: HEADERS,
-    next: { revalidate: 120 }, // Next.js cache: 2 min
+    next: { revalidate: cacheSec },
   });
   if (!res.ok) throw new Error(`football-data ${path}: ${res.status}`);
   return res.json();
@@ -16,7 +16,7 @@ async function fdFetch(path: string) {
 // ─── LIVE / TODAY MATCHES ────────────────────────────────────────────────────
 export async function getLiveMatches(): Promise<Match[]> {
   try {
-    const data = await fdFetch('/matches?status=LIVE');
+    const data = await fdFetch('/matches?status=LIVE', 30);
     return mapMatches(data.matches ?? []);
   } catch {
     return [];
@@ -26,7 +26,7 @@ export async function getLiveMatches(): Promise<Match[]> {
 export async function getTodayMatches(): Promise<Match[]> {
   try {
     const today = new Date().toISOString().slice(0, 10);
-    const data = await fdFetch(`/matches?dateFrom=${today}&dateTo=${today}`);
+    const data = await fdFetch(`/matches?dateFrom=${today}&dateTo=${today}`, 60);
     return mapMatches(data.matches ?? []);
   } catch {
     return [];
@@ -35,7 +35,7 @@ export async function getTodayMatches(): Promise<Match[]> {
 
 export async function getMatchesByDate(date: string): Promise<Match[]> {
   try {
-    const data = await fdFetch(`/matches?dateFrom=${date}&dateTo=${date}`);
+    const data = await fdFetch(`/matches?dateFrom=${date}&dateTo=${date}`, 300);
     return mapMatches(data.matches ?? []);
   } catch {
     return [];
@@ -110,22 +110,80 @@ export async function getUpcomingFixtures(leagueCode: string, limit = 5): Promis
   }
 }
 
+// ─── MATCH DETAILS (goals, assists) ─────────────────────────────────────────
+// The /matches list endpoint doesn't include goal events.
+// Fetch /matches/{id} for up to 6 matches to stay within rate limits (10 req/min).
+export async function enrichMatchesWithGoals(matches: Match[]): Promise<Match[]> {
+  const toEnrich = matches
+    .filter((m) => m.status === 'FINISHED' || m.status === 'IN_PLAY' || m.status === 'LIVE' || m.status === 'PAUSED')
+    .filter((m) => m.homeScore !== null && m.homeScore + (m.awayScore ?? 0) > 0)
+    .slice(0, 6);
+
+  if (toEnrich.length === 0) return matches;
+
+  const details = await Promise.allSettled(
+    toEnrich.map((m) => fdFetch(`/matches/${m.id}`, 60))
+  );
+
+  const goalsMap = new Map<number, MatchGoal[]>();
+  for (let i = 0; i < toEnrich.length; i++) {
+    const result = details[i];
+    if (result.status !== 'fulfilled') continue;
+    const data = result.value;
+    const goalsRaw = (data.goals as Record<string, unknown>[]) ?? [];
+    if (goalsRaw.length === 0) continue;
+    goalsMap.set(toEnrich[i].id, goalsRaw.map((g) => ({
+      minute: (g.minute as number) ?? 0,
+      scorer: ((g.scorer as Record<string, unknown>)?.name as string) ?? 'Nieznany',
+      assist: ((g.assist as Record<string, unknown>)?.name as string) ?? undefined,
+      type: (g.type as MatchGoal['type']) ?? 'REGULAR',
+      teamId: ((g.team as Record<string, unknown>)?.id as number) ?? 0,
+    })));
+  }
+
+  return matches.map((m) => {
+    const goals = goalsMap.get(m.id);
+    return goals ? { ...m, goals } : m;
+  });
+}
+
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 function mapMatches(raw: Record<string, unknown>[]): Match[] {
-  return raw.map((m) => ({
-    id: m.id as number,
-    homeTeam: (m.homeTeam as Record<string, unknown>)?.shortName as string ?? (m.homeTeam as Record<string, unknown>)?.name as string ?? '',
-    awayTeam: (m.awayTeam as Record<string, unknown>)?.shortName as string ?? (m.awayTeam as Record<string, unknown>)?.name as string ?? '',
-    homeScore: (m.score as Record<string, unknown>)?.fullTime
-      ? ((m.score as Record<string, unknown>).fullTime as Record<string, unknown>).home as number | null
-      : null,
-    awayScore: (m.score as Record<string, unknown>)?.fullTime
-      ? ((m.score as Record<string, unknown>).fullTime as Record<string, unknown>).away as number | null
-      : null,
-    status: m.status as Match['status'],
-    minute: (m.minute as number) ?? null,
-    utcDate: m.utcDate as string,
-    competition: (m.competition as Record<string, unknown>)?.name as string ?? '',
-    competitionCode: (m.competition as Record<string, unknown>)?.code as string ?? '',
-  }));
+  return raw.map((m) => {
+    const homeTeamObj = m.homeTeam as Record<string, unknown>;
+    const awayTeamObj = m.awayTeam as Record<string, unknown>;
+    const scoreObj = m.score as Record<string, unknown> | undefined;
+    const fullTime = scoreObj?.fullTime as Record<string, unknown> | undefined;
+    const halfTime = scoreObj?.halfTime as Record<string, unknown> | undefined;
+
+    const htHome = halfTime?.home as number | null ?? null;
+    const htAway = halfTime?.away as number | null ?? null;
+
+    // Extract goals with scorer + assist
+    const goalsRaw = (m.goals as Record<string, unknown>[]) ?? [];
+    const goals: MatchGoal[] = goalsRaw.map((g) => ({
+      minute: (g.minute as number) ?? 0,
+      scorer: ((g.scorer as Record<string, unknown>)?.name as string) ?? 'Nieznany',
+      assist: ((g.assist as Record<string, unknown>)?.name as string) ?? undefined,
+      type: (g.type as MatchGoal['type']) ?? 'REGULAR',
+      teamId: ((g.team as Record<string, unknown>)?.id as number) ?? 0,
+    }));
+
+    return {
+      id: m.id as number,
+      homeTeam: (homeTeamObj?.shortName as string) ?? (homeTeamObj?.name as string) ?? '',
+      awayTeam: (awayTeamObj?.shortName as string) ?? (awayTeamObj?.name as string) ?? '',
+      homeTeamId: (homeTeamObj?.id as number) ?? 0,
+      awayTeamId: (awayTeamObj?.id as number) ?? 0,
+      homeScore: fullTime ? (fullTime.home as number | null) : null,
+      awayScore: fullTime ? (fullTime.away as number | null) : null,
+      status: m.status as Match['status'],
+      minute: (m.minute as number) ?? null,
+      utcDate: m.utcDate as string,
+      competition: (m.competition as Record<string, unknown>)?.name as string ?? '',
+      competitionCode: (m.competition as Record<string, unknown>)?.code as string ?? '',
+      goals,
+      halfTime: htHome !== null && htAway !== null ? `${htHome}–${htAway}` : undefined,
+    };
+  });
 }

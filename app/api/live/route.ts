@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getLiveMatches, getTodayMatches, getMatchesByDate } from '@/lib/data-sources/football-data';
+import { getLiveMatches, getTodayMatches, getMatchesByDate, enrichMatchesWithGoals } from '@/lib/data-sources/football-data';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   const dateParam = request.nextUrl.searchParams.get('date');
@@ -16,10 +16,11 @@ export async function GET(request: NextRequest) {
       seen.add(m.id);
       return true;
     });
-    return NextResponse.json({ live, today: merged, updatedAt: new Date().toISOString() });
+    const enriched = await enrichMatchesWithGoals(merged);
+    return NextResponse.json({ live, today: enriched, updatedAt: new Date().toISOString() });
   }
 
-  // Historical/future date
   const matches = await getMatchesByDate(dateParam!);
-  return NextResponse.json({ live: [], today: matches, updatedAt: new Date().toISOString() });
+  const enriched = await enrichMatchesWithGoals(matches);
+  return NextResponse.json({ live: [], today: enriched, updatedAt: new Date().toISOString() });
 }
