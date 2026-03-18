@@ -11,128 +11,176 @@ interface NewsData {
   guardian: NewsItem[];
   weszlo: NewsItem[];
   tifo: NewsItem[];
-  updatedAt: string;
 }
 
 type TabId = 'bbc' | 'guardian' | 'weszlo' | 'tifo';
 
-const TAB_CONFIG: Record<TabId, { label: string; flag: string }> = {
-  bbc:      { label: 'BBC Sport', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-  guardian: { label: 'Guardian', flag: '📰' },
-  weszlo:   { label: 'Weszło', flag: '🇵🇱' },
-  tifo:     { label: 'Tifo', flag: '🎬' },
+const TAB_META: Record<TabId, { label: string; flag: string; color: string }> = {
+  bbc:      { label: 'BBC Sport', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'text-red-400' },
+  guardian: { label: 'Guardian',  flag: '📰',          color: 'text-blue-400' },
+  weszlo:   { label: 'Weszło',    flag: '🇵🇱',          color: 'text-amber-400' },
+  tifo:     { label: 'Tifo',      flag: '🎬',           color: 'text-purple-400' },
 };
 
-function ArticleRow({ item }: { item: NewsItem }) {
+const TAB_ORDER: TabId[] = ['weszlo', 'bbc', 'guardian', 'tifo'];
+
+function ArticleCard({ item }: { item: NewsItem }) {
+  const meta = TAB_META[item.source as TabId];
   return (
     <a
       href={item.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block py-2.5 border-b border-border/40 last:border-0 group"
+      className="group flex flex-col gap-1.5 py-3 border-b border-border/30 last:border-0 hover:bg-white/[0.02] -mx-1 px-1 rounded transition-colors"
     >
-      <p className="text-[13px] text-foreground group-hover:text-primary transition-colors leading-snug">
+      <p className="text-[14px] leading-snug text-foreground group-hover:text-primary transition-colors font-medium">
         {item.title}
       </p>
       {item.description && (
-        <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{item.description}</p>
+        <p className="text-[12px] text-muted-foreground line-clamp-1 leading-relaxed">
+          {item.description}
+        </p>
       )}
-      <p className="text-[11px] text-muted-foreground/60 mt-0.5">{formatDistanceToNow(item.publishedAt)}</p>
+      <div className="flex items-center gap-2 mt-0.5">
+        {meta && (
+          <span className={cn('text-[10px] font-bold uppercase tracking-wide', meta.color)}>
+            {meta.flag} {meta.label}
+          </span>
+        )}
+        <span className="text-[11px] text-muted-foreground/50">·</span>
+        <span className="text-[11px] text-muted-foreground/60">{formatDistanceToNow(item.publishedAt)}</span>
+      </div>
     </a>
   );
 }
 
-function TifoVideo({ item }: { item: NewsItem }) {
+function TifoCard({ item }: { item: NewsItem }) {
   return (
     <a
       href={item.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex gap-3 py-2.5 border-b border-border/40 last:border-0 group"
+      className="group flex gap-3 py-3 border-b border-border/30 last:border-0 hover:bg-white/[0.02] -mx-1 px-1 rounded transition-colors"
     >
       {item.thumbnail && (
         <img
           src={item.thumbnail}
           alt=""
-          className="w-28 h-16 object-cover rounded flex-shrink-0"
+          className="w-28 h-[63px] object-cover rounded flex-shrink-0 opacity-90 group-hover:opacity-100 transition-opacity"
           loading="lazy"
         />
       )}
-      <div className="flex-1 min-w-0">
-        <p className="text-[13px] text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
+      <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+        <p className="text-[13px] leading-snug text-foreground group-hover:text-primary transition-colors font-medium line-clamp-2">
           {item.title}
         </p>
-        <p className="text-[11px] text-muted-foreground/60 mt-1">{formatDistanceToNow(item.publishedAt)}</p>
+        <span className="text-[11px] text-purple-400 font-bold uppercase tracking-wide">
+          🎬 Tifo Football · {formatDistanceToNow(item.publishedAt)}
+        </span>
       </div>
     </a>
+  );
+}
+
+function EmptyState({ tab }: { tab: TabId }) {
+  const msgs: Record<TabId, string> = {
+    bbc:      'BBC Sport nie odpowiada. Sprawdź za chwilę.',
+    guardian: 'Guardian niedostępny. Spróbuj za chwilę.',
+    weszlo:   'Weszło niedostępne. Sprawdź za chwilę.',
+    tifo:     'Brak nowych wideo Tifo Football.',
+  };
+  return (
+    <div className="py-6 text-center">
+      <p className="text-[13px] text-muted-foreground">{msgs[tab]}</p>
+    </div>
   );
 }
 
 export function NewsFeed() {
   const [data, setData] = useState<NewsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabId | null>(null);
+  const [error, setError] = useState(false);
+  // ← Fix: selectedTab is the single source of truth for what tab is shown
+  const [selectedTab, setSelectedTab] = useState<TabId>('weszlo');
 
   useEffect(() => {
+    setLoading(true);
     fetch('/api/news')
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('network');
+        return r.json();
+      })
       .then((d: NewsData) => {
         setData(d);
-        // Auto-select first non-empty tab
-        const order: TabId[] = ['weszlo', 'bbc', 'guardian', 'tifo'];
-        const first = order.find((t) => (d[t]?.length ?? 0) > 0);
-        if (first) setActiveTab(first);
+        // Auto-select first tab that has content, in preferred order
+        const first = TAB_ORDER.find((t) => (d[t]?.length ?? 0) > 0);
+        if (first) setSelectedTab(first);
       })
-      .catch(() => {})
+      .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
-    return <div className="space-y-2">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>;
+    return (
+      <div className="space-y-3">
+        {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
+      </div>
+    );
   }
 
-  if (!data) return null;
-
-  // Only tabs with content
-  const availableTabs = (Object.keys(TAB_CONFIG) as TabId[]).filter((t) => (data[t]?.length ?? 0) > 0);
-
-  if (availableTabs.length === 0) {
-    return <p className="text-sm text-muted-foreground py-4 text-center">Brak newsów — sprawdź za chwilę.</p>;
+  if (error || !data) {
+    return <p className="text-[13px] text-muted-foreground py-4 text-center">Błąd ładowania newsów.</p>;
   }
 
-  const current = activeTab && availableTabs.includes(activeTab) ? activeTab : availableTabs[0];
-  const items = data[current] ?? [];
+  // Tabs with content only
+  const activeTabs = TAB_ORDER.filter((t) => (data[t]?.length ?? 0) > 0);
+
+  if (activeTabs.length === 0) {
+    return <p className="text-[13px] text-muted-foreground py-4 text-center">Brak newsów — sprawdź za chwilę.</p>;
+  }
+
+  // Guarantee selectedTab is valid
+  const currentTab: TabId = activeTabs.includes(selectedTab) ? selectedTab : activeTabs[0];
+  // ← This is the items for the SELECTED tab only — no mixing
+  const items: NewsItem[] = data[currentTab] ?? [];
 
   return (
     <div>
-      {/* Tabs - only show if more than 1 source has content */}
-      {availableTabs.length > 1 && (
-        <div className="flex gap-1 mb-3 flex-wrap">
-          {availableTabs.map((t) => (
-            <button
-              key={t}
-              onClick={() => setActiveTab(t)}
-              className={cn(
-                'flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-md font-medium transition-colors',
-                current === t
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground border border-border hover:border-foreground/30'
-              )}
-            >
-              <span>{TAB_CONFIG[t].flag}</span>
-              <span>{TAB_CONFIG[t].label}</span>
-              <span className="opacity-50">({data[t]?.length})</span>
-            </button>
-          ))}
+      {/* Tabs */}
+      {activeTabs.length > 1 && (
+        <div className="flex gap-1 mb-1 flex-wrap border-b border-border/30 pb-2">
+          {activeTabs.map((t) => {
+            const m = TAB_META[t];
+            const isActive = currentTab === t;
+            return (
+              <button
+                key={t}
+                onClick={() => setSelectedTab(t)}
+                className={cn(
+                  'flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded font-bold uppercase tracking-wide transition-all',
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
+                )}
+              >
+                <span>{m.flag}</span>
+                <span>{m.label}</span>
+                <span className={cn('opacity-50', isActive && 'opacity-80')}>({data[t]?.length})</span>
+              </button>
+            );
+          })}
         </div>
       )}
 
-      {/* Content */}
+      {/* Items — only currentTab */}
       <div>
-        {current === 'tifo'
-          ? items.map((item) => <TifoVideo key={item.id} item={item} />)
-          : items.map((item) => <ArticleRow key={item.id} item={item} />)
-        }
+        {items.length === 0 ? (
+          <EmptyState tab={currentTab} />
+        ) : currentTab === 'tifo' ? (
+          items.map((item) => <TifoCard key={item.id} item={item} />)
+        ) : (
+          items.map((item) => <ArticleCard key={item.id} item={item} />)
+        )}
       </div>
     </div>
   );

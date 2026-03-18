@@ -47,6 +47,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ─── DOBITKA DARK THEME ─────────────────────────────────────────────── */
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -83,37 +84,57 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Base */
+  --background: oklch(0.12 0 0);
+  --foreground: oklch(0.94 0 0);
+
+  /* Cards: slightly lighter than bg */
+  --card: oklch(0.17 0 0);
+  --card-foreground: oklch(0.94 0 0);
+
+  --popover: oklch(0.17 0 0);
+  --popover-foreground: oklch(0.94 0 0);
+
+  /* Primary: DOBITKA lime-green — football pitch energy */
+  --primary: oklch(0.78 0.2 140);
+  --primary-foreground: oklch(0.1 0 0);
+
+  /* Secondary */
+  --secondary: oklch(0.22 0 0);
+  --secondary-foreground: oklch(0.94 0 0);
+
+  /* Muted */
+  --muted: oklch(0.20 0 0);
+  --muted-foreground: oklch(0.56 0 0);
+
+  /* Accent: amber/gold for highlights */
+  --accent: oklch(0.24 0 0);
+  --accent-foreground: oklch(0.94 0 0);
+
+  /* Destructive: strong red for live */
+  --destructive: oklch(0.62 0.22 25);
+
+  /* Borders: visible but not loud */
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.78 0.2 140);
+
+  /* Charts */
+  --chart-1: oklch(0.78 0.2 140);
+  --chart-2: oklch(0.7 0.18 55);
+  --chart-3: oklch(0.62 0.22 25);
+  --chart-4: oklch(0.6 0.18 260);
+  --chart-5: oklch(0.56 0 0);
+
+  /* Sidebar */
+  --sidebar: oklch(0.15 0 0);
+  --sidebar-foreground: oklch(0.94 0 0);
+  --sidebar-primary: oklch(0.78 0.2 140);
+  --sidebar-primary-foreground: oklch(0.1 0 0);
+  --sidebar-accent: oklch(0.20 0 0);
+  --sidebar-accent-foreground: oklch(0.94 0 0);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.78 0.2 140);
 }
 
 @layer base {
@@ -122,19 +143,56 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.65;
   }
   html {
     @apply font-sans;
   }
+}
 
-  /* Scrollbar hide utility */
+/* ─── DOBITKA RETRO UTILITIES ────────────────────────────────────────── */
+@layer utilities {
+  /* Section label — newspaper-style uppercase */
+  .label-retro {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+
+  /* Numeric scoreboard feel */
+  .score-display {
+    font-family: var(--font-geist-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+  }
+
+  /* Hide scrollbars */
   .scrollbar-none {
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Retro dashed divider */
+  .divider-retro {
+    border: none;
+    border-top: 1px dashed oklch(1 0 0 / 12%);
+    margin: 0.75rem 0;
+  }
+
+  /* Live pulse ring */
+  .live-ring {
+    box-shadow: 0 0 0 0 oklch(0.62 0.22 25 / 0.7);
+    animation: live-ring 2s infinite;
+  }
+  @keyframes live-ring {
+    0%   { box-shadow: 0 0 0 0 oklch(0.62 0.22 25 / 0.6); }
+    70%  { box-shadow: 0 0 0 6px oklch(0.62 0.22 25 / 0); }
+    100% { box-shadow: 0 0 0 0 oklch(0.62 0.22 25 / 0); }
   }
 }

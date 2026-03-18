@@ -20,79 +20,67 @@ function MatchCard({ match }: { match: BracketMatch }) {
 
   return (
     <div className={cn(
-      'rounded-xl border p-3 space-y-2 transition-all',
-      isLive ? 'border-red-500/50 bg-red-950/20' : 'border-border bg-card'
+      'rounded-lg border overflow-hidden transition-all',
+      isLive ? 'border-red-500/60 shadow-[0_0_12px_oklch(0.62_0.22_25/0.2)]' : 'border-border/60',
     )}>
-      {/* Teams + Score */}
-      <div className="space-y-1.5">
-        {/* Home */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            {match.homeCrest && (
-              <img src={match.homeCrest} alt="" className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
-            )}
-            <span className={cn('text-sm truncate', homeWin ? 'font-bold text-foreground' : 'text-muted-foreground')}>
-              {match.homeTeam}
-            </span>
-          </div>
-          {hasScore ? (
-            <span className={cn('font-mono font-bold text-base tabular-nums', isLive ? 'text-red-300' : 'text-foreground')}>
-              {match.homeScore}
-            </span>
-          ) : (
-            <span className="text-xs text-muted-foreground font-mono">{dateStr} {timeStr}</span>
-          )}
-        </div>
-        {/* Away */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            {match.awayCrest && (
-              <img src={match.awayCrest} alt="" className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
-            )}
-            <span className={cn('text-sm truncate', awayWin ? 'font-bold text-foreground' : 'text-muted-foreground')}>
-              {match.awayTeam}
-            </span>
-          </div>
-          {hasScore && (
-            <span className={cn('font-mono font-bold text-base tabular-nums', isLive ? 'text-red-300' : 'text-foreground')}>
-              {match.awayScore}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Status + comment */}
-      <div className="flex items-start justify-between gap-2 pt-1 border-t border-border/50">
+      {/* Header */}
+      <div className={cn(
+        'flex items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest',
+        isLive ? 'bg-red-600 text-white' : isFinished ? 'bg-white/5 text-muted-foreground' : 'bg-white/3 text-muted-foreground/60'
+      )}>
         {isLive ? (
-          <Badge variant="destructive" className="text-xs h-5">LIVE</Badge>
+          <span className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+            LIVE {match.status === 'PAUSED' ? '— przerwa' : ''}
+          </span>
         ) : isFinished ? (
-          <Badge variant="secondary" className="text-xs h-5">FT</Badge>
+          <span>Pełny czas</span>
         ) : (
-          <Badge variant="outline" className="text-xs h-5">{dateStr}</Badge>
+          <span>{dateStr} · {timeStr}</span>
         )}
-        {match.comment && (
-          <p className="text-xs text-muted-foreground italic leading-relaxed text-right">
-            {match.comment}
-          </p>
-        )}
+        <span className="opacity-60 text-[9px]">UCL</span>
       </div>
-    </div>
-  );
-}
 
-function RoundSection({ round }: { round: BracketRound }) {
-  return (
-    <div>
-      <h3 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
-        <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-        {round.label}
-        <span className="text-xs text-muted-foreground font-normal ml-1">({round.matches.length} meczów)</span>
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-        {round.matches.map((m) => (
-          <MatchCard key={m.id} match={m} />
+      {/* Teams + Score */}
+      <div className="bg-card px-3 py-2.5 space-y-1.5">
+        {[
+          { team: match.homeTeam, crest: match.homeCrest, score: match.homeScore, win: homeWin },
+          { team: match.awayTeam, crest: match.awayCrest, score: match.awayScore, win: awayWin },
+        ].map((side, i) => (
+          <div key={i} className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              {side.crest ? (
+                <img src={side.crest} alt="" className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
+              ) : (
+                <span className="w-5 h-5 rounded-full bg-white/10 flex-shrink-0" />
+              )}
+              <span className={cn(
+                'text-[13px] truncate',
+                side.win ? 'font-bold text-foreground' : 'text-muted-foreground'
+              )}>
+                {side.team}
+              </span>
+            </div>
+            {hasScore && (
+              <span className={cn(
+                'score-display text-xl font-black tabular-nums w-7 text-right flex-shrink-0',
+                isLive ? 'text-red-300' : side.win ? 'text-primary' : 'text-foreground/70'
+              )}>
+                {side.score}
+              </span>
+            )}
+          </div>
         ))}
       </div>
+
+      {/* Editorial comment — fixed: now always renders when present */}
+      {match.comment && (
+        <div className="px-3 pb-2.5 pt-0">
+          <p className="text-[11px] text-muted-foreground/70 italic leading-relaxed border-t border-border/30 pt-2">
+            {match.comment}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -100,44 +88,54 @@ function RoundSection({ round }: { round: BracketRound }) {
 export function UCLBracket() {
   const [rounds, setRounds] = useState<BracketRound[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeRound, setActiveRound] = useState(0);
+  const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => {
     fetch('/api/ucl-bracket')
       .then((r) => r.json())
       .then((d) => {
-        setRounds(d.rounds ?? []);
-        // Default to latest round
-        if (d.rounds?.length > 0) setActiveRound(d.rounds.length - 1);
+        const r: BracketRound[] = d.rounds ?? [];
+        setRounds(r);
+        // Default to latest (most recent) round
+        if (r.length > 0) setActiveIdx(r.length - 1);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
-    return <div className="space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}</div>;
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 w-full" />)}
+      </div>
+    );
   }
 
   if (rounds.length === 0) {
-    return <p className="text-sm text-muted-foreground py-4 text-center">Brak danych UCL — przerwa lub nieznana faza.</p>;
+    return (
+      <div className="py-5 text-center space-y-1">
+        <p className="text-[14px] text-muted-foreground">Brak danych UCL.</p>
+        <p className="text-[12px] text-muted-foreground/50">Przerwa między rundami lub API niedostępne.</p>
+      </div>
+    );
   }
 
-  const current = rounds[activeRound];
+  const current = rounds[activeIdx];
 
   return (
-    <div className="space-y-4">
-      {/* Round tabs */}
+    <div className="space-y-3">
+      {/* Round selector */}
       {rounds.length > 1 && (
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex gap-1.5 flex-wrap">
           {rounds.map((r, i) => (
             <button
               key={r.stage}
-              onClick={() => setActiveRound(i)}
+              onClick={() => setActiveIdx(i)}
               className={cn(
-                'px-3 py-1 text-xs rounded-full font-medium transition-colors',
-                activeRound === i
+                'px-3 py-1 text-[11px] font-bold uppercase tracking-wide rounded transition-all',
+                activeIdx === i
                   ? 'bg-blue-600 text-white'
-                  : 'text-muted-foreground hover:text-foreground border border-border hover:border-foreground/30'
+                  : 'border border-border/50 text-muted-foreground hover:text-foreground hover:border-blue-500/40'
               )}
             >
               {r.label}
@@ -146,7 +144,14 @@ export function UCLBracket() {
         </div>
       )}
 
-      {current && <RoundSection round={current} />}
+      {/* Matches grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {current.matches.map((m) => <MatchCard key={m.id} match={m} />)}
+      </div>
+
+      {current.matches.length === 0 && (
+        <p className="text-[13px] text-muted-foreground py-3 text-center">Brak meczów w tej rundzie.</p>
+      )}
     </div>
   );
 }
