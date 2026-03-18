@@ -112,17 +112,18 @@ export async function getUpcomingFixtures(leagueCode: string, limit = 5): Promis
 
 // ─── MATCH DETAILS (goals, assists) ─────────────────────────────────────────
 // The /matches list endpoint doesn't include goal events.
-// Fetch /matches/{id} for up to 6 matches to stay within rate limits (10 req/min).
+// Fetch /matches/{id} for up to 4 matches to stay within rate limits (10 req/min).
 export async function enrichMatchesWithGoals(matches: Match[]): Promise<Match[]> {
+  try {
   const toEnrich = matches
     .filter((m) => m.status === 'FINISHED' || m.status === 'IN_PLAY' || m.status === 'LIVE' || m.status === 'PAUSED')
     .filter((m) => m.homeScore !== null && m.homeScore + (m.awayScore ?? 0) > 0)
-    .slice(0, 6);
+    .slice(0, 4);
 
   if (toEnrich.length === 0) return matches;
 
   const details = await Promise.allSettled(
-    toEnrich.map((m) => fdFetch(`/matches/${m.id}`, 60))
+    toEnrich.map((m) => fdFetch(`/matches/${m.id}`, m.status === 'FINISHED' ? 3600 : 60))
   );
 
   const goalsMap = new Map<number, MatchGoal[]>();
@@ -145,6 +146,9 @@ export async function enrichMatchesWithGoals(matches: Match[]): Promise<Match[]>
     const goals = goalsMap.get(m.id);
     return goals ? { ...m, goals } : m;
   });
+  } catch {
+    return matches; // fallback: return matches without goals on any error
+  }
 }
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
