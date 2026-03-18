@@ -1,5 +1,6 @@
 import type { Match } from '@/types';
 import { FOOTBALL_DATA_KEY } from '@/config/sources';
+import { getMatchComment } from '@/lib/match-comments';
 
 const BASE = 'https://api.football-data.org/v4';
 const HEADERS = { 'X-Auth-Token': FOOTBALL_DATA_KEY };
@@ -38,16 +39,6 @@ const STAGE_ORDER = ['ROUND_OF_16', 'LAST_16', 'QUARTER_FINALS', 'SEMI_FINALS', 
 function currentSeason(): number {
   const now = new Date();
   return now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
-}
-
-function generateComment(home: string, away: string, hs: number, as_: number): string {
-  const diff = hs - as_;
-  if (diff === 0) return `Remis — wszystko otwarte na rewanż.`;
-  const winner = diff > 0 ? home : away;
-  const loser = diff > 0 ? away : home;
-  if (Math.abs(diff) >= 3) return `${winner} rozkłada ${loser} — rewanż to formalność.`;
-  if (Math.abs(diff) === 2) return `${winner} w dobrej pozycji. ${loser} potrzebuje przełomu.`;
-  return `${winner} jedną nogą dalej, ale ${loser} wciąż żyje.`;
 }
 
 /**
@@ -214,7 +205,7 @@ function mapMatch(m: Record<string, unknown>): BracketMatch {
     status: m.status as Match['status'],
     utcDate: m.utcDate as string,
     comment: isFinished && hs !== null && as_ !== null
-      ? generateComment(home, away, hs, as_)
+      ? getMatchComment(home, away, hs, as_, m.id as number)
       : undefined,
   };
 }

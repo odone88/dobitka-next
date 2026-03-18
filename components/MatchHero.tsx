@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { Match } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getEditorialLine } from '@/lib/match-comments';
 
 const COMP_PRIORITY = ['CL', 'PL', 'PD', 'SA', 'BL1', 'FL1'];
 
@@ -26,24 +27,7 @@ function pickHeroMatch(live: Match[], today: Match[]): Match | null {
 }
 
 function editorialLine(m: Match): string {
-  if (m.status === 'LIVE' || m.status === 'IN_PLAY') {
-    if (m.homeScore === m.awayScore) return 'Remis na żywo — obaj trenerzy nerwowo ruszają ustami.';
-    const leading = m.homeScore! > m.awayScore! ? m.homeTeam : m.awayTeam;
-    const trailing = m.homeScore! > m.awayScore! ? m.awayTeam : m.homeTeam;
-    return `${leading} prowadzi. ${trailing} szuka gola.`;
-  }
-  if (m.status === 'PAUSED') return 'Przerwa. Trenerzy liczą do 45.';
-  if (m.status === 'FINISHED' && m.homeScore !== null) {
-    const diff = m.homeScore! - m.awayScore!;
-    if (diff === 0) return 'Remis. Jeden punkt, mnóstwo niedosytu.';
-    const winner = diff > 0 ? m.homeTeam : m.awayTeam;
-    const loser = diff > 0 ? m.awayTeam : m.homeTeam;
-    if (Math.abs(diff) >= 3) return `${winner} rozjechał ${loser}. Bez dyskusji.`;
-    if (Math.abs(diff) === 2) return `${winner} kontrolował od początku. ${loser} nigdy nie był blisko.`;
-    return `${winner} wygrał po walce. ${loser} mógł mieć więcej.`;
-  }
-  const time = new Date(m.utcDate).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-  return `Dziś o ${time}. To może być mecz dnia.`;
+  return getEditorialLine(m.homeTeam, m.awayTeam, m.homeScore, m.awayScore, m.status, m.utcDate, m.id);
 }
 
 export function MatchHero() {

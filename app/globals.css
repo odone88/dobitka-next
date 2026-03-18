@@ -185,6 +185,12 @@
     margin: 0.75rem 0;
   }
 
+  /* Fade in for tab transitions */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   /* Live pulse ring */
   .live-ring {
     box-shadow: 0 0 0 0 oklch(0.62 0.22 25 / 0.7);

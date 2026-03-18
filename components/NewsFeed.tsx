@@ -100,8 +100,8 @@ export function NewsFeed() {
   const [data, setData] = useState<NewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  // ← Fix: selectedTab is the single source of truth for what tab is shown
   const [selectedTab, setSelectedTab] = useState<TabId>('weszlo');
+  const [fading, setFading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -112,13 +112,22 @@ export function NewsFeed() {
       })
       .then((d: NewsData) => {
         setData(d);
-        // Auto-select first tab that has content, in preferred order
         const first = TAB_ORDER.find((t) => (d[t]?.length ?? 0) > 0);
         if (first) setSelectedTab(first);
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
+
+  function switchTab(tab: TabId) {
+    if (tab === selectedTab) return;
+    setFading(true);
+    // Short fade-out, then switch, then fade-in
+    setTimeout(() => {
+      setSelectedTab(tab);
+      setFading(false);
+    }, 150);
+  }
 
   if (loading) {
     return (
@@ -132,16 +141,13 @@ export function NewsFeed() {
     return <p className="text-[13px] text-muted-foreground py-4 text-center">Błąd ładowania newsów.</p>;
   }
 
-  // Tabs with content only
   const activeTabs = TAB_ORDER.filter((t) => (data[t]?.length ?? 0) > 0);
 
   if (activeTabs.length === 0) {
     return <p className="text-[13px] text-muted-foreground py-4 text-center">Brak newsów — sprawdź za chwilę.</p>;
   }
 
-  // Guarantee selectedTab is valid
   const currentTab: TabId = activeTabs.includes(selectedTab) ? selectedTab : activeTabs[0];
-  // ← This is the items for the SELECTED tab only — no mixing
   const items: NewsItem[] = data[currentTab] ?? [];
 
   return (
@@ -155,9 +161,9 @@ export function NewsFeed() {
             return (
               <button
                 key={t}
-                onClick={() => setSelectedTab(t)}
+                onClick={() => switchTab(t)}
                 className={cn(
-                  'flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded font-bold uppercase tracking-wide transition-all',
+                  'flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded font-bold uppercase tracking-wide transition-all cursor-pointer',
                   isActive
                     ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
@@ -172,8 +178,14 @@ export function NewsFeed() {
         </div>
       )}
 
-      {/* Items — only currentTab */}
-      <div>
+      {/* Items — keyed by currentTab to force remount on switch */}
+      <div
+        key={currentTab}
+        className={cn(
+          'transition-opacity duration-150',
+          fading ? 'opacity-0' : 'opacity-100 animate-[fadeIn_200ms_ease-out]'
+        )}
+      >
         {items.length === 0 ? (
           <EmptyState tab={currentTab} />
         ) : currentTab === 'tifo' ? (
