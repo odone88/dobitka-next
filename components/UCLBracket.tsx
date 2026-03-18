@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import type { BracketRound, BracketMatch } from '@/lib/data-sources/ucl-bracket';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -73,7 +72,7 @@ function MatchCard({ match }: { match: BracketMatch }) {
         ))}
       </div>
 
-      {/* Editorial comment — fixed: now always renders when present */}
+      {/* Editorial comment */}
       {match.comment && (
         <div className="px-3 pb-2.5 pt-0">
           <p className="text-[11px] text-muted-foreground/70 italic leading-relaxed border-t border-border/30 pt-2">
@@ -89,6 +88,7 @@ export function UCLBracket() {
   const [rounds, setRounds] = useState<BracketRound[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [subtitle, setSubtitle] = useState('');
 
   useEffect(() => {
     fetch('/api/ucl-bracket')
@@ -96,8 +96,8 @@ export function UCLBracket() {
       .then((d) => {
         const r: BracketRound[] = d.rounds ?? [];
         setRounds(r);
-        // Default to latest (most recent) round
-        if (r.length > 0) setActiveIdx(r.length - 1);
+        setActiveIdx(d.defaultIdx ?? (r.length > 0 ? r.length - 1 : 0));
+        setSubtitle(d.subtitle ?? '');
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -124,6 +124,11 @@ export function UCLBracket() {
 
   return (
     <div className="space-y-3">
+      {/* Subtitle */}
+      {subtitle && (
+        <p className="text-[12px] text-muted-foreground/80 italic">{subtitle}</p>
+      )}
+
       {/* Round selector */}
       {rounds.length > 1 && (
         <div className="flex gap-1.5 flex-wrap">

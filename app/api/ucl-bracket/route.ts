@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getUCLBracket } from '@/lib/data-sources/ucl-bracket';
 
-export const revalidate = 1800;
+export const revalidate = 300;
 
 export async function GET() {
-  const rounds = await getUCLBracket();
-  return NextResponse.json({ rounds, updatedAt: new Date().toISOString() });
+  const { rounds, defaultIdx, todayTeams, subtitle } = await getUCLBracket();
+  return NextResponse.json({ rounds, defaultIdx, todayTeams, subtitle, updatedAt: new Date().toISOString() });
 }

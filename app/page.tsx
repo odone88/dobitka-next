@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MatchHero } from '@/components/MatchHero';
 import { MatchStrip } from '@/components/MatchStrip';
@@ -10,12 +10,17 @@ import { QuotesSection } from '@/components/QuotesSection';
 import { BirthdayBlock, HistoricalMatchBlock, FactsBlock } from '@/components/DailyBlocks';
 import { LEAGUES } from '@/config/leagues';
 
-function SectionLabel({ emoji, text }: { emoji: string; text: string }) {
+function SectionLabel({ emoji, text, subtitle }: { emoji: string; text: string; subtitle?: string }) {
   return (
-    <div className="flex items-center gap-2 mb-3">
-      <span className="text-lg leading-none">{emoji}</span>
-      <span className="text-[11px] font-black uppercase tracking-[0.14em] text-primary">{text}</span>
-      <span className="flex-1 border-t border-border/30" />
+    <div className="mb-3">
+      <div className="flex items-center gap-2">
+        <span className="text-lg leading-none">{emoji}</span>
+        <span className="text-[11px] font-black uppercase tracking-[0.14em] text-primary">{text}</span>
+        <span className="flex-1 border-t border-border/30" />
+      </div>
+      {subtitle && (
+        <p className="text-[11px] text-muted-foreground/70 italic mt-1 ml-7">{subtitle}</p>
+      )}
     </div>
   );
 }
@@ -75,7 +80,7 @@ export default function HomePage() {
 
             {/* UCL */}
             <section id="ucl">
-              <SectionLabel emoji="🏆" text="Liga Mistrzów UEFA" />
+              <SectionLabel emoji="🏆" text="Liga Mistrzów UEFA" subtitle="Kliknij rundę aby zobaczyć wyniki i terminarz" />
               <Card>
                 <CardContent className="pt-4">
                   <Suspense fallback={<Skel rows={4} />}>
@@ -87,7 +92,7 @@ export default function HomePage() {
 
             {/* League Tables */}
             <section id="tabele">
-              <SectionLabel emoji="📊" text="Tabele Ligowe" />
+              <SectionLabel emoji="📊" text="Tabele Ligowe" subtitle="Top 5 europejskich lig — kliknij NERD by zobaczyć szanse" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {leagues.map((league) => (
                   <Card key={league.code}>
@@ -107,7 +112,7 @@ export default function HomePage() {
 
             {/* Newsy */}
             <section id="newsy">
-              <SectionLabel emoji="📰" text="Newsy" />
+              <SectionLabel emoji="📰" text="Newsy" subtitle="BBC Sport, Guardian, Weszło — co 15 min" />
               <Card>
                 <CardContent className="pt-4">
                   <Suspense fallback={<Skel rows={4} />}>
@@ -119,7 +124,7 @@ export default function HomePage() {
 
             {/* Cytaty dnia */}
             <section>
-              <SectionLabel emoji="💬" text="Cytaty dnia" />
+              <SectionLabel emoji="💬" text="Cytaty dnia" subtitle="Słowa trenerów i legend — kontekstowe w dni meczowe" />
               <Card>
                 <CardContent className="pt-4">
                   <QuotesSection />
@@ -134,7 +139,9 @@ export default function HomePage() {
                 <BirthdayBlock />
                 <Card>
                   <CardContent className="pt-4">
-                    <HistoricalMatchBlock />
+                    <Suspense fallback={<Skel rows={3} />}>
+                      <HistoricalMatchBlock />
+                    </Suspense>
                   </CardContent>
                 </Card>
                 <Card>

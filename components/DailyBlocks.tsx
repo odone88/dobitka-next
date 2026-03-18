@@ -4,7 +4,8 @@
  */
 import { getDailyFacts } from '@/lib/content/facts';
 import { getTodayBirthdays, getAge } from '@/lib/content/birthdays';
-import { getTodayHistoricalMatch, getFallbackHistoricalMatch } from '@/lib/content/historical-matches';
+import { getTodayHistoricalMatch, getFallbackHistoricalMatch, getTeamContextualMatch } from '@/lib/content/historical-matches';
+import { getTodayUCLTeams } from '@/lib/data-sources/ucl-bracket';
 
 function BlockHeader({ emoji, label }: { emoji: string; label: string }) {
   return (
@@ -38,13 +39,38 @@ export function BirthdayBlock() {
   );
 }
 
-export function HistoricalMatchBlock() {
-  const match = getTodayHistoricalMatch() ?? getFallbackHistoricalMatch();
+export async function HistoricalMatchBlock() {
+  // Try UCL-contextual match first
+  let framing: string | null = null;
+  let match = getTodayHistoricalMatch();
+
+  try {
+    const todayTeams = await getTodayUCLTeams();
+    if (todayTeams.length > 0) {
+      const contextual = getTeamContextualMatch(todayTeams);
+      if (contextual) {
+        match = contextual.match;
+        framing = contextual.framing;
+      }
+    }
+  } catch { /* fallback to regular match */ }
+
+  if (!match) match = getFallbackHistoricalMatch();
+
   const hasScore = match.score && match.score !== '';
 
   return (
     <div className="p-3 rounded-lg border border-border/60 bg-white/[0.02]">
-      <BlockHeader emoji="📅" label={match.score ? 'Mecz historyczny' : 'Wydarzenie dnia'} />
+      {framing ? (
+        <div className="mb-2">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-blue-400/80 mb-1">
+            ⚡ Kontekst meczu
+          </p>
+          <p className="text-[12px] text-muted-foreground/90 italic leading-relaxed">{framing}</p>
+        </div>
+      ) : (
+        <BlockHeader emoji="📅" label={match.score ? 'Mecz historyczny' : 'Wydarzenie dnia'} />
+      )}
       <div className="space-y-1.5">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-[12px] font-bold text-primary/80 tabular-nums">{match.year}</span>

@@ -1,7 +1,44 @@
-import { getDailyQuotes } from '@/lib/content/quotes';
+'use client';
+
+import { useEffect, useState } from 'react';
+import type { Quote } from '@/lib/content/quotes';
 
 export function QuotesSection() {
-  const quotes = getDailyQuotes();
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+
+  useEffect(() => {
+    // Fetch UCL data for contextual tags
+    fetch('/api/ucl-bracket')
+      .then((r) => r.json())
+      .then((d) => {
+        const todayTeams: string[] = d.todayTeams ?? [];
+        const priorityTags = todayTeams.length > 0 ? ['ucl', 'rewanz', 'presja'] : [];
+
+        // Import and call getDailyQuotes dynamically to keep it server-safe
+        import('@/lib/content/quotes').then(({ getDailyQuotes }) => {
+          const all = getDailyQuotes(6, priorityTags);
+
+          // Dedup with sessionStorage
+          const seenKey = 'dobitka_seen_quotes';
+          const seen: string[] = JSON.parse(sessionStorage.getItem(seenKey) ?? '[]');
+          const fresh = all.filter((q) => !seen.includes(q.text));
+          const picked = fresh.length >= 4 ? fresh.slice(0, 4) : all.slice(0, 4);
+
+          // Save shown quotes
+          const newSeen = [...seen, ...picked.map((q) => q.text)].slice(-20);
+          sessionStorage.setItem(seenKey, JSON.stringify(newSeen));
+
+          setQuotes(picked);
+        });
+      })
+      .catch(() => {
+        import('@/lib/content/quotes').then(({ getDailyQuotes }) => {
+          setQuotes(getDailyQuotes(4));
+        });
+      });
+  }, []);
+
+  if (quotes.length === 0) return null;
 
   return (
     <div className="space-y-3">
