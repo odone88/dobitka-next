@@ -98,6 +98,7 @@ export function LeagueTable({ leagueCode }: { leagueCode: string }) {
   const total = standings.table.length;
   const visible = showFull ? total : Math.min(10, total);
   const table = standings.table.slice(0, visible);
+  const maxPoints = standings.table[0]?.points ?? 1;
 
   return (
     <div className="space-y-2.5">
@@ -181,7 +182,13 @@ export function LeagueTable({ leagueCode }: { leagueCode: string }) {
                   <td className="py-1.5 text-center text-muted-foreground/70 tabular-nums">
                     {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
                   </td>
-                  <td className="py-1.5 text-center score-display font-black text-[15px] text-foreground">{row.points}</td>
+                  <td className="py-1.5 text-center relative">
+                    <div
+                      className="absolute inset-y-0.5 left-0 bg-primary/[0.07] rounded-r"
+                      style={{ width: `${(row.points / maxPoints) * 100}%` }}
+                    />
+                    <span className="relative score-display font-black text-[15px] text-foreground">{row.points}</span>
+                  </td>
                   <td className="py-1.5 text-center hidden md:table-cell">
                     <FormCell form={row.form} />
                   </td>

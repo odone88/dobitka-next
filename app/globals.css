@@ -85,14 +85,14 @@
 
 .dark {
   /* Base */
-  --background: oklch(0.12 0 0);
+  --background: oklch(0.10 0.005 260);
   --foreground: oklch(0.94 0 0);
 
   /* Cards: slightly lighter than bg */
-  --card: oklch(0.17 0 0);
+  --card: oklch(0.15 0.005 260);
   --card-foreground: oklch(0.94 0 0);
 
-  --popover: oklch(0.17 0 0);
+  --popover: oklch(0.15 0.005 260);
   --popover-foreground: oklch(0.94 0 0);
 
   /* Primary: DOBITKA lime-green — football pitch energy */
@@ -100,22 +100,22 @@
   --primary-foreground: oklch(0.1 0 0);
 
   /* Secondary */
-  --secondary: oklch(0.22 0 0);
+  --secondary: oklch(0.20 0.005 260);
   --secondary-foreground: oklch(0.94 0 0);
 
   /* Muted */
-  --muted: oklch(0.20 0 0);
+  --muted: oklch(0.18 0.005 260);
   --muted-foreground: oklch(0.56 0 0);
 
   /* Accent: amber/gold for highlights */
-  --accent: oklch(0.24 0 0);
+  --accent: oklch(0.22 0.005 260);
   --accent-foreground: oklch(0.94 0 0);
 
   /* Destructive: strong red for live */
   --destructive: oklch(0.62 0.22 25);
 
   /* Borders: visible but not loud */
-  --border: oklch(1 0 0 / 9%);
+  --border: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.78 0.2 140);
 
@@ -127,13 +127,13 @@
   --chart-5: oklch(0.56 0 0);
 
   /* Sidebar */
-  --sidebar: oklch(0.15 0 0);
+  --sidebar: oklch(0.13 0.005 260);
   --sidebar-foreground: oklch(0.94 0 0);
   --sidebar-primary: oklch(0.78 0.2 140);
   --sidebar-primary-foreground: oklch(0.1 0 0);
-  --sidebar-accent: oklch(0.20 0 0);
+  --sidebar-accent: oklch(0.18 0.005 260);
   --sidebar-accent-foreground: oklch(0.94 0 0);
-  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.78 0.2 140);
 }
 
@@ -143,15 +143,17 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-size: 16px;
-    line-height: 1.65;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;
   }
 }
 
-/* ─── DOBITKA RETRO UTILITIES ────────────────────────────────────────── */
+/* ─── DOBITKA UTILITIES ────────────────────────────────────────── */
 @layer utilities {
   /* Section label — newspaper-style uppercase */
   .label-retro {
@@ -181,17 +183,43 @@
   /* Retro dashed divider */
   .divider-retro {
     border: none;
-    border-top: 1px dashed oklch(1 0 0 / 12%);
+    border-top: 1px dashed oklch(1 0 0 / 10%);
     margin: 0.75rem 0;
   }
 
-  /* Fade in for tab transitions */
+  /* Card elevation */
+  .card-elevated {
+    box-shadow:
+      0 1px 3px oklch(0 0 0 / 25%),
+      inset 0 1px 0 oklch(1 0 0 / 3%);
+    transition: box-shadow 200ms ease, transform 200ms ease;
+  }
+  .card-elevated:hover {
+    box-shadow:
+      0 4px 16px oklch(0 0 0 / 35%),
+      inset 0 1px 0 oklch(1 0 0 / 5%);
+    transform: translateY(-1px);
+  }
+
+  /* ─── ANIMATIONS ─────────────────────────────────────────────── */
+
+  /* Fade in for tab/content transitions */
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Live pulse ring */
+  /* Score flash when goal scored */
+  @keyframes scoreFlash {
+    0%   { color: oklch(0.78 0.2 140); transform: scale(1.2); }
+    40%  { color: oklch(0.9 0.25 140); }
+    100% { color: inherit; transform: scale(1); }
+  }
+  .score-just-changed {
+    animation: scoreFlash 900ms ease-out;
+  }
+
+  /* Live pulse ring — outer glow */
   .live-ring {
     box-shadow: 0 0 0 0 oklch(0.62 0.22 25 / 0.7);
     animation: live-ring 2s infinite;
@@ -200,5 +228,20 @@
     0%   { box-shadow: 0 0 0 0 oklch(0.62 0.22 25 / 0.6); }
     70%  { box-shadow: 0 0 0 6px oklch(0.62 0.22 25 / 0); }
     100% { box-shadow: 0 0 0 0 oklch(0.62 0.22 25 / 0); }
+  }
+
+  /* Pulsing border for live cards */
+  @keyframes liveBorder {
+    0%, 100% { border-color: oklch(0.62 0.22 25 / 0.5); }
+    50%      { border-color: oklch(0.62 0.22 25 / 0.15); }
+  }
+  .border-live {
+    animation: liveBorder 3s ease-in-out infinite;
+  }
+
+  /* Smooth slide-in for match rows */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
   }
 }

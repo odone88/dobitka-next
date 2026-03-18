@@ -20,7 +20,7 @@ function MatchCard({ match }: { match: BracketMatch }) {
   return (
     <div className={cn(
       'rounded-lg border overflow-hidden transition-all',
-      isLive ? 'border-red-500/60 shadow-[0_0_12px_oklch(0.62_0.22_25/0.2)]' : 'border-border/60',
+      isLive ? 'border-live border-red-500/60 shadow-[0_0_12px_oklch(0.62_0.22_25/0.2)]' : 'border-border/60',
     )}>
       {/* Header */}
       <div className={cn(
@@ -29,7 +29,10 @@ function MatchCard({ match }: { match: BracketMatch }) {
       )}>
         {isLive ? (
           <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+            </span>
             LIVE {match.status === 'PAUSED' ? '— przerwa' : ''}
           </span>
         ) : isFinished ? (
@@ -72,12 +75,19 @@ function MatchCard({ match }: { match: BracketMatch }) {
         ))}
       </div>
 
-      {/* Editorial comment */}
-      {match.comment && (
-        <div className="px-3 pb-2.5 pt-0">
-          <p className="text-[11px] text-muted-foreground/70 italic leading-relaxed border-t border-border/30 pt-2">
-            {match.comment}
-          </p>
+      {/* Half-time + Editorial comment */}
+      {(match.halfTime || match.comment) && (
+        <div className="px-3 pb-2.5 pt-0 border-t border-border/20">
+          {match.halfTime && (
+            <p className="text-[10px] text-muted-foreground/40 pt-1.5 tabular-nums">
+              Przerwa: {match.halfTime}
+            </p>
+          )}
+          {match.comment && (
+            <p className="text-[11px] text-muted-foreground/60 italic leading-relaxed pt-1">
+              {match.comment}
+            </p>
+          )}
         </div>
       )}
     </div>

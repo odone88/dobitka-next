@@ -1,45 +1,48 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Match } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getEditorialLine } from '@/lib/match-comments';
+import { cn } from '@/lib/utils';
 
 const COMP_PRIORITY = ['CL', 'PL', 'PD', 'SA', 'BL1', 'FL1'];
 
-function pickHeroMatch(live: Match[], today: Match[]): Match | null {
+function pickMatches(live: Match[], today: Match[]): { hero: Match | null; secondary: Match[] } {
   if (live.length > 0) {
-    return [...live].sort((a, b) => {
+    const sorted = [...live].sort((a, b) => {
       const ai = COMP_PRIORITY.indexOf(a.competitionCode);
       const bi = COMP_PRIORITY.indexOf(b.competitionCode);
       return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-    })[0];
+    });
+    return { hero: sorted[0], secondary: sorted.slice(1, 4) };
   }
   const finished = [...today]
     .filter((m) => m.status === 'FINISHED' && m.homeScore !== null)
     .sort((a, b) => (b.homeScore! + b.awayScore!) - (a.homeScore! + a.awayScore!));
-  if (finished.length > 0) return finished[0];
+  if (finished.length > 0) return { hero: finished[0], secondary: [] };
 
   const upcoming = [...today]
     .filter((m) => m.status === 'SCHEDULED' || m.status === 'TIMED')
     .sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime());
-  return upcoming[0] ?? null;
-}
-
-function editorialLine(m: Match): string {
-  return getEditorialLine(m.homeTeam, m.awayTeam, m.homeScore, m.awayScore, m.status, m.utcDate, m.id);
+  return { hero: upcoming[0] ?? null, secondary: [] };
 }
 
 export function MatchHero() {
   const [hero, setHero] = useState<Match | null>(null);
+  const [secondary, setSecondary] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [scoreChanged, setScoreChanged] = useState(false);
+  const prevScoreRef = useRef<string>('');
 
   const fetchData = useCallback(async () => {
     try {
       const res = await fetch('/api/live');
       if (!res.ok) return;
       const d = await res.json();
-      setHero(pickHeroMatch(d.live ?? [], d.today ?? []));
+      const { hero: h, secondary: s } = pickMatches(d.live ?? [], d.today ?? []);
+      setHero(h);
+      setSecondary(s);
     } catch { /* silent */ }
     finally { setLoading(false); }
   }, []);
@@ -50,7 +53,19 @@ export function MatchHero() {
     return () => clearInterval(id);
   }, [fetchData]);
 
-  if (loading) return <Skeleton className="h-32 w-full rounded-xl" />;
+  // Detect score changes for animation
+  useEffect(() => {
+    if (!hero) return;
+    const key = `${hero.homeScore}-${hero.awayScore}`;
+    if (prevScoreRef.current !== '' && prevScoreRef.current !== key) {
+      setScoreChanged(true);
+      const t = setTimeout(() => setScoreChanged(false), 1000);
+      return () => clearTimeout(t);
+    }
+    prevScoreRef.current = key;
+  }, [hero?.homeScore, hero?.awayScore, hero]);
+
+  if (loading) return <Skeleton className="h-36 w-full rounded-xl" />;
   if (!hero) return null;
 
   const isLive = hero.status === 'LIVE' || hero.status === 'IN_PLAY' || hero.status === 'PAUSED';
@@ -60,68 +75,104 @@ export function MatchHero() {
   const awayWin = hasScore && hero.awayScore! > hero.homeScore!;
 
   return (
-    <div className={`relative overflow-hidden rounded-xl border ${
-      isLive
-        ? 'border-red-500/50 bg-gradient-to-br from-red-950/50 via-card to-card'
-        : 'border-border bg-card'
-    }`}>
-      {/* Top strip */}
-      <div className={`flex items-center justify-between px-4 py-2 text-[10px] font-black uppercase tracking-widest ${
-        isLive ? 'bg-red-600 text-white' : 'bg-white/4 text-muted-foreground'
-      }`}>
-        <span className="flex items-center gap-2">
-          {isLive && <span className="w-1.5 h-1.5 rounded-full bg-white live-ring" />}
-          {isLive ? 'NA ŻYWO' : isFinished ? 'WYNIK MECZU' : 'ZAPOWIEDŹ'}
-        </span>
-        <span className="opacity-70">{hero.competition || hero.competitionCode}</span>
-      </div>
-
-      {/* Score area */}
-      <div className="px-4 py-5 flex items-center gap-4">
-        {/* Home */}
-        <div className="flex-1 text-right">
-          <p className={`text-[18px] font-black leading-tight ${homeWin ? 'text-foreground' : 'text-foreground/70'}`}>
-            {hero.homeTeam}
-          </p>
+    <div className="space-y-2">
+      {/* Main hero card */}
+      <div className={cn(
+        'relative overflow-hidden rounded-xl border card-elevated',
+        isLive
+          ? 'border-live border-red-500/50 bg-gradient-to-br from-red-950/40 via-card to-card'
+          : 'border-border bg-card'
+      )}>
+        {/* Top strip */}
+        <div className={cn(
+          'flex items-center justify-between px-4 py-2 text-[10px] font-black uppercase tracking-widest',
+          isLive ? 'bg-red-600 text-white' : 'bg-white/[0.03] text-muted-foreground/60'
+        )}>
+          <span className="flex items-center gap-2">
+            {isLive && (
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+              </span>
+            )}
+            {isLive ? 'Na żywo' : isFinished ? 'Wynik meczu' : 'Zapowiedź'}
+          </span>
+          <span className="opacity-70">{hero.competition || hero.competitionCode}</span>
         </div>
 
-        {/* Score / vs */}
-        <div className="flex-shrink-0 text-center min-w-[100px]">
-          {hasScore ? (
-            <div className={`score-display text-[42px] leading-none font-black tracking-tight ${
-              isLive ? 'text-red-300' : 'text-foreground'
-            }`}>
-              {hero.homeScore}<span className="text-muted-foreground/40 mx-1">–</span>{hero.awayScore}
+        {/* Score area */}
+        <div className="px-4 py-5 flex items-center gap-4">
+          <div className="flex-1 text-right">
+            <p className={cn('text-[18px] font-extrabold leading-tight',
+              homeWin ? 'text-foreground' : 'text-foreground/60')}>
+              {hero.homeTeam}
+            </p>
+          </div>
+
+          <div className="flex-shrink-0 text-center min-w-[100px]">
+            {hasScore ? (
+              <div className={cn(
+                'score-display text-[42px] leading-none font-black tracking-tight',
+                isLive ? 'text-red-300' : 'text-foreground',
+                scoreChanged && 'score-just-changed'
+              )}>
+                {hero.homeScore}<span className="text-muted-foreground/30 mx-1">–</span>{hero.awayScore}
+              </div>
+            ) : (
+              <div>
+                <p className="text-[28px] font-black text-muted-foreground/30">VS</p>
+                <p className="text-[12px] text-muted-foreground/50 score-display mt-0.5">
+                  {new Date(hero.utcDate).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+            )}
+            {isLive && hero.minute && (
+              <p className="text-[13px] font-black text-red-400 score-display mt-1">{hero.minute}&apos;</p>
+            )}
+          </div>
+
+          <div className="flex-1 text-left">
+            <p className={cn('text-[18px] font-extrabold leading-tight',
+              awayWin ? 'text-foreground' : 'text-foreground/60')}>
+              {hero.awayTeam}
+            </p>
+          </div>
+        </div>
+
+        {/* Editorial comment */}
+        <div className="px-4 pb-4 pt-0">
+          <div className="border-t border-border/20 pt-3">
+            <p className="text-[13px] text-muted-foreground/70 italic leading-relaxed">
+              {getEditorialLine(hero.homeTeam, hero.awayTeam, hero.homeScore, hero.awayScore, hero.status, hero.utcDate, hero.id)}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Secondary live matches — mini cards under hero */}
+      {secondary.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto scrollbar-none">
+          {secondary.map((m) => (
+            <div
+              key={m.id}
+              className="flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg
+                         border border-red-500/25 bg-red-950/15 text-[12px]
+                         animate-[fadeIn_300ms_ease-out]"
+            >
+              <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400/60" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-400" />
+              </span>
+              <span className="font-bold text-foreground/80 truncate max-w-[80px]">{m.homeTeam}</span>
+              <span className="score-display text-red-300 font-black">
+                {m.homeScore}–{m.awayScore}
+              </span>
+              <span className="font-bold text-foreground/80 truncate max-w-[80px]">{m.awayTeam}</span>
+              {m.minute && <span className="text-red-400/60 score-display text-[10px]">{m.minute}&apos;</span>}
             </div>
-          ) : (
-            <div>
-              <p className="text-[28px] font-black text-muted-foreground/40">VS</p>
-              <p className="text-[12px] text-muted-foreground/60 score-display mt-0.5">
-                {new Date(hero.utcDate).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-              </p>
-            </div>
-          )}
-          {isLive && hero.minute && (
-            <p className="text-[13px] font-black text-red-400 score-display mt-1">{hero.minute}&apos;</p>
-          )}
+          ))}
         </div>
-
-        {/* Away */}
-        <div className="flex-1 text-left">
-          <p className={`text-[18px] font-black leading-tight ${awayWin ? 'text-foreground' : 'text-foreground/70'}`}>
-            {hero.awayTeam}
-          </p>
-        </div>
-      </div>
-
-      {/* Editorial comment */}
-      <div className="px-4 pb-4 pt-0">
-        <div className="border-t border-border/30 pt-3">
-          <p className="text-[13px] text-muted-foreground italic leading-relaxed">
-            {editorialLine(hero)}
-          </p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

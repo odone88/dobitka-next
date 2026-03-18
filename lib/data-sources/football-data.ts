@@ -33,6 +33,15 @@ export async function getTodayMatches(): Promise<Match[]> {
   }
 }
 
+export async function getMatchesByDate(date: string): Promise<Match[]> {
+  try {
+    const data = await fdFetch(`/matches?dateFrom=${date}&dateTo=${date}`);
+    return mapMatches(data.matches ?? []);
+  } catch {
+    return [];
+  }
+}
+
 // ─── STANDINGS ───────────────────────────────────────────────────────────────
 export async function getStandings(leagueCode: string): Promise<LeagueStandings | null> {
   try {

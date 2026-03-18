@@ -17,6 +17,7 @@ export interface BracketMatch {
   status: Match['status'];
   utcDate: string;
   comment?: string;
+  halfTime?: string;
 }
 
 export interface BracketRound {
@@ -189,6 +190,8 @@ function mapMatches(raw: Record<string, unknown>[]): BracketMatch[] {
 function mapMatch(m: Record<string, unknown>): BracketMatch {
   const hs = ((m.score as Record<string, unknown>)?.fullTime as Record<string, unknown>)?.home as number | null ?? null;
   const as_ = ((m.score as Record<string, unknown>)?.fullTime as Record<string, unknown>)?.away as number | null ?? null;
+  const htHome = ((m.score as Record<string, unknown>)?.halfTime as Record<string, unknown>)?.home as number | null ?? null;
+  const htAway = ((m.score as Record<string, unknown>)?.halfTime as Record<string, unknown>)?.away as number | null ?? null;
   const isFinished = m.status === 'FINISHED';
   const home = ((m.homeTeam as Record<string, unknown>)?.shortName ?? (m.homeTeam as Record<string, unknown>)?.name ?? '?') as string;
   const away = ((m.awayTeam as Record<string, unknown>)?.shortName ?? (m.awayTeam as Record<string, unknown>)?.name ?? '?') as string;
@@ -204,6 +207,7 @@ function mapMatch(m: Record<string, unknown>): BracketMatch {
     awayScore: as_,
     status: m.status as Match['status'],
     utcDate: m.utcDate as string,
+    halfTime: htHome !== null && htAway !== null ? `${htHome}–${htAway}` : undefined,
     comment: isFinished && hs !== null && as_ !== null
       ? getMatchComment(home, away, hs, as_, m.id as number)
       : undefined,

@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MatchHero } from '@/components/MatchHero';
-import { MatchStrip } from '@/components/MatchStrip';
+import { TodayMatches } from '@/components/TodayMatches';
 import { UCLBracket } from '@/components/UCLBracket';
 import { LeagueTable } from '@/components/LeagueTable';
 import { NewsFeed } from '@/components/NewsFeed';
@@ -16,10 +16,10 @@ function SectionLabel({ emoji, text, subtitle }: { emoji: string; text: string; 
       <div className="flex items-center gap-2">
         <span className="text-lg leading-none">{emoji}</span>
         <span className="text-[11px] font-black uppercase tracking-[0.14em] text-primary">{text}</span>
-        <span className="flex-1 border-t border-border/30" />
+        <span className="flex-1 border-t border-border/20" />
       </div>
       {subtitle && (
-        <p className="text-[11px] text-muted-foreground/70 italic mt-1 ml-7">{subtitle}</p>
+        <p className="text-[11px] text-muted-foreground/50 mt-1 ml-7">{subtitle}</p>
       )}
     </div>
   );
@@ -42,45 +42,46 @@ export default function HomePage() {
     <div className="min-h-screen bg-background text-foreground">
 
       {/* ── HEADER ─────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-md">
         <div className="max-w-screen-xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-xl leading-none">⚽</span>
             <span className="font-black text-xl tracking-tight text-primary">DOBITKA</span>
-            <span className="text-[12px] text-muted-foreground/70 hidden sm:block capitalize">{todayStr}</span>
+            <span className="text-[11px] text-muted-foreground/50 hidden sm:block capitalize">{todayStr}</span>
           </div>
-          <nav className="flex items-center gap-4 text-[12px] font-bold uppercase tracking-widest text-muted-foreground/60">
+          <nav className="flex items-center gap-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50">
             <a href="#live"   className="hover:text-primary transition-colors">Live</a>
+            <a href="#mecze"  className="hover:text-primary transition-colors">Mecze</a>
             <a href="#ucl"    className="hover:text-primary transition-colors">UCL</a>
             <a href="#tabele" className="hover:text-primary transition-colors">Tabele</a>
-            <a href="#newsy"  className="hover:text-primary transition-colors">Newsy</a>
           </nav>
         </div>
       </header>
 
-      <main className="max-w-screen-xl mx-auto px-4 py-5 space-y-5">
+      <main className="max-w-screen-xl mx-auto px-4 py-4 space-y-5">
 
         {/* ── HERO MATCH ─────────────────────────────────────────────────── */}
         <section id="live">
-          <Suspense fallback={<Skeleton className="h-32 w-full rounded-xl" />}>
+          <Suspense fallback={<Skeleton className="h-36 w-full rounded-xl" />}>
             <MatchHero />
           </Suspense>
         </section>
 
-        {/* ── TODAY'S MATCHES STRIP ───────────────────────────────────────── */}
-        <Suspense fallback={null}>
-          <MatchStrip />
-        </Suspense>
+        {/* ── TODAY'S MATCHES — the core livescore feature ────────────── */}
+        <section id="mecze">
+          <SectionLabel emoji="📋" text="Mecze" subtitle="Wszystkie mecze dnia — kliknij wynik po szczegóły" />
+          <TodayMatches />
+        </section>
 
         {/* ── MAIN GRID ──────────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
 
-          {/* ─── LEFT COLUMN ─────────────────────────────────────────────── */}
-          <div className="space-y-6 min-w-0">
+          {/* ─── LEFT COLUMN ────────────────────────────── */}
+          <div className="space-y-6 min-w-0 order-2 lg:order-1">
 
             {/* UCL */}
             <section id="ucl">
-              <SectionLabel emoji="🏆" text="Liga Mistrzów UEFA" subtitle="Kliknij rundę aby zobaczyć wyniki i terminarz" />
+              <SectionLabel emoji="🏆" text="Liga Mistrzów UEFA" subtitle="Faza pucharowa — kliknij rundę" />
               <Card>
                 <CardContent className="pt-4">
                   <Suspense fallback={<Skel rows={4} />}>
@@ -92,7 +93,7 @@ export default function HomePage() {
 
             {/* League Tables */}
             <section id="tabele">
-              <SectionLabel emoji="📊" text="Tabele Ligowe" subtitle="Top 5 europejskich lig — kliknij NERD by zobaczyć szanse" />
+              <SectionLabel emoji="📊" text="Tabele Ligowe" subtitle="Top 5 lig — NERD mode pokazuje szanse na tytuł" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {leagues.map((league) => (
                   <Card key={league.code}>
@@ -107,8 +108,8 @@ export default function HomePage() {
             </section>
           </div>
 
-          {/* ─── SIDEBAR ─────────────────────────────────────────────────── */}
-          <aside className="space-y-5">
+          {/* ─── SIDEBAR — shows FIRST on mobile (order-1) ────────────── */}
+          <aside className="space-y-5 order-1 lg:order-2">
 
             {/* Newsy */}
             <section id="newsy">
@@ -124,7 +125,7 @@ export default function HomePage() {
 
             {/* Cytaty dnia */}
             <section>
-              <SectionLabel emoji="💬" text="Cytaty dnia" subtitle="Słowa trenerów i legend — kontekstowe w dni meczowe" />
+              <SectionLabel emoji="💬" text="Cytaty dnia" />
               <Card>
                 <CardContent className="pt-4">
                   <QuotesSection />
@@ -157,13 +158,13 @@ export default function HomePage() {
 
         {/* ── FOOTER ─────────────────────────────────────────────────────── */}
         <div className="divider-retro my-6" />
-        <footer className="text-[11px] text-muted-foreground/40 pb-6 space-y-1">
+        <footer className="text-[11px] text-muted-foreground/30 pb-6 space-y-1">
           <p>
-            <span className="text-muted-foreground/60 font-semibold">Źródła:</span>{' '}
-            football-data.org · TheSportsDB · BBC Sport RSS · The Guardian RSS · YouTube RSS · Weszło.com RSS
+            <span className="text-muted-foreground/50 font-semibold">Źródła:</span>{' '}
+            football-data.org · TheSportsDB · BBC Sport · The Guardian · Weszło.com · Tifo Football
           </p>
           <p>Live: 60s · UCL: 5min · Tabele: 1h · Newsy: 15min</p>
-          <p className="text-primary/40 font-bold uppercase tracking-widest text-[9px]">DOBITKA — codziennie, bezkompromisowo</p>
+          <p className="text-primary/30 font-bold uppercase tracking-widest text-[9px]">DOBITKA — codziennie, bezkompromisowo</p>
         </footer>
       </main>
     </div>
