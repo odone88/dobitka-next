@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import type { Match } from '@/types';
+import type { Match, MatchGoal } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getEditorialLine } from '@/lib/match-comments';
 import { cn } from '@/lib/utils';
 
 const COMP_PRIORITY = ['CL', 'PL', 'PD', 'SA', 'BL1', 'FL1'];
@@ -26,6 +25,24 @@ function pickMatches(live: Match[], today: Match[]): { hero: Match | null; secon
     .filter((m) => m.status === 'SCHEDULED' || m.status === 'TIMED')
     .sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime());
   return { hero: upcoming[0] ?? null, secondary: [] };
+}
+
+function HeroGoalLine({ goals, teamId, isHome }: { goals: MatchGoal[]; teamId: number; isHome: boolean }) {
+  const teamGoals = goals.filter((g) => g.teamId === teamId);
+  if (teamGoals.length === 0) return null;
+  return (
+    <div className={cn('flex flex-col gap-0.5', isHome ? 'items-end' : 'items-start')}>
+      {teamGoals.map((g, i) => (
+        <span key={i} className="text-[11px] text-muted-foreground/60 leading-tight">
+          <span className="text-foreground/70">{g.scorer}</span>
+          <span className="text-muted-foreground/40"> {g.minute}&apos;</span>
+          {g.type === 'PENALTY' && <span className="text-muted-foreground/30"> (k)</span>}
+          {g.type === 'OWN_GOAL' && <span className="text-red-400/50"> (sam.)</span>}
+          {g.assist && <span className="text-muted-foreground/30"> ({g.assist})</span>}
+        </span>
+      ))}
+    </div>
+  );
 }
 
 export function MatchHero() {
@@ -139,14 +156,22 @@ export function MatchHero() {
           </div>
         </div>
 
-        {/* Editorial comment */}
-        <div className="px-4 pb-4 pt-0">
-          <div className="border-t border-border/20 pt-3">
-            <p className="text-[13px] text-muted-foreground/70 italic leading-relaxed">
-              {getEditorialLine(hero.homeTeam, hero.awayTeam, hero.homeScore, hero.awayScore, hero.status, hero.utcDate, hero.id)}
-            </p>
+        {/* Goal scorers */}
+        {hero.goals && hero.goals.length > 0 && (isLive || isFinished) && (
+          <div className="px-4 pb-3 pt-0">
+            <div className="border-t border-border/20 pt-2 grid grid-cols-[1fr_auto_1fr] gap-x-4 items-start">
+              <HeroGoalLine goals={hero.goals} teamId={hero.homeTeamId} isHome={true} />
+              <div />
+              <HeroGoalLine goals={hero.goals} teamId={hero.awayTeamId} isHome={false} />
+            </div>
           </div>
-        </div>
+        )}
+        {/* Half-time */}
+        {hero.halfTime && isFinished && (
+          <div className="px-4 pb-3 pt-0 text-center">
+            <span className="text-[10px] text-muted-foreground/30">Przerwa: {hero.halfTime}</span>
+          </div>
+        )}
       </div>
 
       {/* Secondary live matches — mini cards under hero */}

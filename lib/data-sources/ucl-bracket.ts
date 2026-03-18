@@ -1,6 +1,5 @@
 import type { Match } from '@/types';
 import { FOOTBALL_DATA_KEY } from '@/config/sources';
-import { getMatchComment } from '@/lib/match-comments';
 
 const BASE = 'https://api.football-data.org/v4';
 const HEADERS = { 'X-Auth-Token': FOOTBALL_DATA_KEY };
@@ -16,7 +15,6 @@ export interface BracketMatch {
   awayCrest?: string;
   status: Match['status'];
   utcDate: string;
-  comment?: string;
   halfTime?: string;
 }
 
@@ -192,7 +190,6 @@ function mapMatch(m: Record<string, unknown>): BracketMatch {
   const as_ = ((m.score as Record<string, unknown>)?.fullTime as Record<string, unknown>)?.away as number | null ?? null;
   const htHome = ((m.score as Record<string, unknown>)?.halfTime as Record<string, unknown>)?.home as number | null ?? null;
   const htAway = ((m.score as Record<string, unknown>)?.halfTime as Record<string, unknown>)?.away as number | null ?? null;
-  const isFinished = m.status === 'FINISHED';
   const home = ((m.homeTeam as Record<string, unknown>)?.shortName ?? (m.homeTeam as Record<string, unknown>)?.name ?? '?') as string;
   const away = ((m.awayTeam as Record<string, unknown>)?.shortName ?? (m.awayTeam as Record<string, unknown>)?.name ?? '?') as string;
 
@@ -208,8 +205,5 @@ function mapMatch(m: Record<string, unknown>): BracketMatch {
     status: m.status as Match['status'],
     utcDate: m.utcDate as string,
     halfTime: htHome !== null && htAway !== null ? `${htHome}–${htAway}` : undefined,
-    comment: isFinished && hs !== null && as_ !== null
-      ? getMatchComment(home, away, hs, as_, m.id as number)
-      : undefined,
   };
 }

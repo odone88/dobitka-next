@@ -75,19 +75,12 @@ function MatchCard({ match }: { match: BracketMatch }) {
         ))}
       </div>
 
-      {/* Half-time + Editorial comment */}
-      {(match.halfTime || match.comment) && (
+      {/* Half-time */}
+      {match.halfTime && (
         <div className="px-3 pb-2.5 pt-0 border-t border-border/20">
-          {match.halfTime && (
-            <p className="text-[10px] text-muted-foreground/40 pt-1.5 tabular-nums">
-              Przerwa: {match.halfTime}
-            </p>
-          )}
-          {match.comment && (
-            <p className="text-[11px] text-muted-foreground/60 italic leading-relaxed pt-1">
-              {match.comment}
-            </p>
-          )}
+          <p className="text-[10px] text-muted-foreground/40 pt-1.5 tabular-nums">
+            Przerwa: {match.halfTime}
+          </p>
         </div>
       )}
     </div>
