@@ -47,6 +47,7 @@ export default function HomePage() {
             <a href="#mecze"  className="hover:text-primary transition-colors">Mecze</a>
             <a href="#ucl"    className="hover:text-primary transition-colors">UCL</a>
             <a href="#tabele" className="hover:text-primary transition-colors">Tabele</a>
+            <a href="#newsy"  className="hover:text-primary transition-colors hidden sm:block">Newsy</a>
           </nav>
         </div>
       </header>

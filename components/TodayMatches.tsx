@@ -256,6 +256,12 @@ export function TodayMatches() {
         <div className="flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/35">
           {liveCount > 0 && <span className="text-red-400/80">{liveCount} live</span>}
           <span>{matches.length} meczów</span>
+          {updatedAt && (() => {
+            const ago = Math.round((Date.now() - new Date(updatedAt).getTime()) / 60000);
+            return ago > 5 ? (
+              <span className="text-muted-foreground/25">· dane sprzed {ago} min</span>
+            ) : null;
+          })()}
         </div>
       )}
 
