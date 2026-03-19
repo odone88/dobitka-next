@@ -29,6 +29,40 @@ export const FACTS: string[] = [
   'Pepe grał w reprezentacji Portugalii w wieku 41 lat — jeden z najstarszych obrońców na ME.',
   'Wojciech Szczęsny w dniu debiutu w FC Barcelonie miał 34 lata i był bez klubu od 2 miesięcy.',
   'Lamine Yamal strzelił gola na Euro 2024 mając 17 lat — najmłodszy strzelec w historii Mistrzostw Europy.',
+  // ── Rekordy i statystyki ──────────────────────────────────────────
+  'Real Madryt wygrał Ligę Mistrzów 15 razy — więcej niż jakikolwiek inny klub.',
+  'AC Milan wygrał Serie A 19 razy, ale od 2011 roku ani razu nie obronił tytułu.',
+  'Bramka Justa Fontaine\'a — 13 goli na jednym turnieju MŚ (1958) — to rekord nie do pobicia.',
+  'Dani Alves zdobył 43 trofea w karierze — więcej niż jakikolwiek inny piłkarz w historii.',
+  'Ryan Giggs rozegrał 963 mecze dla jednego klubu (Manchester United) — rekord Premier League.',
+  'Rogério Ceni strzelił ponad 130 bramek jako bramkarz São Paulo FC — rekordzista wśród golkiperów.',
+  'Lev Yashin to jedyny bramkarz w historii, który zdobył Złotą Piłkę (1963).',
+  'Miroslav Klose strzelił 16 bramek na mistrzostwach świata — rekord wszech czasów.',
+  // ── Ciekawostki historyczne ────────────────────────────────────────
+  'Pierwszy mecz w historii piłki nożnej rozegrano w 1872 roku: Szkocja 0:0 Anglia.',
+  'Piłka nożna stała się sportem olimpijskim w 1900 roku w Paryżu.',
+  'Brazylia to jedyny kraj, który grał w każdym turnieju Mistrzostw Świata od 1930 roku.',
+  'Pierwszy Puchar Świata w 1930 roku wygrał Urugwaj — grający u siebie.',
+  'Włochy i Brazylia mają po 5 tytułów mistrza świata — jedyne kraje z takim dorobkiem oprócz 3 tytułów Argentyny i Niemiec.',
+  'Stadion Maracanã pomieścił 199 854 widzów na finale MŚ 1950 — absolutny rekord frekwencji.',
+  'Piłka nożna jest sportem nr 1 w ponad 200 krajach świata.',
+  // ── Transfery i pieniądze ─────────────────────────────────────────
+  'PSG wydało ponad 1,3 mld euro na transfery w latach 2017–2023.',
+  'Jack Grealish kosztował Manchester City 100 mln funtów — najdroższy angielski piłkarz w historii.',
+  'Zinédine Zidane kosztował 77,5 mln euro w 2001 roku — rekord, który przetrwał 8 lat.',
+  'Philippe Coutinho za 160 mln euro do Barcelony (2018) jest uznawany za jeden z najgorszych transferów w historii.',
+  // ── Polskie wątki ─────────────────────────────────────────────────
+  'Grzegorz Lato strzelił 10 bramek na MŚ 1974 i został królem strzelców turnieju.',
+  'Polska zajęła 3. miejsce na MŚ w 1974 i 1982 roku — złota era polskiej piłki.',
+  'Zbigniew Boniek strzelił hat-tricka na MŚ 1982 przeciwko Belgii — jeden z najlepszych występów Polaka w historii.',
+  'Legia Warszawa jest jedynym polskim klubem, który dotarł do półfinału Pucharu Europy (1970).',
+  'Kazimierz Deyna rozegrał 97 meczów w reprezentacji Polski — legendarny kapitan złotej ery.',
+  // ── Taktyka i innowacje ───────────────────────────────────────────
+  'Formacja 4-4-2 dominowała angielską piłkę przez ponad 30 lat, aż Wenger wprowadził 4-2-3-1.',
+  'Catenaccio — włoski system obronny z lat 60. — zmienił podejście do taktyki defensywnej na dekady.',
+  'VAR został wprowadzony na MŚ 2018 w Rosji — pierwsza wielka zmiana technologiczna w historii futbolu.',
+  'Offside trap (pułapka ofsajdowa) została spopularyzowana przez AC Milan Arrigo Sacchiego pod koniec lat 80.',
+  'Gegenpressing Kloppa w Borussii Dortmund zrewolucjonizował pressing w nowoczesnym futbolu.',
 ];
 
 export function getDailyFacts(count = 3): string[] {
