@@ -42,12 +42,12 @@ export default function HomePage() {
             <span className="font-black text-xl tracking-tight text-primary">DOBITKA</span>
             <span className="text-[11px] text-muted-foreground/50 hidden sm:block capitalize">{todayStr}</span>
           </div>
-          <nav className="flex items-center gap-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50">
+          <nav className="flex items-center gap-3 sm:gap-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50">
             <a href="#live"   className="hover:text-primary transition-colors">Live</a>
             <a href="#mecze"  className="hover:text-primary transition-colors">Mecze</a>
             <a href="#ucl"    className="hover:text-primary transition-colors">UCL</a>
-            <a href="#tabele" className="hover:text-primary transition-colors">Tabele</a>
-            <a href="#newsy"  className="hover:text-primary transition-colors hidden sm:block">Newsy</a>
+            <a href="#tabele" className="hover:text-primary transition-colors hidden sm:inline">Tabele</a>
+            <a href="#newsy"  className="hover:text-primary transition-colors">Newsy</a>
           </nav>
         </div>
       </header>

@@ -7,9 +7,25 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "DOBITKA — codzienny przegląd piłki",
-  description: "Twój poranny dashboard piłkarski. Live wyniki, tabele, transfery, newsy — wszystko co ważne w 3 minuty.",
+  description: "Wyniki live, tabele, strzelcy, newsy z BBC/Guardian/Weszło/Reddit — codziennie, bezkompromisowo.",
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>",
+  },
+  openGraph: {
+    title: "DOBITKA — codzienny przegląd piłki",
+    description: "Wyniki live, tabele, strzelcy, newsy z BBC/Guardian/Weszło/Reddit — codziennie, bezkompromisowo.",
+    siteName: "DOBITKA",
+    locale: "pl_PL",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "DOBITKA — codzienny przegląd piłki",
+    description: "Wyniki live, tabele, strzelcy, newsy — codziennie, bezkompromisowo.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

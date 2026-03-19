@@ -193,13 +193,13 @@ function MatchRow({ match }: { match: Match }) {
         </div>
       </div>
 
-      {/* Goal scorers — shown under the match */}
+      {/* Goal scorers — always show if from list API, on-demand only when expanded */}
       {expanded && loadingGoals && (
         <div className="px-3 pb-2 text-center">
           <span className="text-[10px] text-muted-foreground/40">Ładowanie strzelców...</span>
         </div>
       )}
-      {hasGoals && (expanded || (hasGoals && match.goals.length > 0)) && (finished || live) && (
+      {hasGoals && (match.goals.length > 0 || expanded) && (finished || live) && (
         <div className="px-3 pb-2 -mt-0.5 grid grid-cols-[1fr_40px_1fr] gap-x-2 items-start"
              style={{ paddingLeft: 'calc(0.75rem + 2.75rem)' }}>
           <GoalLine goals={goals} teamId={match.homeTeamId} isHome={true} />
