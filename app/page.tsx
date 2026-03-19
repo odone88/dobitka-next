@@ -89,11 +89,11 @@ export default function HomePage() {
             <section id="tabele">
               <SectionLabel text="Tabele ligowe" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {leagues.map((league) => (
+                {leagues.map((league, i) => (
                   <Card key={league.code}>
                     <CardContent className="pt-4">
                       <Suspense fallback={<Skel />}>
-                        <LeagueTable leagueCode={league.code} />
+                        <LeagueTable leagueCode={league.code} delay={i * 8000} />
                       </Suspense>
                     </CardContent>
                   </Card>

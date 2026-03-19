@@ -71,18 +71,21 @@ const LEGEND_ITEMS: { zone: ZoneType; label: string; color: string }[] = [
   { zone: 'rel',     label: 'Spadek',             color: 'bg-red-500' },
 ];
 
-export function LeagueTable({ leagueCode }: { leagueCode: string }) {
+export function LeagueTable({ leagueCode, delay = 0 }: { leagueCode: string; delay?: number }) {
   const [data, setData] = useState<LeagueData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showFull, setShowFull] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/standings/${leagueCode}`)
-      .then((r) => r.json())
-      .then(setData)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [leagueCode]);
+    const t = setTimeout(() => {
+      fetch(`/api/standings/${leagueCode}`)
+        .then((r) => r.json())
+        .then(setData)
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    }, delay);
+    return () => clearTimeout(t);
+  }, [leagueCode, delay]);
 
   const league = getLeague(leagueCode);
 
