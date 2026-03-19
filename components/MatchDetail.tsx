@@ -45,17 +45,17 @@ function ScoreHeader({ match }: { match: MatchDetail }) {
       )}>
         <div className="flex items-center justify-center gap-6 sm:gap-10">
           {/* Home team */}
-          <div className="flex flex-col items-center gap-2 min-w-0 flex-1">
+          <a href={`/team/${match.homeTeamId}`} className="flex flex-col items-center gap-2 min-w-0 flex-1 group">
             {match.homeCrest && (
-              <img src={match.homeCrest} alt={match.homeTeam} className="w-14 h-14 sm:w-16 sm:h-16 object-contain" loading="lazy" />
+              <img src={match.homeCrest} alt={match.homeTeam} className="w-14 h-14 sm:w-16 sm:h-16 object-contain group-hover:scale-105 transition-transform" loading="lazy" />
             )}
             <span className={cn(
-              'text-[14px] sm:text-[16px] font-bold text-center leading-tight',
+              'text-[14px] sm:text-[16px] font-bold text-center leading-tight group-hover:text-primary transition-colors',
               hasScore && match.homeScore! > match.awayScore! ? 'text-foreground' : 'text-foreground/70'
             )}>
               {match.homeTeam}
             </span>
-          </div>
+          </a>
 
           {/* Score / Time */}
           <div className="flex flex-col items-center gap-1">
@@ -100,17 +100,17 @@ function ScoreHeader({ match }: { match: MatchDetail }) {
           </div>
 
           {/* Away team */}
-          <div className="flex flex-col items-center gap-2 min-w-0 flex-1">
+          <a href={`/team/${match.awayTeamId}`} className="flex flex-col items-center gap-2 min-w-0 flex-1 group">
             {match.awayCrest && (
-              <img src={match.awayCrest} alt={match.awayTeam} className="w-14 h-14 sm:w-16 sm:h-16 object-contain" loading="lazy" />
+              <img src={match.awayCrest} alt={match.awayTeam} className="w-14 h-14 sm:w-16 sm:h-16 object-contain group-hover:scale-105 transition-transform" loading="lazy" />
             )}
             <span className={cn(
-              'text-[14px] sm:text-[16px] font-bold text-center leading-tight',
+              'text-[14px] sm:text-[16px] font-bold text-center leading-tight group-hover:text-primary transition-colors',
               hasScore && match.awayScore! > match.homeScore! ? 'text-foreground' : 'text-foreground/70'
             )}>
               {match.awayTeam}
             </span>
-          </div>
+          </a>
         </div>
 
         {/* Date */}
