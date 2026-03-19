@@ -21,9 +21,9 @@ function Crest({ src, name, size = 22 }: { src?: string; name: string; size?: nu
   );
 }
 
-export function MatchHero() {
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [loading, setLoading] = useState(true);
+export function MatchHero({ initialMatches = [] }: { initialMatches?: Match[] }) {
+  const [matches, setMatches] = useState<Match[]>(initialMatches);
+  const [loading, setLoading] = useState(initialMatches.length === 0);
   const [changedIds, setChangedIds] = useState<Set<number>>(new Set());
   const prevScoresRef = useRef<Map<number, string>>(new Map());
 
@@ -38,10 +38,15 @@ export function MatchHero() {
   }, []);
 
   useEffect(() => {
+    // If we have initial data, skip first fetch — just start polling
+    if (initialMatches.length > 0) {
+      const id = setInterval(fetchData, 90_000);
+      return () => clearInterval(id);
+    }
     fetchData();
     const id = setInterval(fetchData, 90_000);
     return () => clearInterval(id);
-  }, [fetchData]);
+  }, [fetchData, initialMatches.length]);
 
   // Score change detection
   useEffect(() => {

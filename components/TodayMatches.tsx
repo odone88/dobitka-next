@@ -275,9 +275,9 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
 }
 
 /* ─── Main Component ─────────────────────────────────────────────── */
-export function TodayMatches() {
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [loading, setLoading] = useState(true);
+export function TodayMatches({ initialMatches = [] }: { initialMatches?: Match[] }) {
+  const [matches, setMatches] = useState<Match[]>(initialMatches);
+  const [loading, setLoading] = useState(initialMatches.length === 0);
   const [timedOut, setTimedOut] = useState(false);
   const [switching, setSwitching] = useState(false);
   const [updatedAt, setUpdatedAt] = useState('');
@@ -305,12 +305,18 @@ export function TodayMatches() {
   }, [loading]);
 
   useEffect(() => {
-    fetchData(selectedDate);
+    // If we have SSR data for today, skip initial fetch — just poll
     const isToday = selectedDate === new Date().toISOString().slice(0, 10);
+    if (initialMatches.length > 0 && isToday && !switching) {
+      const id = setInterval(() => fetchData(selectedDate), 90_000);
+      return () => clearInterval(id);
+    }
+    fetchData(selectedDate);
     if (isToday) {
       const id = setInterval(() => fetchData(selectedDate), 90_000);
       return () => clearInterval(id);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, fetchData]);
 
   function handleDateChange(date: string) {

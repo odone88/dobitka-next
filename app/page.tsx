@@ -13,6 +13,11 @@ import { DobitkaDnia } from '@/components/DobitkaDnia';
 import { HomeClient } from '@/components/HomeClient';
 import { LazySection } from '@/components/LazySection';
 import { LEAGUES } from '@/config/leagues';
+import { getLiveMatches, getTodayMatches } from '@/lib/data-sources/football-data';
+import type { Match } from '@/types';
+
+// Revalidate every 90 seconds (matching live poll interval)
+export const revalidate = 90;
 
 function SectionLabel({ text, id }: { text: string; id?: string }) {
   return (
@@ -31,10 +36,28 @@ const todayStr = new Date().toLocaleDateString('pl-PL', {
   weekday: 'long', day: 'numeric', month: 'long',
 });
 
-export default function HomePage() {
+// Merge live + today matches, dedup by id
+async function fetchInitialMatches(): Promise<Match[]> {
+  try {
+    const [live, today] = await Promise.all([getLiveMatches(), getTodayMatches()]);
+    const seen = new Set<number>();
+    return [...live, ...today].filter((m) => {
+      if (seen.has(m.id)) return false;
+      seen.add(m.id);
+      return true;
+    });
+  } catch {
+    return [];
+  }
+}
+
+export default async function HomePage() {
   const leagueOrder = ['PL', 'PD', 'SA', 'BL1', 'FL1'];
   const leagues = LEAGUES.filter((l) => leagueOrder.includes(l.code))
     .sort((a, b) => leagueOrder.indexOf(a.code) - leagueOrder.indexOf(b.code));
+
+  // Server-side fetch — no skeleton for above-the-fold content
+  const initialMatches = await fetchInitialMatches();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -51,27 +74,24 @@ export default function HomePage() {
             </a>
             <span className="text-[11px] text-muted-foreground/40 hidden sm:block capitalize font-medium">{todayStr}</span>
           </div>
-          {/* Nav + favorites button — client component */}
           <HomeClient />
         </div>
       </header>
 
       <main className="max-w-screen-xl mx-auto px-4 py-4 space-y-5">
 
-        {/* SMART BANNER */}
+        {/* SMART BANNER — SSR with initial data */}
         <section id="live" className="scroll-mt-16">
-          <Suspense fallback={<Skeleton className="h-16 w-full rounded-xl" />}>
-            <MatchHero />
-          </Suspense>
+          <MatchHero initialMatches={initialMatches} />
         </section>
 
-        {/* DOBITKA DNIA — komponent sam sie ukryje gdy brak predykcji */}
+        {/* DOBITKA DNIA */}
         <DobitkaDnia />
 
-        {/* MECZE DNIA */}
+        {/* MECZE DNIA — SSR with initial data */}
         <section id="mecze" className="scroll-mt-16">
           <SectionLabel text="Mecze" />
-          <TodayMatches />
+          <TodayMatches initialMatches={initialMatches} />
         </section>
 
         {/* MAIN GRID */}
@@ -80,7 +100,6 @@ export default function HomePage() {
           {/* LEFT COLUMN */}
           <div className="space-y-6 min-w-0 order-1">
 
-            {/* UCL — lazy load, nie blokuje initial render */}
             <LazySection>
               <section id="ucl" className="scroll-mt-16">
                 <SectionLabel text="Liga Mistrzow" />
@@ -94,7 +113,6 @@ export default function HomePage() {
               </section>
             </LazySection>
 
-            {/* League Tables — lazy load */}
             <LazySection>
               <section id="tabele" className="scroll-mt-16">
                 <SectionLabel text="Tabele ligowe" />
@@ -116,7 +134,6 @@ export default function HomePage() {
           {/* SIDEBAR */}
           <aside className="space-y-5 order-2">
 
-            {/* Newsy — lazy */}
             <LazySection>
               <section id="newsy" className="scroll-mt-16">
                 <SectionLabel text="Newsy" />
@@ -130,7 +147,6 @@ export default function HomePage() {
               </section>
             </LazySection>
 
-            {/* Cytaty — renderuja sie od razu (lekkie, statyczne) */}
             <section>
               <SectionLabel text="Glosy futbolu" />
               <Card>
@@ -140,7 +156,6 @@ export default function HomePage() {
               </Card>
             </section>
 
-            {/* Daily blocks — renderuja sie od razu (server component) */}
             <section>
               <SectionLabel text="Dzis w pilce" />
               <div className="space-y-3">
@@ -166,10 +181,10 @@ export default function HomePage() {
         <footer className="text-[11px] text-muted-foreground/30 pb-6 space-y-1">
           <p>
             <span className="text-muted-foreground/50 font-semibold">Zrodla:</span>{' '}
-            football-data.org · TheSportsDB · BBC Sport · The Guardian · Weszlo.com · Tifo Football
+            football-data.org &middot; TheSportsDB &middot; BBC Sport &middot; The Guardian &middot; Weszlo.com &middot; Tifo Football
           </p>
-          <p>Live: 90s · UCL: 5min · Tabele: 2h · Newsy: 15min</p>
-          <p className="text-primary/30 font-bold uppercase tracking-widest text-[9px]">DOBITKA — codziennie, bezkompromisowo</p>
+          <p>Live: 90s &middot; UCL: 5min &middot; Tabele: 2h &middot; Newsy: 15min</p>
+          <p className="text-primary/30 font-bold uppercase tracking-widest text-[9px]">DOBITKA &mdash; codziennie, bezkompromisowo</p>
         </footer>
       </main>
     </div>
