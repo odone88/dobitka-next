@@ -81,20 +81,58 @@ function GoalLine({ goals, teamId, isHome }: { goals: MatchGoal[]; teamId: numbe
 
 /* ─── Single match row ───────────────────────────────────────────── */
 function MatchRow({ match }: { match: Match }) {
+  const [expanded, setExpanded] = useState(false);
+  const [loadedGoals, setLoadedGoals] = useState<MatchGoal[] | null>(null);
+  const [loadingGoals, setLoadingGoals] = useState(false);
+
   const live = isLive(match);
   const finished = match.status === 'FINISHED';
   const hasScore = match.homeScore !== null && match.awayScore !== null;
   const homeWin = hasScore && match.homeScore! > match.awayScore!;
   const awayWin = hasScore && match.awayScore! > match.homeScore!;
   const time = new Date(match.utcDate).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-  const hasGoals = match.goals.length > 0;
+
+  // Use loaded goals if available, otherwise fall back to inline goals
+  const goals = loadedGoals ?? match.goals;
+  const hasGoals = goals.length > 0;
+
+  // Can expand if match has a score > 0 and goals aren't already visible
+  const canExpand = hasScore && (match.homeScore! + match.awayScore!) > 0 && (finished || live);
+
+  function handleClick() {
+    if (!canExpand) return;
+
+    if (expanded) {
+      setExpanded(false);
+      return;
+    }
+
+    setExpanded(true);
+
+    // If we already have goals (from list API or previous load), just show them
+    if (goals.length > 0) return;
+
+    // Fetch goal details on-demand
+    setLoadingGoals(true);
+    fetch(`/api/match/${match.id}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.goals) setLoadedGoals(data.goals);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingGoals(false));
+  }
 
   return (
-    <div className={cn(
-      'border-b border-border/10 border-l-2',
-      LEAGUE_ACCENT[match.competitionCode] ?? 'border-l-border/20',
-      live && 'bg-red-950/10',
-    )}>
+    <div
+      className={cn(
+        'border-b border-border/10 border-l-2',
+        LEAGUE_ACCENT[match.competitionCode] ?? 'border-l-border/20',
+        live && 'bg-red-950/10',
+        canExpand && 'cursor-pointer',
+      )}
+      onClick={handleClick}
+    >
       {/* Main row */}
       <div className="flex items-center px-3 py-2">
         {/* Time / Status */}
@@ -137,21 +175,36 @@ function MatchRow({ match }: { match: Match }) {
           </span>
         </div>
 
-        {/* HT indicator */}
-        {match.halfTime && finished && (
-          <span className="text-[9px] text-muted-foreground/40 ml-2 flex-shrink-0 hidden sm:block">
-            ({match.halfTime})
-          </span>
-        )}
+        {/* HT indicator + expand hint */}
+        <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+          {match.halfTime && finished && (
+            <span className="text-[9px] text-muted-foreground/40 hidden sm:block">
+              ({match.halfTime})
+            </span>
+          )}
+          {canExpand && !hasGoals && (
+            <span className={cn(
+              'text-[9px] text-muted-foreground/30 transition-transform',
+              expanded ? 'rotate-180' : ''
+            )}>
+              ▾
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Goal scorers — shown under the match */}
-      {hasGoals && (finished || live) && (
+      {expanded && loadingGoals && (
+        <div className="px-3 pb-2 text-center">
+          <span className="text-[10px] text-muted-foreground/40">Ładowanie strzelców...</span>
+        </div>
+      )}
+      {hasGoals && (expanded || (hasGoals && match.goals.length > 0)) && (finished || live) && (
         <div className="px-3 pb-2 -mt-0.5 grid grid-cols-[1fr_40px_1fr] gap-x-2 items-start"
              style={{ paddingLeft: 'calc(0.75rem + 2.75rem)' }}>
-          <GoalLine goals={match.goals} teamId={match.homeTeamId} isHome={true} />
+          <GoalLine goals={goals} teamId={match.homeTeamId} isHome={true} />
           <div />
-          <GoalLine goals={match.goals} teamId={match.awayTeamId} isHome={false} />
+          <GoalLine goals={goals} teamId={match.awayTeamId} isHome={false} />
         </div>
       )}
     </div>

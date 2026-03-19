@@ -151,6 +151,24 @@ export async function enrichMatchesWithGoals(matches: Match[]): Promise<Match[]>
   }
 }
 
+// ─── SINGLE MATCH DETAILS ────────────────────────────────────────────────────
+export async function getMatchDetails(matchId: number): Promise<{ goals: MatchGoal[] } | null> {
+  try {
+    const data = await fdFetch(`/matches/${matchId}`, 300);
+    const goalsRaw = (data.goals as Record<string, unknown>[]) ?? [];
+    const goals: MatchGoal[] = goalsRaw.map((g) => ({
+      minute: (g.minute as number) ?? 0,
+      scorer: ((g.scorer as Record<string, unknown>)?.name as string) ?? 'Nieznany',
+      assist: ((g.assist as Record<string, unknown>)?.name as string) ?? undefined,
+      type: (g.type as MatchGoal['type']) ?? 'REGULAR',
+      teamId: ((g.team as Record<string, unknown>)?.id as number) ?? 0,
+    }));
+    return { goals };
+  } catch {
+    return null;
+  }
+}
+
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 function mapMatches(raw: Record<string, unknown>[]): Match[] {
   return raw.map((m) => {
