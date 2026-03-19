@@ -26,8 +26,7 @@ export async function getLiveMatches(): Promise<Match[]> {
 export async function getTodayMatches(): Promise<Match[]> {
   try {
     const today = new Date().toISOString().slice(0, 10);
-    const data = await fdFetch(`/matches?dateFrom=${today}&dateTo=${today}`, 60);
-    return mapMatches(data.matches ?? []);
+    return await fetchMatchesForDate(today, 60);
   } catch {
     return [];
   }
@@ -35,11 +34,26 @@ export async function getTodayMatches(): Promise<Match[]> {
 
 export async function getMatchesByDate(date: string): Promise<Match[]> {
   try {
-    const data = await fdFetch(`/matches?dateFrom=${date}&dateTo=${date}`, 300);
-    return mapMatches(data.matches ?? []);
+    return await fetchMatchesForDate(date, 300);
   } catch {
     return [];
   }
+}
+
+// football-data.org single-day query (?dateFrom=X&dateTo=X) misses CUP matches.
+// Workaround: fetch a 3-day range and filter to the target date.
+async function fetchMatchesForDate(targetDate: string, cacheSec: number): Promise<Match[]> {
+  const d = new Date(targetDate + 'T12:00:00Z');
+  const prev = new Date(d); prev.setDate(d.getDate() - 1);
+  const next = new Date(d); next.setDate(d.getDate() + 1);
+  const from = prev.toISOString().slice(0, 10);
+  const to = next.toISOString().slice(0, 10);
+
+  const data = await fdFetch(`/matches?dateFrom=${from}&dateTo=${to}`, cacheSec);
+  const all = mapMatches(data.matches ?? []);
+
+  // Filter to only matches on the target date (UTC)
+  return all.filter((m) => m.utcDate.slice(0, 10) === targetDate);
 }
 
 // ─── STANDINGS ───────────────────────────────────────────────────────────────
