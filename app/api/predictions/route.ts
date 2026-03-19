@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { getTodayMatches, getStandings } from '@/lib/data-sources/football-data';
 import type { Match, StandingRow } from '@/types';
 
-export const revalidate = 7200; // 2h — predykcje sie nie zmieniaja
+// Force-dynamic — predykcje zależa od dzisiejszych meczow
+export const dynamic = 'force-dynamic';
 
 interface Prediction {
   matchId: number;
@@ -35,13 +36,18 @@ async function getTeamPositions(): Promise<Map<string, { pos: number; form: stri
     if (result.status !== 'fulfilled' || !result.value) continue;
     const standings = result.value;
     for (const row of standings.table) {
-      map.set(row.teamName, {
+      const entry = {
         pos: row.position,
         form: row.form ?? '',
         goalsFor: row.goalsFor,
         goalsAgainst: row.goalsAgainst,
         league: leagues[i],
-      });
+      };
+      // Indeksuj po pelnej nazwie I shortName (mecze uzywaja shortName)
+      map.set(row.teamName, entry);
+      if (row.teamShortName) {
+        map.set(row.teamShortName, entry);
+      }
     }
   }
 

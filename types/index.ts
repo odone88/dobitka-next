@@ -30,6 +30,7 @@ export interface Match {
 export interface StandingRow {
   position: number;
   teamName: string;
+  teamShortName?: string;
   teamCrest?: string;
   played: number;
   won: number;

@@ -11,6 +11,7 @@ import { HistoricalMatchBlock, FactsBlock } from '@/components/DailyBlocks';
 import { LiveToastContainer } from '@/components/LiveToast';
 import { DobitkaDnia } from '@/components/DobitkaDnia';
 import { HomeClient } from '@/components/HomeClient';
+import { LazySection } from '@/components/LazySection';
 import { LEAGUES } from '@/config/leagues';
 
 function SectionLabel({ text, id }: { text: string; id?: string }) {
@@ -79,51 +80,57 @@ export default function HomePage() {
           {/* LEFT COLUMN */}
           <div className="space-y-6 min-w-0 order-1">
 
-            {/* UCL */}
-            <section id="ucl" className="scroll-mt-16">
-              <SectionLabel text="Liga Mistrzow" />
-              <Card>
-                <CardContent className="pt-4">
-                  <Suspense fallback={<Skel rows={4} />}>
-                    <UCLBracket />
-                  </Suspense>
-                </CardContent>
-              </Card>
-            </section>
+            {/* UCL — lazy load, nie blokuje initial render */}
+            <LazySection>
+              <section id="ucl" className="scroll-mt-16">
+                <SectionLabel text="Liga Mistrzow" />
+                <Card>
+                  <CardContent className="pt-4">
+                    <Suspense fallback={<Skel rows={4} />}>
+                      <UCLBracket />
+                    </Suspense>
+                  </CardContent>
+                </Card>
+              </section>
+            </LazySection>
 
-            {/* League Tables */}
-            <section id="tabele" className="scroll-mt-16">
-              <SectionLabel text="Tabele ligowe" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {leagues.map((league) => (
-                  <Card key={league.code}>
-                    <CardContent className="pt-4">
-                      <Suspense fallback={<Skel />}>
-                        <LeagueTable leagueCode={league.code} />
-                      </Suspense>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </section>
+            {/* League Tables — lazy load */}
+            <LazySection>
+              <section id="tabele" className="scroll-mt-16">
+                <SectionLabel text="Tabele ligowe" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {leagues.map((league) => (
+                    <Card key={league.code}>
+                      <CardContent className="pt-4">
+                        <Suspense fallback={<Skel />}>
+                          <LeagueTable leagueCode={league.code} />
+                        </Suspense>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            </LazySection>
           </div>
 
           {/* SIDEBAR */}
           <aside className="space-y-5 order-2">
 
-            {/* Newsy */}
-            <section id="newsy" className="scroll-mt-16">
-              <SectionLabel text="Newsy" />
-              <Card>
-                <CardContent className="pt-4">
-                  <Suspense fallback={<Skel rows={4} />}>
-                    <NewsFeed />
-                  </Suspense>
-                </CardContent>
-              </Card>
-            </section>
+            {/* Newsy — lazy */}
+            <LazySection>
+              <section id="newsy" className="scroll-mt-16">
+                <SectionLabel text="Newsy" />
+                <Card>
+                  <CardContent className="pt-4">
+                    <Suspense fallback={<Skel rows={4} />}>
+                      <NewsFeed />
+                    </Suspense>
+                  </CardContent>
+                </Card>
+              </section>
+            </LazySection>
 
-            {/* Cytaty */}
+            {/* Cytaty — renderuja sie od razu (lekkie, statyczne) */}
             <section>
               <SectionLabel text="Glosy futbolu" />
               <Card>
@@ -133,7 +140,7 @@ export default function HomePage() {
               </Card>
             </section>
 
-            {/* Daily blocks */}
+            {/* Daily blocks — renderuja sie od razu (server component) */}
             <section>
               <SectionLabel text="Dzis w pilce" />
               <div className="space-y-3">

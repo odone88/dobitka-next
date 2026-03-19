@@ -63,6 +63,7 @@ export async function getStandings(leagueCode: string): Promise<LeagueStandings 
     const table: StandingRow[] = (data.standings?.[0]?.table ?? []).map((row: Record<string, unknown>) => ({
       position: row.position as number,
       teamName: (row.team as Record<string, unknown>)?.name as string,
+      teamShortName: ((row.team as Record<string, unknown>)?.shortName as string) ?? undefined,
       teamCrest: (row.team as Record<string, unknown>)?.crest as string,
       played: row.playedGames as number,
       won: row.won as number,
