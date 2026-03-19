@@ -6,6 +6,7 @@ import { getDailyFacts } from '@/lib/content/facts';
 import { getTodayBirthdays, getAge } from '@/lib/content/birthdays';
 import { getTodayHistoricalMatch, getFallbackHistoricalMatch, getTeamContextualMatch } from '@/lib/content/historical-matches';
 import { getTodayUCLTeams } from '@/lib/data-sources/ucl-bracket';
+import { getOnThisDay } from '@/lib/data-sources/wikipedia';
 
 function BlockHeader({ label }: { label: string }) {
   return (
@@ -93,16 +94,36 @@ export async function HistoricalMatchBlock() {
   );
 }
 
-export function FactsBlock() {
+export async function FactsBlock() {
+  let wikiEvents: { year: number; text: string }[] = [];
+  try {
+    wikiEvents = await getOnThisDay();
+  } catch { /* fallback to static */ }
+
   const facts = getDailyFacts(2);
+
   return (
     <div className="space-y-2">
-      <BlockHeader label="Wiedza dnia" />
-      {facts.map((fact, i) => (
-        <p key={i} className="text-[13px] text-muted-foreground leading-relaxed border-l-2 border-primary/30 pl-3">
-          {fact}
-        </p>
-      ))}
+      {wikiEvents.length > 0 ? (
+        <>
+          <BlockHeader label="Tego dnia w piłce" />
+          {wikiEvents.map((e, i) => (
+            <p key={i} className="text-[13px] text-muted-foreground leading-relaxed border-l-2 border-primary/30 pl-3">
+              <span className="text-primary/70 font-bold tabular-nums">{e.year}</span>{' '}
+              {e.text}
+            </p>
+          ))}
+        </>
+      ) : (
+        <>
+          <BlockHeader label="Wiedza dnia" />
+          {facts.map((fact, i) => (
+            <p key={i} className="text-[13px] text-muted-foreground leading-relaxed border-l-2 border-primary/30 pl-3">
+              {fact}
+            </p>
+          ))}
+        </>
+      )}
     </div>
   );
 }
