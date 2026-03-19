@@ -93,7 +93,7 @@ export default function HomePage() {
                   <Card key={league.code}>
                     <CardContent className="pt-4">
                       <Suspense fallback={<Skel />}>
-                        <LeagueTable leagueCode={league.code} delay={i * 2000} />
+                        <LeagueTable leagueCode={league.code} />
                       </Suspense>
                     </CardContent>
                   </Card>

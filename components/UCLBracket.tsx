@@ -1,92 +1,99 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { BracketRound, BracketMatch } from '@/lib/data-sources/ucl-bracket';
+import type { BracketRound, BracketTie } from '@/lib/data-sources/ucl-bracket';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
-function MatchCard({ match }: { match: BracketMatch }) {
-  const isLive = match.status === 'LIVE' || match.status === 'IN_PLAY' || match.status === 'PAUSED';
-  const isFinished = match.status === 'FINISHED';
-  const hasScore = match.homeScore !== null && match.awayScore !== null;
-
-  const homeWin = hasScore && match.homeScore! > match.awayScore!;
-  const awayWin = hasScore && match.awayScore! > match.homeScore!;
-
-  const date = new Date(match.utcDate);
-  const dateStr = date.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' });
-  const timeStr = date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+/* ─── Single Tie Row ─────────────────────────────────────────────── */
+function TieRow({ tie }: { tie: BracketTie }) {
+  const decided = !!tie.winner;
+  const hasAnyScore = tie.leg1?.homeScore !== null || (tie.leg2 && tie.leg2.homeScore !== null);
 
   return (
     <div className={cn(
-      'rounded-lg border overflow-hidden transition-all',
-      isLive ? 'border-live border-red-500/60 shadow-[0_0_12px_oklch(0.62_0.22_25/0.2)]' : 'border-border/60',
+      'rounded-lg border overflow-hidden',
+      tie.isLive ? 'border-red-500/60 shadow-[0_0_8px_oklch(0.62_0.22_25/0.15)]' : 'border-border/40',
     )}>
-      {/* Header */}
-      <div className={cn(
-        'flex items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest',
-        isLive ? 'bg-red-600 text-white' : isFinished ? 'bg-white/5 text-muted-foreground' : 'bg-white/3 text-muted-foreground/60'
-      )}>
-        {isLive ? (
-          <span className="flex items-center gap-1.5">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
-            </span>
-            LIVE {match.status === 'PAUSED' ? '— przerwa' : ''}
+      {/* Team rows */}
+      {[
+        { team: tie.team1, crest: tie.crest1, agg: tie.agg1, isWinner: tie.winner === tie.team1 },
+        { team: tie.team2, crest: tie.crest2, agg: tie.agg2, isWinner: tie.winner === tie.team2 },
+      ].map((side, i) => (
+        <div
+          key={i}
+          className={cn(
+            'flex items-center gap-2 px-3 py-1.5',
+            i === 0 && 'border-b border-border/20',
+            side.isWinner && 'bg-blue-500/10',
+          )}
+        >
+          {side.crest ? (
+            <img src={side.crest} alt={side.team} className="w-4 h-4 object-contain flex-shrink-0" loading="lazy" />
+          ) : (
+            <span className="w-4 h-4 rounded-full bg-white/10 flex-shrink-0" />
+          )}
+          <span className={cn(
+            'text-[13px] flex-1 truncate',
+            side.isWinner ? 'font-bold text-foreground' : decided ? 'text-muted-foreground' : 'text-foreground/80',
+          )}>
+            {side.team}
           </span>
-        ) : isFinished ? (
-          <span>Pełny czas</span>
-        ) : (
-          <span>{dateStr} · {timeStr}</span>
-        )}
-        <span className="opacity-60 text-[9px]">UCL</span>
-      </div>
+          {hasAnyScore && (
+            <span className={cn(
+              'score-display text-[15px] font-black tabular-nums',
+              tie.isLive ? 'text-red-300' : side.isWinner ? 'text-primary' : 'text-foreground/60',
+            )}>
+              {side.agg}
+            </span>
+          )}
+        </div>
+      ))}
 
-      {/* Teams + Score */}
-      <div className="bg-card px-3 py-2.5 space-y-1.5">
-        {[
-          { team: match.homeTeam, crest: match.homeCrest, score: match.homeScore, win: homeWin },
-          { team: match.awayTeam, crest: match.awayCrest, score: match.awayScore, win: awayWin },
-        ].map((side, i) => (
-          <div key={i} className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0 flex-1">
-              {side.crest ? (
-                <img src={side.crest} alt="" className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
-              ) : (
-                <span className="w-5 h-5 rounded-full bg-white/10 flex-shrink-0" />
-              )}
-              <span className={cn(
-                'text-[13px] truncate',
-                side.win ? 'font-bold text-foreground' : 'text-muted-foreground'
-              )}>
-                {side.team}
+      {/* Leg scores */}
+      {hasAnyScore && (
+        <div className="px-3 py-1 bg-white/[0.02] border-t border-border/20 flex items-center gap-3 text-[10px] text-muted-foreground/50">
+          {tie.leg1 && tie.leg1.homeScore !== null && (
+            <span>
+              Mecz 1: <span className="text-foreground/60 tabular-nums">{tie.leg1.homeScore}–{tie.leg1.awayScore}</span>
+            </span>
+          )}
+          {tie.leg2 && tie.leg2.homeScore !== null && (
+            <span>
+              Mecz 2: <span className="text-foreground/60 tabular-nums">{tie.leg2.homeScore}–{tie.leg2.awayScore}</span>
+            </span>
+          )}
+          {tie.isLive && (
+            <span className="flex items-center gap-1 text-red-400 font-bold uppercase tracking-wider">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400/60" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-400" />
               </span>
-            </div>
-            {hasScore && (
-              <span className={cn(
-                'score-display text-xl font-black tabular-nums w-7 text-right flex-shrink-0',
-                isLive ? 'text-red-300' : side.win ? 'text-primary' : 'text-foreground/70'
-              )}>
-                {side.score}
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Half-time */}
-      {match.halfTime && (
-        <div className="px-3 pb-2.5 pt-0 border-t border-border/20">
-          <p className="text-[10px] text-muted-foreground/40 pt-1.5 tabular-nums">
-            Przerwa: {match.halfTime}
-          </p>
+              Live
+            </span>
+          )}
         </div>
       )}
     </div>
   );
 }
 
+/* ─── Bracket Column ─────────────────────────────────────────────── */
+function BracketColumn({ round, isActive }: { round: BracketRound; isActive: boolean }) {
+  if (!isActive) return null;
+
+  return (
+    <div className="space-y-2">
+      {round.ties.length > 0 ? (
+        round.ties.map((tie, i) => <TieRow key={i} tie={tie} />)
+      ) : (
+        <p className="text-[12px] text-muted-foreground/40 text-center py-3">Brak meczów w tej rundzie</p>
+      )}
+    </div>
+  );
+}
+
+/* ─── Main UCL Bracket ───────────────────────────────────────────── */
 export function UCLBracket() {
   const [rounds, setRounds] = useState<BracketRound[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,8 +115,8 @@ export function UCLBracket() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 w-full" />)}
+      <div className="space-y-2">
+        {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
       </div>
     );
   }
@@ -127,39 +134,52 @@ export function UCLBracket() {
 
   return (
     <div className="space-y-3">
-      {/* Subtitle */}
-      {subtitle && (
-        <p className="text-[12px] text-muted-foreground/80 italic">{subtitle}</p>
-      )}
-
-      {/* Round selector */}
+      {/* Round tabs — styled as bracket progression */}
       {rounds.length > 1 && (
-        <div className="flex gap-1.5 flex-wrap">
-          {rounds.map((r, i) => (
-            <button
-              key={r.stage}
-              onClick={() => setActiveIdx(i)}
-              className={cn(
-                'px-3 py-1 text-[11px] font-bold uppercase tracking-wide rounded transition-all',
-                activeIdx === i
-                  ? 'bg-blue-600 text-white'
-                  : 'border border-border/50 text-muted-foreground hover:text-foreground hover:border-blue-500/40'
-              )}
-            >
-              {r.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-0.5 overflow-x-auto pb-1">
+          {rounds.map((r, i) => {
+            const hasLive = r.ties.some((t) => t.isLive);
+            const allDone = r.ties.length > 0 && r.ties.every((t) => t.winner);
+            return (
+              <button
+                key={r.stage}
+                onClick={() => setActiveIdx(i)}
+                className={cn(
+                  'relative px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide rounded-lg transition-all whitespace-nowrap cursor-pointer',
+                  activeIdx === i
+                    ? 'bg-blue-600 text-white'
+                    : hasLive
+                    ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                    : 'text-muted-foreground/60 hover:text-foreground hover:bg-white/5',
+                  allDone && activeIdx !== i && 'text-muted-foreground/40',
+                )}
+              >
+                {r.label}
+                {hasLive && activeIdx !== i && (
+                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400/60" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-400" />
+                  </span>
+                )}
+              </button>
+            );
+          })}
+          {/* Bracket progression arrows */}
+          {rounds.length > 1 && (
+            <div className="flex-shrink-0 text-[10px] text-muted-foreground/20 px-1 hidden sm:block">
+              → Finał
+            </div>
+          )}
         </div>
       )}
 
-      {/* Matches grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-        {current.matches.map((m) => <MatchCard key={m.id} match={m} />)}
-      </div>
-
-      {current.matches.length === 0 && (
-        <p className="text-[13px] text-muted-foreground py-3 text-center">Brak meczów w tej rundzie.</p>
+      {/* Subtitle */}
+      {subtitle && (
+        <p className="text-[11px] text-muted-foreground/60 italic">{subtitle}</p>
       )}
+
+      {/* Ties */}
+      <BracketColumn round={current} isActive={true} />
     </div>
   );
 }

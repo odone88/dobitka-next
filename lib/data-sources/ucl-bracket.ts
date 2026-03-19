@@ -18,10 +18,24 @@ export interface BracketMatch {
   halfTime?: string;
 }
 
+export interface BracketTie {
+  team1: string;
+  team2: string;
+  crest1?: string;
+  crest2?: string;
+  leg1?: BracketMatch;
+  leg2?: BracketMatch;
+  agg1: number;
+  agg2: number;
+  winner?: string; // team name or undefined if not decided
+  isLive: boolean;
+}
+
 export interface BracketRound {
   stage: string;
   label: string;
   matches: BracketMatch[];
+  ties: BracketTie[];
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -92,8 +106,9 @@ export async function getUCLBracket(): Promise<{ rounds: BracketRound[]; default
         .filter((m) => (m.stage as string) === 'LEAGUE_PHASE')
         .sort((a, b) => new Date(b.utcDate as string).getTime() - new Date(a.utcDate as string).getTime())
         .slice(0, 8);
+      const lpMapped = mapMatches(lp);
       return {
-        rounds: lp.length > 0 ? [{ stage: 'LEAGUE_PHASE', label: 'Faza Ligowa (ostatnie)', matches: mapMatches(lp) }] : [],
+        rounds: lp.length > 0 ? [{ stage: 'LEAGUE_PHASE', label: 'Faza Ligowa (ostatnie)', matches: lpMapped, ties: groupIntoTies(lpMapped, false) }] : [],
         defaultIdx: 0,
         todayTeams: [],
         subtitle: '',
@@ -178,7 +193,68 @@ function groupByStage(matches: Record<string, unknown>[]): BracketRound[] {
   }
   return STAGE_ORDER
     .filter((s) => byStage[s]?.length > 0)
-    .map((s) => ({ stage: s, label: STAGE_LABELS[s] ?? s, matches: byStage[s] }));
+    .map((s) => ({
+      stage: s,
+      label: STAGE_LABELS[s] ?? s,
+      matches: byStage[s],
+      ties: groupIntoTies(byStage[s], s === 'FINAL'),
+    }));
+}
+
+function groupIntoTies(matches: BracketMatch[], isFinal: boolean): BracketTie[] {
+  if (isFinal) {
+    // Final is a single match, not a two-leg tie
+    return matches.map((m) => ({
+      team1: m.homeTeam,
+      team2: m.awayTeam,
+      crest1: m.homeCrest,
+      crest2: m.awayCrest,
+      leg1: m,
+      agg1: m.homeScore ?? 0,
+      agg2: m.awayScore ?? 0,
+      winner: m.status === 'FINISHED'
+        ? (m.homeScore! > m.awayScore! ? m.homeTeam : m.awayScore! > m.homeScore! ? m.awayTeam : undefined)
+        : undefined,
+      isLive: m.status === 'LIVE' || m.status === 'IN_PLAY' || m.status === 'PAUSED',
+    }));
+  }
+
+  // Group by team pair — in a two-leg tie, team A hosts leg 1, team B hosts leg 2
+  const tieMap = new Map<string, BracketMatch[]>();
+  for (const m of matches) {
+    const key = [m.homeTeam, m.awayTeam].sort().join('|');
+    if (!tieMap.has(key)) tieMap.set(key, []);
+    tieMap.get(key)!.push(m);
+  }
+
+  const ties: BracketTie[] = [];
+  for (const [, legs] of tieMap) {
+    legs.sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime());
+    const leg1 = legs[0];
+    const leg2 = legs[1];
+
+    // team1 = home team of leg 1
+    const team1 = leg1.homeTeam;
+    const team2 = leg1.awayTeam;
+    const crest1 = leg1.homeCrest;
+    const crest2 = leg1.awayCrest;
+
+    // Aggregate: team1 scored at home in leg1 + away in leg2
+    const agg1 = (leg1.homeScore ?? 0) + (leg2 ? (leg2.awayScore ?? 0) : 0);
+    const agg2 = (leg1.awayScore ?? 0) + (leg2 ? (leg2.homeScore ?? 0) : 0);
+
+    const bothFinished = leg1.status === 'FINISHED' && (!leg2 || leg2.status === 'FINISHED');
+    const isLive = legs.some((l) => l.status === 'LIVE' || l.status === 'IN_PLAY' || l.status === 'PAUSED');
+
+    let winner: string | undefined;
+    if (bothFinished && leg2) {
+      winner = agg1 > agg2 ? team1 : agg2 > agg1 ? team2 : undefined; // penalties not tracked
+    }
+
+    ties.push({ team1, team2, crest1, crest2, leg1, leg2, agg1, agg2, winner, isLive });
+  }
+
+  return ties;
 }
 
 function mapMatches(raw: Record<string, unknown>[]): BracketMatch[] {
