@@ -109,7 +109,7 @@ function MatchRow({ match }: { match: Match }) {
               {match.minute ? `${match.minute}'` : '•'}
             </span>
           ) : finished ? (
-            <span className="text-[10px] font-bold text-muted-foreground/35">KOŃ</span>
+            <span className="text-[10px] font-bold text-muted-foreground/50">KOŃ</span>
           ) : (
             <span className="text-[11px] score-display text-muted-foreground/50">{time}</span>
           )}
@@ -125,7 +125,7 @@ function MatchRow({ match }: { match: Match }) {
           </span>
           <span className={cn(
             'score-display text-[15px] font-black min-w-[40px] text-center',
-            live ? 'text-red-300' : finished ? 'text-foreground' : 'text-muted-foreground/25'
+            live ? 'text-red-300' : finished ? 'text-foreground' : 'text-muted-foreground/40'
           )}>
             {hasScore ? `${match.homeScore} – ${match.awayScore}` : '–'}
           </span>
@@ -139,7 +139,7 @@ function MatchRow({ match }: { match: Match }) {
 
         {/* HT indicator */}
         {match.halfTime && finished && (
-          <span className="text-[9px] text-muted-foreground/25 ml-2 flex-shrink-0 hidden sm:block">
+          <span className="text-[9px] text-muted-foreground/40 ml-2 flex-shrink-0 hidden sm:block">
             ({match.halfTime})
           </span>
         )}
@@ -259,7 +259,7 @@ export function TodayMatches() {
           {updatedAt && (() => {
             const ago = Math.round((Date.now() - new Date(updatedAt).getTime()) / 60000);
             return ago > 5 ? (
-              <span className="text-muted-foreground/25">· dane sprzed {ago} min</span>
+              <span className="text-muted-foreground/40">· dane sprzed {ago} min</span>
             ) : null;
           })()}
         </div>
@@ -294,7 +294,7 @@ export function TodayMatches() {
                     )}>
                       {league?.name ?? code}
                     </span>
-                    <span className="text-[9px] text-muted-foreground/25 ml-auto tabular-nums">{ms.length}</span>
+                    <span className="text-[9px] text-muted-foreground/40 ml-auto tabular-nums">{ms.length}</span>
                   </div>
 
                   {ms.map((m) => <MatchRow key={m.id} match={m} />)}

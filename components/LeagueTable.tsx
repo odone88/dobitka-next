@@ -208,7 +208,7 @@ export function LeagueTable({ leagueCode }: { leagueCode: string }) {
         <div className="pt-2 border-t border-border/30">
           <p className="label-retro mb-1.5">Strzelcy</p>
           <div className="space-y-1">
-            {scorers.slice(0, 3).map((s, i) => (
+            {scorers.slice(0, 5).map((s, i) => (
               <div key={s.playerName} className="flex items-center gap-2 text-[13px]">
                 <span className="text-[10px] text-muted-foreground/40 w-4 tabular-nums text-right">{i + 1}.</span>
                 <span className="text-foreground flex-1 truncate">{s.playerName}</span>
