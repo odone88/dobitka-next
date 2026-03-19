@@ -11,18 +11,20 @@ interface NewsData {
   guardian: NewsItem[];
   weszlo: NewsItem[];
   tifo: NewsItem[];
+  reddit: NewsItem[];
 }
 
-type TabId = 'bbc' | 'guardian' | 'weszlo' | 'tifo';
+type TabId = 'bbc' | 'guardian' | 'weszlo' | 'tifo' | 'reddit';
 
 const TAB_META: Record<TabId, { label: string; flag: string; color: string }> = {
-  bbc:      { label: 'BBC Sport', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'text-red-400' },
-  guardian: { label: 'Guardian',  flag: '📰',          color: 'text-blue-400' },
   weszlo:   { label: 'Weszło',    flag: '🇵🇱',          color: 'text-amber-400' },
+  reddit:   { label: 'Reddit',    flag: '🔥',          color: 'text-orange-400' },
+  bbc:      { label: 'BBC',       flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'text-red-400' },
+  guardian: { label: 'Guardian',  flag: '📰',          color: 'text-blue-400' },
   tifo:     { label: 'Tifo',      flag: '🎬',           color: 'text-purple-400' },
 };
 
-const TAB_ORDER: TabId[] = ['weszlo', 'bbc', 'guardian', 'tifo'];
+const TAB_ORDER: TabId[] = ['weszlo', 'reddit', 'bbc', 'guardian', 'tifo'];
 
 function ArticleCard({ item }: { item: NewsItem }) {
   const meta = TAB_META[item.source as TabId];
@@ -82,12 +84,51 @@ function TifoCard({ item }: { item: NewsItem }) {
   );
 }
 
+function RedditCard({ item }: { item: NewsItem }) {
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex flex-col gap-1.5 py-3 border-b border-border/30 last:border-0 hover:bg-white/[0.02] -mx-1 px-1 rounded transition-colors"
+    >
+      <p className="text-[14px] leading-snug text-foreground group-hover:text-primary transition-colors font-medium">
+        {item.title}
+      </p>
+      <div className="flex items-center gap-2 mt-0.5">
+        <span className="text-[10px] font-bold uppercase tracking-wide text-orange-400">
+          r/soccer
+        </span>
+        {item.score != null && (
+          <>
+            <span className="text-[11px] text-muted-foreground/50">·</span>
+            <span className="text-[11px] text-orange-300/70 font-bold">{item.score} ▲</span>
+          </>
+        )}
+        {item.comments != null && (
+          <>
+            <span className="text-[11px] text-muted-foreground/50">·</span>
+            <span className="text-[11px] text-muted-foreground/60">{item.comments} komentarzy</span>
+          </>
+        )}
+        {item.description && (
+          <>
+            <span className="text-[11px] text-muted-foreground/50">·</span>
+            <span className="text-[10px] text-muted-foreground/40 uppercase">{item.description}</span>
+          </>
+        )}
+      </div>
+    </a>
+  );
+}
+
 function EmptyState({ tab }: { tab: TabId }) {
   const msgs: Record<TabId, string> = {
     bbc:      'BBC Sport nie odpowiada. Sprawdź za chwilę.',
     guardian: 'Guardian niedostępny. Spróbuj za chwilę.',
     weszlo:   'Weszło niedostępne. Sprawdź za chwilę.',
     tifo:     'Brak nowych wideo Tifo Football.',
+    reddit:   'Reddit niedostępny. Sprawdź za chwilę.',
   };
   return (
     <div className="py-6 text-center">
@@ -190,6 +231,8 @@ export function NewsFeed() {
           <EmptyState tab={currentTab} />
         ) : currentTab === 'tifo' ? (
           items.map((item) => <TifoCard key={item.id} item={item} />)
+        ) : currentTab === 'reddit' ? (
+          items.map((item) => <RedditCard key={item.id} item={item} />)
         ) : (
           items.map((item) => <ArticleCard key={item.id} item={item} />)
         )}

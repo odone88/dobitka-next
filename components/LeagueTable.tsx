@@ -74,7 +74,7 @@ const LEGEND_ITEMS: { zone: ZoneType; label: string; color: string }[] = [
 export function LeagueTable({ leagueCode }: { leagueCode: string }) {
   const [data, setData] = useState<LeagueData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showFull, setShowFull] = useState(false);
+  const [showFull, setShowFull] = useState(true);
 
   useEffect(() => {
     fetch(`/api/standings/${leagueCode}`)
@@ -142,8 +142,13 @@ export function LeagueTable({ leagueCode }: { leagueCode: string }) {
                   <td className="py-1.5 pl-2">
                     <span className="tabular-nums text-muted-foreground/60 w-5 inline-block text-center">{row.position}</span>
                   </td>
-                  <td className="py-1.5 pr-2 max-w-[100px]">
-                    <span className="truncate block text-foreground font-medium leading-tight">{row.teamName}</span>
+                  <td className="py-1.5 pr-2 max-w-[140px]">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {row.teamCrest && (
+                        <img src={row.teamCrest} alt="" className="w-4 h-4 object-contain flex-shrink-0" loading="lazy" />
+                      )}
+                      <span className="truncate text-foreground font-medium leading-tight">{row.teamName}</span>
+                    </div>
                   </td>
                   <td className="py-1.5 text-center text-muted-foreground/70 hidden sm:table-cell">{row.played}</td>
                   <td className="py-1.5 text-center text-emerald-400 font-semibold">{row.won}</td>

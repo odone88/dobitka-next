@@ -7,10 +7,9 @@ import { getTodayBirthdays, getAge } from '@/lib/content/birthdays';
 import { getTodayHistoricalMatch, getFallbackHistoricalMatch, getTeamContextualMatch } from '@/lib/content/historical-matches';
 import { getTodayUCLTeams } from '@/lib/data-sources/ucl-bracket';
 
-function BlockHeader({ emoji, label }: { emoji: string; label: string }) {
+function BlockHeader({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-2 mb-2">
-      <span className="text-base leading-none">{emoji}</span>
+    <div className="mb-2">
       <span className="label-retro text-primary">{label}</span>
     </div>
   );
@@ -22,7 +21,7 @@ export function BirthdayBlock() {
 
   return (
     <div className="p-3 rounded-lg border border-amber-500/25 bg-amber-500/5">
-      <BlockHeader emoji="🎂" label="Urodziny dnia" />
+      <BlockHeader label="Urodziny dnia" />
       <div className="space-y-2">
         {birthdays.map((b) => (
           <div key={b.name}>
@@ -64,12 +63,12 @@ export async function HistoricalMatchBlock() {
       {framing ? (
         <div className="mb-2">
           <p className="text-[11px] font-bold uppercase tracking-widest text-blue-400/80 mb-1">
-            ⚡ Kontekst meczu
+            Kontekst meczu
           </p>
           <p className="text-[12px] text-muted-foreground/90 italic leading-relaxed">{framing}</p>
         </div>
       ) : (
-        <BlockHeader emoji="📅" label={match.score ? 'Mecz historyczny' : 'Wydarzenie dnia'} />
+        <BlockHeader label={match.score ? 'Mecz historyczny' : 'Wydarzenie dnia'} />
       )}
       <div className="space-y-1.5">
         <div className="flex items-center gap-2 flex-wrap">
@@ -98,7 +97,7 @@ export function FactsBlock() {
   const facts = getDailyFacts(2);
   return (
     <div className="space-y-2">
-      <BlockHeader emoji="⚡" label="Wiedza dnia" />
+      <BlockHeader label="Wiedza dnia" />
       {facts.map((fact, i) => (
         <p key={i} className="text-[13px] text-muted-foreground leading-relaxed border-l-2 border-primary/30 pl-3">
           {fact}
