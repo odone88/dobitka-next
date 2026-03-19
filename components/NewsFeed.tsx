@@ -26,6 +26,10 @@ const TAB_META: Record<TabId, { label: string; flag: string; color: string }> = 
 
 const TAB_ORDER: TabId[] = ['weszlo', 'reddit', 'bbc', 'guardian', 'tifo'];
 
+function isRecent(dateStr: string): boolean {
+  return Date.now() - new Date(dateStr).getTime() < 30 * 60 * 1000; // <30 min
+}
+
 function ArticleCard({ item }: { item: NewsItem }) {
   const meta = TAB_META[item.source as TabId];
   return (
@@ -51,6 +55,9 @@ function ArticleCard({ item }: { item: NewsItem }) {
         )}
         <span className="text-[11px] text-muted-foreground/50">·</span>
         <span className="text-[11px] text-muted-foreground/60">{formatDistanceToNow(item.publishedAt)}</span>
+        {isRecent(item.publishedAt) && (
+          <span className="text-[9px] font-black uppercase tracking-wider text-red-400 bg-red-400/10 px-1.5 py-0.5 rounded">NEW</span>
+        )}
       </div>
     </a>
   );

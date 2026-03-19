@@ -271,8 +271,9 @@ export function TodayMatches() {
         switching ? 'opacity-40' : 'opacity-100'
       )}>
         {sortedLeagues.length === 0 ? (
-          <div className="py-8 text-center">
-            <p className="text-[13px] text-muted-foreground/50">Brak meczów na ten dzień.</p>
+          <div className="py-6 text-center space-y-1">
+            <p className="text-[13px] text-muted-foreground/60">Brak meczów na ten dzień.</p>
+            <p className="text-[11px] text-muted-foreground/40">Wybierz inny dzień lub sprawdź sekcję newsów poniżej.</p>
           </div>
         ) : (
           <div className="rounded-xl overflow-hidden border border-border/30 card-elevated">
