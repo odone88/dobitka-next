@@ -3,13 +3,17 @@ interface WikiEvent {
   text: string;
 }
 
+// Strict keywords — avoid false positives like "international", "intervention", city names
 const FOOTBALL_KEYWORDS = [
   'football', 'soccer', 'FIFA', 'UEFA', 'World Cup', 'Champions League',
   'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1',
-  'goal', 'match', 'cup final', 'stadium', 'derby', 'league',
-  'FC ', ' FC', ' CF', 'Real Madrid', 'Barcelona', 'Manchester', 'Liverpool',
-  'Arsenal', 'Chelsea', 'Bayern', 'Juventus', 'Milan', 'Inter',
+  'cup final', 'football stadium', 'football club',
+  'FC ', ' FC', ' CF ',
+  'Real Madrid', 'Manchester United', 'Manchester City', 'Liverpool FC',
+  'Arsenal FC', 'Chelsea FC', 'Bayern Munich', 'Juventus FC', 'AC Milan',
+  'Inter Milan', 'FC Barcelona',
   'Pelé', 'Maradona', 'Messi', 'Ronaldo', 'Beckham', 'Zidane',
+  'goalkeeper', 'footballer', 'penalty kick',
 ];
 
 export async function getOnThisDay(): Promise<WikiEvent[]> {
