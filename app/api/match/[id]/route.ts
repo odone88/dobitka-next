@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getMatchDetails } from '@/lib/data-sources/football-data';
+import { getMatchFull } from '@/lib/data-sources/football-data';
 
 export async function GET(
   _req: Request,
@@ -11,7 +11,7 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid match ID' }, { status: 400 });
   }
 
-  const data = await getMatchDetails(matchId);
+  const data = await getMatchFull(matchId);
   if (!data) {
     return NextResponse.json({ error: 'Match not found' }, { status: 404 });
   }

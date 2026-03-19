@@ -1,4 +1,4 @@
-import type { Match, MatchGoal, StandingRow, LeagueStandings, Scorer } from '@/types';
+import type { Match, MatchGoal, MatchDetail, Referee, H2HData, H2HMatch, StandingRow, LeagueStandings, Scorer } from '@/types';
 import { FOOTBALL_DATA_KEY } from '@/config/sources';
 
 const BASE = 'https://api.football-data.org/v4';
@@ -165,7 +165,7 @@ export async function enrichMatchesWithGoals(matches: Match[]): Promise<Match[]>
   }
 }
 
-// ─── SINGLE MATCH DETAILS ────────────────────────────────────────────────────
+// ─── SINGLE MATCH DETAILS (basic — backwards compat) ────────────────────────
 export async function getMatchDetails(matchId: number): Promise<{ goals: MatchGoal[] } | null> {
   try {
     const data = await fdFetch(`/matches/${matchId}`, 300);
@@ -178,6 +178,98 @@ export async function getMatchDetails(matchId: number): Promise<{ goals: MatchGo
       teamId: ((g.team as Record<string, unknown>)?.id as number) ?? 0,
     }));
     return { goals };
+  } catch {
+    return null;
+  }
+}
+
+// ─── FULL MATCH DETAIL (match detail page) ──────────────────────────────────
+export async function getMatchFull(matchId: number): Promise<MatchDetail | null> {
+  try {
+    const data = await fdFetch(`/matches/${matchId}`, 120);
+
+    const homeTeamObj = data.homeTeam as Record<string, unknown>;
+    const awayTeamObj = data.awayTeam as Record<string, unknown>;
+    const scoreObj = data.score as Record<string, unknown> | undefined;
+    const fullTime = scoreObj?.fullTime as Record<string, unknown> | undefined;
+    const halfTime = scoreObj?.halfTime as Record<string, unknown> | undefined;
+    const compObj = data.competition as Record<string, unknown>;
+
+    const goalsRaw = (data.goals as Record<string, unknown>[]) ?? [];
+    const goals: MatchGoal[] = goalsRaw.map((g) => ({
+      minute: (g.minute as number) ?? 0,
+      scorer: ((g.scorer as Record<string, unknown>)?.name as string) ?? 'Nieznany',
+      assist: ((g.assist as Record<string, unknown>)?.name as string) ?? undefined,
+      type: (g.type as MatchGoal['type']) ?? 'REGULAR',
+      teamId: ((g.team as Record<string, unknown>)?.id as number) ?? 0,
+    }));
+
+    const refereesRaw = (data.referees as Record<string, unknown>[]) ?? [];
+    const referees: Referee[] = refereesRaw.map((r) => ({
+      name: (r.name as string) ?? '',
+      type: (r.type as string) ?? 'REFEREE',
+      nationality: (r.nationality as string) ?? undefined,
+    }));
+
+    const detail: MatchDetail = {
+      id: data.id as number,
+      homeTeam: (homeTeamObj?.shortName as string) ?? (homeTeamObj?.name as string) ?? '',
+      awayTeam: (awayTeamObj?.shortName as string) ?? (awayTeamObj?.name as string) ?? '',
+      homeTeamId: (homeTeamObj?.id as number) ?? 0,
+      awayTeamId: (awayTeamObj?.id as number) ?? 0,
+      homeCrest: (homeTeamObj?.crest as string) ?? undefined,
+      awayCrest: (awayTeamObj?.crest as string) ?? undefined,
+      homeScore: fullTime ? (fullTime.home as number | null) : null,
+      awayScore: fullTime ? (fullTime.away as number | null) : null,
+      halfTimeHome: halfTime ? (halfTime.home as number | null) : null,
+      halfTimeAway: halfTime ? (halfTime.away as number | null) : null,
+      status: data.status as MatchDetail['status'],
+      minute: (data.minute as number) ?? null,
+      utcDate: data.utcDate as string,
+      competition: (compObj?.name as string) ?? '',
+      competitionCode: (compObj?.code as string) ?? '',
+      competitionEmblem: (compObj?.emblem as string) ?? undefined,
+      matchday: (data.matchday as number) ?? undefined,
+      venue: (data.venue as string) ?? undefined,
+      goals,
+      referees,
+    };
+
+    // H2H: pobierz ostatnie spotkania tych druzyn (osobny request)
+    try {
+      const h2hData = await fdFetch(`/matches/${matchId}/head2head?limit=5`, 3600);
+      if (h2hData?.resultSet && h2hData?.matches) {
+        const resultSet = h2hData.resultSet as Record<string, unknown>;
+        const h2hMatches = (h2hData.matches as Record<string, unknown>[]) ?? [];
+
+        const lastMatches: H2HMatch[] = h2hMatches.map((m) => {
+          const ht = m.homeTeam as Record<string, unknown>;
+          const at = m.awayTeam as Record<string, unknown>;
+          const sc = m.score as Record<string, unknown>;
+          const ft = sc?.fullTime as Record<string, unknown>;
+          return {
+            date: m.utcDate as string,
+            homeTeam: (ht?.shortName as string) ?? (ht?.name as string) ?? '',
+            awayTeam: (at?.shortName as string) ?? (at?.name as string) ?? '',
+            homeScore: (ft?.home as number) ?? 0,
+            awayScore: (ft?.away as number) ?? 0,
+            competition: ((m.competition as Record<string, unknown>)?.name as string) ?? '',
+          };
+        });
+
+        detail.head2head = {
+          numberOfMatches: (resultSet.count as number) ?? 0,
+          homeWins: (resultSet.homeTeamWins as number) ?? 0,
+          awayWins: (resultSet.awayTeamWins as number) ?? 0,
+          draws: (resultSet.draws as number) ?? 0,
+          lastMatches,
+        };
+      }
+    } catch {
+      // H2H to bonus — nie blokuj strony jesli sie nie uda
+    }
+
+    return detail;
   } catch {
     return null;
   }

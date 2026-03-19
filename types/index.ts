@@ -122,6 +122,55 @@ export interface DailyFact {
   source?: string;
 }
 
+// ─── MATCH DETAIL ───────────────────────────────────────────────────────────
+export interface MatchDetail {
+  id: number;
+  homeTeam: string;
+  awayTeam: string;
+  homeTeamId: number;
+  awayTeamId: number;
+  homeCrest?: string;
+  awayCrest?: string;
+  homeScore: number | null;
+  awayScore: number | null;
+  halfTimeHome: number | null;
+  halfTimeAway: number | null;
+  status: MatchStatus;
+  minute?: number | null;
+  utcDate: string;
+  competition: string;
+  competitionCode: string;
+  competitionEmblem?: string;
+  matchday?: number;
+  venue?: string;
+  goals: MatchGoal[];
+  referees: Referee[];
+  head2head?: H2HData;
+}
+
+export interface Referee {
+  name: string;
+  type: string;
+  nationality?: string;
+}
+
+export interface H2HData {
+  numberOfMatches: number;
+  homeWins: number;
+  awayWins: number;
+  draws: number;
+  lastMatches: H2HMatch[];
+}
+
+export interface H2HMatch {
+  date: string;
+  homeTeam: string;
+  awayTeam: string;
+  homeScore: number;
+  awayScore: number;
+  competition: string;
+}
+
 // ─── API RESPONSE WRAPPERS ──────────────────────────────────────────────────
 export interface ApiResponse<T> {
   data: T | null;

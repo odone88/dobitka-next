@@ -1,9 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { DM_Serif_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+// Editorial display — nagłówki, tytuły sekcji
+const dmSerif = DM_Serif_Display({
+  weight: '400',
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-display',
+});
+
+// Czytelny body — cały tekst
+const dmSans = DM_Sans({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-sans',
+});
+
+// Precyzyjny mono — wyniki, minuty, dane liczbowe
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+});
 
 export const metadata: Metadata = {
   title: "DOBITKA — codzienny przegląd piłki",
@@ -32,7 +48,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pl" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background min-h-screen`}>
+      <body className={`${dmSerif.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased bg-background min-h-screen`}>
         {children}
       </body>
     </html>
