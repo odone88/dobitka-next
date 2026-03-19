@@ -143,7 +143,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -194,11 +194,13 @@
       inset 0 1px 0 oklch(1 0 0 / 3%);
     transition: box-shadow 200ms ease, transform 200ms ease;
   }
-  .card-elevated:hover {
-    box-shadow:
-      0 4px 16px oklch(0 0 0 / 35%),
-      inset 0 1px 0 oklch(1 0 0 / 5%);
-    transform: translateY(-1px);
+  @media (hover: hover) {
+    .card-elevated:hover {
+      box-shadow:
+        0 4px 16px oklch(0 0 0 / 35%),
+        inset 0 1px 0 oklch(1 0 0 / 5%);
+      transform: translateY(-1px);
+    }
   }
 
   /* ─── ANIMATIONS ─────────────────────────────────────────────── */

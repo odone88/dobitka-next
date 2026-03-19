@@ -74,7 +74,6 @@ const LEGEND_ITEMS: { zone: ZoneType; label: string; color: string }[] = [
 export function LeagueTable({ leagueCode }: { leagueCode: string }) {
   const [data, setData] = useState<LeagueData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showNerd, setShowNerd] = useState(false);
   const [showFull, setShowFull] = useState(false);
 
   useEffect(() => {
@@ -110,18 +109,7 @@ export function LeagueTable({ leagueCode }: { leagueCode: string }) {
             {standings.leagueName}
           </span>
         </div>
-        <button
-          onClick={() => setShowNerd(!showNerd)}
-          title="Tryb z szacunkiem szans"
-          className={cn(
-            'text-[10px] px-2 py-0.5 rounded border font-bold uppercase tracking-widest transition-colors',
-            showNerd
-              ? 'border-primary/60 text-primary bg-primary/10'
-              : 'border-border/50 text-muted-foreground/60 hover:text-muted-foreground hover:border-border'
-          )}
-        >
-          NERD
-        </button>
+        <span className="text-[10px] text-muted-foreground/30 tabular-nums">{standings.season}</span>
       </div>
 
       {/* Table */}
@@ -143,8 +131,6 @@ export function LeagueTable({ leagueCode }: { leagueCode: string }) {
           <tbody>
             {table.map((row) => {
               const zone = getZone(row.position, leagueCode);
-              const insight = insights.titleRace.find((t) => t.teamName === row.teamName);
-
               return (
                 <tr
                   key={row.position}
@@ -158,22 +144,6 @@ export function LeagueTable({ leagueCode }: { leagueCode: string }) {
                   </td>
                   <td className="py-1.5 pr-2 max-w-[100px]">
                     <span className="truncate block text-foreground font-medium leading-tight">{row.teamName}</span>
-                    {showNerd && insight && (
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <div className="w-10 h-1 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className={cn('h-full rounded-full', {
-                              'bg-emerald-500': insight.color === 'green',
-                              'bg-amber-500':   insight.color === 'amber',
-                              'bg-red-500':     insight.color === 'red',
-                              'bg-blue-500':    insight.color === 'blue',
-                            })}
-                            style={{ width: `${insight.probability}%` }}
-                          />
-                        </div>
-                        <span className="text-[9px] text-muted-foreground/50 tabular-nums">{insight.probability}%</span>
-                      </div>
-                    )}
                   </td>
                   <td className="py-1.5 text-center text-muted-foreground/70 hidden sm:table-cell">{row.played}</td>
                   <td className="py-1.5 text-center text-emerald-400 font-semibold">{row.won}</td>

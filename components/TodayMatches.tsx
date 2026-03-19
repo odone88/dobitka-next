@@ -162,7 +162,9 @@ function MatchRow({ match }: { match: Match }) {
 export function TodayMatches() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timedOut, setTimedOut] = useState(false);
   const [switching, setSwitching] = useState(false);
+  const [updatedAt, setUpdatedAt] = useState('');
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
 
   const fetchData = useCallback(async (date: string, isSwitch = false) => {
@@ -172,6 +174,7 @@ export function TodayMatches() {
       if (!res.ok) return;
       const d = await res.json();
       setMatches(d.today ?? []);
+      if (d.updatedAt) setUpdatedAt(d.updatedAt);
     } catch { /* silent */ }
     finally {
       setLoading(false);
@@ -179,11 +182,18 @@ export function TodayMatches() {
     }
   }, []);
 
+  // Timeout: if still loading after 6s, show fallback
+  useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => setTimedOut(true), 6000);
+    return () => clearTimeout(t);
+  }, [loading]);
+
   useEffect(() => {
     fetchData(selectedDate);
     const isToday = selectedDate === new Date().toISOString().slice(0, 10);
     if (isToday) {
-      const id = setInterval(() => fetchData(selectedDate), 60000);
+      const id = setInterval(() => fetchData(selectedDate), 90_000);
       return () => clearInterval(id);
     }
   }, [selectedDate, fetchData]);
@@ -222,9 +232,17 @@ export function TodayMatches() {
     return (
       <div className="space-y-2">
         <DayPicker selected={selectedDate} onChange={handleDateChange} />
-        <div className="space-y-0.5">
-          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-11 w-full" />)}
-        </div>
+        {timedOut ? (
+          <div className="py-6 text-center">
+            <p className="text-[13px] text-muted-foreground/60">Nie udało się załadować meczów.</p>
+            <button onClick={() => { setTimedOut(false); setLoading(true); fetchData(selectedDate); }}
+              className="mt-2 text-[12px] text-primary hover:underline cursor-pointer">Spróbuj ponownie</button>
+          </div>
+        ) : (
+          <div className="space-y-0.5">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-11 w-full" />)}
+          </div>
+        )}
       </div>
     );
   }

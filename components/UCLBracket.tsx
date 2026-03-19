@@ -116,9 +116,9 @@ export function UCLBracket() {
 
   if (rounds.length === 0) {
     return (
-      <div className="py-5 text-center space-y-1">
-        <p className="text-[14px] text-muted-foreground">Brak danych UCL.</p>
-        <p className="text-[12px] text-muted-foreground/50">Przerwa między rundami lub API niedostępne.</p>
+      <div className="py-6 text-center space-y-1.5">
+        <p className="text-[14px] text-muted-foreground">Przerwa w rozgrywkach Ligi Mistrzów</p>
+        <p className="text-[12px] text-muted-foreground/40">Następna runda wkrótce — dane pojawią się automatycznie.</p>
       </div>
     );
   }

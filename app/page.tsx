@@ -7,20 +7,14 @@ import { UCLBracket } from '@/components/UCLBracket';
 import { LeagueTable } from '@/components/LeagueTable';
 import { NewsFeed } from '@/components/NewsFeed';
 import { QuotesSection } from '@/components/QuotesSection';
-import { BirthdayBlock, HistoricalMatchBlock, FactsBlock } from '@/components/DailyBlocks';
+import { HistoricalMatchBlock, FactsBlock } from '@/components/DailyBlocks';
 import { LEAGUES } from '@/config/leagues';
 
-function SectionLabel({ emoji, text, subtitle }: { emoji: string; text: string; subtitle?: string }) {
+function SectionLabel({ text }: { text: string }) {
   return (
-    <div className="mb-3">
-      <div className="flex items-center gap-2">
-        <span className="text-lg leading-none">{emoji}</span>
-        <span className="text-[11px] font-black uppercase tracking-[0.14em] text-primary">{text}</span>
-        <span className="flex-1 border-t border-border/20" />
-      </div>
-      {subtitle && (
-        <p className="text-[11px] text-muted-foreground/50 mt-1 ml-7">{subtitle}</p>
-      )}
+    <div className="mb-3 flex items-center gap-3">
+      <span className="text-[11px] font-black uppercase tracking-[0.14em] text-primary">{text}</span>
+      <span className="flex-1 border-t border-border/20" />
     </div>
   );
 }
@@ -41,11 +35,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
 
-      {/* ── HEADER ─────────────────────────────────────────────────────── */}
+      {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-md">
         <div className="max-w-screen-xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-xl leading-none">⚽</span>
             <span className="font-black text-xl tracking-tight text-primary">DOBITKA</span>
             <span className="text-[11px] text-muted-foreground/50 hidden sm:block capitalize">{todayStr}</span>
           </div>
@@ -60,28 +53,28 @@ export default function HomePage() {
 
       <main className="max-w-screen-xl mx-auto px-4 py-4 space-y-5">
 
-        {/* ── HERO MATCH ─────────────────────────────────────────────────── */}
+        {/* SMART BANNER */}
         <section id="live">
-          <Suspense fallback={<Skeleton className="h-36 w-full rounded-xl" />}>
+          <Suspense fallback={<Skeleton className="h-14 w-full rounded-xl" />}>
             <MatchHero />
           </Suspense>
         </section>
 
-        {/* ── TODAY'S MATCHES — the core livescore feature ────────────── */}
+        {/* MECZE DNIA */}
         <section id="mecze">
-          <SectionLabel emoji="📋" text="Mecze" subtitle="Wszystkie mecze dnia — kliknij wynik po szczegóły" />
+          <SectionLabel text="Mecze" />
           <TodayMatches />
         </section>
 
-        {/* ── MAIN GRID ──────────────────────────────────────────────────── */}
+        {/* MAIN GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
 
-          {/* ─── LEFT COLUMN ────────────────────────────── */}
+          {/* LEFT COLUMN */}
           <div className="space-y-6 min-w-0 order-2 lg:order-1">
 
             {/* UCL */}
             <section id="ucl">
-              <SectionLabel emoji="🏆" text="Liga Mistrzów UEFA" subtitle="Faza pucharowa — kliknij rundę" />
+              <SectionLabel text="Liga Mistrzów" />
               <Card>
                 <CardContent className="pt-4">
                   <Suspense fallback={<Skel rows={4} />}>
@@ -93,7 +86,7 @@ export default function HomePage() {
 
             {/* League Tables */}
             <section id="tabele">
-              <SectionLabel emoji="📊" text="Tabele Ligowe" subtitle="Top 5 lig — NERD mode pokazuje szanse na tytuł" />
+              <SectionLabel text="Tabele ligowe" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {leagues.map((league) => (
                   <Card key={league.code}>
@@ -108,12 +101,12 @@ export default function HomePage() {
             </section>
           </div>
 
-          {/* ─── SIDEBAR — shows FIRST on mobile (order-1) ────────────── */}
+          {/* SIDEBAR — first on mobile */}
           <aside className="space-y-5 order-1 lg:order-2">
 
             {/* Newsy */}
             <section id="newsy">
-              <SectionLabel emoji="📰" text="Newsy" subtitle="BBC Sport, Guardian, Weszło — co 15 min" />
+              <SectionLabel text="Newsy" />
               <Card>
                 <CardContent className="pt-4">
                   <Suspense fallback={<Skel rows={4} />}>
@@ -125,7 +118,7 @@ export default function HomePage() {
 
             {/* Cytaty dnia */}
             <section>
-              <SectionLabel emoji="💬" text="Cytaty dnia" />
+              <SectionLabel text="Cytaty dnia" />
               <Card>
                 <CardContent className="pt-4">
                   <QuotesSection />
@@ -133,11 +126,10 @@ export default function HomePage() {
               </Card>
             </section>
 
-            {/* Daily retention blocks */}
+            {/* Daily blocks */}
             <section>
-              <SectionLabel emoji="⚡" text="Dziś w piłce" />
+              <SectionLabel text="Dziś w piłce" />
               <div className="space-y-3">
-                <BirthdayBlock />
                 <Card>
                   <CardContent className="pt-4">
                     <Suspense fallback={<Skel rows={3} />}>
@@ -156,14 +148,14 @@ export default function HomePage() {
           </aside>
         </div>
 
-        {/* ── FOOTER ─────────────────────────────────────────────────────── */}
+        {/* FOOTER */}
         <div className="divider-retro my-6" />
         <footer className="text-[11px] text-muted-foreground/30 pb-6 space-y-1">
           <p>
             <span className="text-muted-foreground/50 font-semibold">Źródła:</span>{' '}
             football-data.org · TheSportsDB · BBC Sport · The Guardian · Weszło.com · Tifo Football
           </p>
-          <p>Live: 60s · UCL: 5min · Tabele: 1h · Newsy: 15min</p>
+          <p>Live: 90s · UCL: 5min · Tabele: 2h · Newsy: 15min</p>
           <p className="text-primary/30 font-bold uppercase tracking-widest text-[9px]">DOBITKA — codziennie, bezkompromisowo</p>
         </footer>
       </main>
