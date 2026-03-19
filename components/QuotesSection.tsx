@@ -18,15 +18,18 @@ export function QuotesSection() {
         import('@/lib/content/quotes').then(({ getDailyQuotes }) => {
           const all = getDailyQuotes(6, priorityTags);
 
-          // Dedup with sessionStorage
+          // Dedup with sessionStorage (try-catch for private/restricted mode)
+          let seen: string[] = [];
           const seenKey = 'dobitka_seen_quotes';
-          const seen: string[] = JSON.parse(sessionStorage.getItem(seenKey) ?? '[]');
+          try { seen = JSON.parse(sessionStorage.getItem(seenKey) ?? '[]'); } catch {}
           const fresh = all.filter((q) => !seen.includes(q.text));
           const picked = fresh.length >= 4 ? fresh.slice(0, 4) : all.slice(0, 4);
 
           // Save shown quotes
-          const newSeen = [...seen, ...picked.map((q) => q.text)].slice(-20);
-          sessionStorage.setItem(seenKey, JSON.stringify(newSeen));
+          try {
+            const newSeen = [...seen, ...picked.map((q) => q.text)].slice(-20);
+            sessionStorage.setItem(seenKey, JSON.stringify(newSeen));
+          } catch {}
 
           setQuotes(picked);
         });

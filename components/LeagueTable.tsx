@@ -148,7 +148,7 @@ export function LeagueTable({ leagueCode, delay = 0 }: { leagueCode: string; del
                   <td className="py-1.5 pr-2 max-w-[140px]">
                     <div className="flex items-center gap-1.5 min-w-0">
                       {row.teamCrest && (
-                        <img src={row.teamCrest} alt="" className="w-4 h-4 object-contain flex-shrink-0" loading="lazy" />
+                        <img src={row.teamCrest} alt={row.teamName} className="w-4 h-4 object-contain flex-shrink-0" loading="lazy" />
                       )}
                       <span className="truncate text-foreground font-medium leading-tight">{row.teamName}</span>
                     </div>

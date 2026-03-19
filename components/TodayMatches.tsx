@@ -126,10 +126,10 @@ function MatchRow({ match }: { match: Match }) {
   return (
     <div
       className={cn(
-        'border-b border-border/10 border-l-2',
+        'border-b border-border/10 border-l-2 transition-colors',
         LEAGUE_ACCENT[match.competitionCode] ?? 'border-l-border/20',
         live && 'bg-red-950/10',
-        canExpand && 'cursor-pointer',
+        canExpand && 'cursor-pointer hover:bg-white/[0.03]',
       )}
       onClick={handleClick}
     >

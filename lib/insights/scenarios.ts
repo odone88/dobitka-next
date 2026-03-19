@@ -73,7 +73,7 @@ export function computeInsights(
   // Relegation zone: bottom 3 (or bottom 2 for smaller leagues)
   const n = rows.length;
   const relegZone = 3;
-  const safeTeam = rows[n - relegZone - 1];
+  const safeTeam = rows[Math.max(0, n - relegZone - 1)];
   const relegCandidates = rows.slice(Math.max(0, n - relegZone - 2));
   const relegScores = relegCandidates.map((r) => {
     const gap = safeTeam ? safeTeam.points - r.points : 0;
@@ -92,7 +92,8 @@ export function computeInsights(
   const euroRange = rows.slice(1, 6);
   const euroInsights: ScenarioInsight[] = euroRange.map((r, i) => {
     const targetPos = i < 3 ? 4 : 6; // UCL top 4, UEL top 6
-    const gap = rows[targetPos - 1]?.points ?? r.points;
+    const safeIdx = Math.min(targetPos - 1, rows.length - 1);
+    const gap = rows[safeIdx]?.points ?? r.points;
     const diff = r.points - gap;
     const prob = Math.round(logistic(diff * 1.5 + formPoints(r.form ?? '') * 0.3) * 100);
     return {

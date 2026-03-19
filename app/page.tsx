@@ -12,10 +12,10 @@ import { LEAGUES } from '@/config/leagues';
 
 function SectionLabel({ text }: { text: string }) {
   return (
-    <div className="mb-3 flex items-center gap-3">
+    <h2 className="mb-3 flex items-center gap-3">
       <span className="text-[11px] font-black uppercase tracking-[0.14em] text-primary">{text}</span>
-      <span className="flex-1 border-t border-border/20" />
-    </div>
+      <span className="flex-1 border-t border-border/20" aria-hidden="true" />
+    </h2>
   );
 }
 
@@ -39,10 +39,10 @@ export default function HomePage() {
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-md">
         <div className="max-w-screen-xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="font-black text-xl tracking-tight text-primary">DOBITKA</span>
+            <h1 className="font-black text-xl tracking-tight text-primary">DOBITKA</h1>
             <span className="text-[11px] text-muted-foreground/50 hidden sm:block capitalize">{todayStr}</span>
           </div>
-          <nav className="flex items-center gap-3 sm:gap-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50">
+          <nav aria-label="Nawigacja główna" className="flex items-center gap-3 sm:gap-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50">
             <a href="#live"   className="hover:text-primary transition-colors">Live</a>
             <a href="#mecze"  className="hover:text-primary transition-colors">Mecze</a>
             <a href="#ucl"    className="hover:text-primary transition-colors">UCL</a>
@@ -70,8 +70,8 @@ export default function HomePage() {
         {/* MAIN GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
 
-          {/* LEFT COLUMN */}
-          <div className="space-y-6 min-w-0 order-2 lg:order-1">
+          {/* LEFT COLUMN — UCL + tables (first on mobile, first on desktop) */}
+          <div className="space-y-6 min-w-0 order-1 lg:order-1">
 
             {/* UCL */}
             <section id="ucl">
@@ -93,7 +93,7 @@ export default function HomePage() {
                   <Card key={league.code}>
                     <CardContent className="pt-4">
                       <Suspense fallback={<Skel />}>
-                        <LeagueTable leagueCode={league.code} delay={i * 8000} />
+                        <LeagueTable leagueCode={league.code} delay={i * 2000} />
                       </Suspense>
                     </CardContent>
                   </Card>
@@ -102,8 +102,8 @@ export default function HomePage() {
             </section>
           </div>
 
-          {/* SIDEBAR — first on mobile */}
-          <aside className="space-y-5 order-1 lg:order-2">
+          {/* SIDEBAR — after main content on mobile */}
+          <aside className="space-y-5 order-2 lg:order-2">
 
             {/* Newsy */}
             <section id="newsy">
@@ -119,7 +119,7 @@ export default function HomePage() {
 
             {/* Cytaty dnia */}
             <section>
-              <SectionLabel text="Cytaty dnia" />
+              <SectionLabel text="Głosy futbolu" />
               <Card>
                 <CardContent className="pt-4">
                   <QuotesSection />
