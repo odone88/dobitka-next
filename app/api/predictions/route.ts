@@ -22,7 +22,8 @@ interface Prediction {
 
 // Proste pozycje druzyn ze standings (cache w pamieci na czas requestu)
 async function getTeamPositions(): Promise<Map<string, { pos: number; form: string; goalsFor: number; goalsAgainst: number; league: string }>> {
-  const leagues = ['PL', 'PD', 'SA', 'BL1', 'FL1'];
+  // Analizujemy wszystkie dostepne ligi (football-data.org free tier)
+  const leagues = ['PL', 'PD', 'SA', 'BL1', 'FL1', 'BSA', 'PPL', 'DED', 'ELC', 'CLI'];
   const map = new Map<string, { pos: number; form: string; goalsFor: number; goalsAgainst: number; league: string }>();
 
   const results = await Promise.allSettled(

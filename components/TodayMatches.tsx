@@ -13,11 +13,19 @@ const LEAGUE_ACCENT: Record<string, string> = {
   SA:  'border-l-green-400',
   BL1: 'border-l-yellow-400',
   FL1: 'border-l-sky-400',
+  ELC: 'border-l-orange-400',
+  PPL: 'border-l-emerald-400',
+  DED: 'border-l-orange-300',
+  BSA: 'border-l-yellow-300',
+  CLI: 'border-l-amber-400',
 };
 
-// Priorytet lig — niższy = ważniejszy. CL zawsze na górze.
+// Priorytet lig — nizszy = wazniejszy
 const LEAGUE_PRIORITY: Record<string, number> = {
-  CL: 0, PL: 1, PD: 2, SA: 3, BL1: 4, FL1: 5,
+  CL: 0, ELC: 1,           // pucharowe
+  PL: 2, PD: 3, SA: 4, BL1: 5, FL1: 6,  // top 5
+  PPL: 7, DED: 8,          // portugalia, holandia
+  BSA: 9, CLI: 10,         // brazylia, argentyna
 };
 
 function isLive(m: Match) {
@@ -267,7 +275,7 @@ export function TodayMatches() {
 
   useEffect(() => {
     if (!loading) return;
-    const t = setTimeout(() => setTimedOut(true), 6000);
+    const t = setTimeout(() => setTimedOut(true), 3500);
     return () => clearTimeout(t);
   }, [loading]);
 
@@ -338,14 +346,21 @@ export function TodayMatches() {
       <div className="space-y-2">
         <DayPicker selected={selectedDate} onChange={handleDateChange} />
         {timedOut ? (
-          <div className="py-6 text-center">
-            <p className="text-[13px] text-muted-foreground/60">Nie udalo sie zaladowac meczow.</p>
+          <div className="py-4 text-center">
+            <p className="text-[12px] text-muted-foreground/50">Nie udalo sie zaladowac meczow.</p>
             <button onClick={() => { setTimedOut(false); setLoading(true); fetchData(selectedDate); }}
-              className="mt-2 text-[12px] text-primary hover:underline cursor-pointer">Sprobuj ponownie</button>
+              className="mt-1.5 text-[11px] text-primary hover:underline cursor-pointer">Sprobuj ponownie</button>
           </div>
         ) : (
-          <div className="space-y-0.5">
-            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-11 w-full" />)}
+          <div className="rounded-xl border border-border/15 overflow-hidden">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-3 py-2.5 border-b border-border/10">
+                <Skeleton className="h-4 w-8" />
+                <Skeleton className="h-4 flex-1" />
+                <Skeleton className="h-4 w-10" />
+                <Skeleton className="h-4 flex-1" />
+              </div>
+            ))}
           </div>
         )}
       </div>

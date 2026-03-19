@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import type { MatchDetail, MatchGoal, H2HMatch } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -275,6 +275,7 @@ export function MatchDetailView({ matchId }: { matchId: string }) {
   const [match, setMatch] = useState<MatchDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const matchRef = useRef<MatchDetail | null>(null);
 
   const fetchMatch = useCallback(async () => {
     try {
@@ -285,6 +286,7 @@ export function MatchDetailView({ matchId }: { matchId: string }) {
       }
       const data = await res.json();
       setMatch(data);
+      matchRef.current = data;
     } catch {
       setError(true);
     } finally {
@@ -295,14 +297,14 @@ export function MatchDetailView({ matchId }: { matchId: string }) {
   useEffect(() => {
     fetchMatch();
 
-    // Auto-refresh dla meczow live
+    // Auto-refresh — uzywam ref zeby uniknac stale closure
     const id = setInterval(() => {
-      if (match && isLive(match.status)) {
+      if (matchRef.current && isLive(matchRef.current.status)) {
         fetchMatch();
       }
     }, 60_000);
     return () => clearInterval(id);
-  }, [fetchMatch, match]);
+  }, [fetchMatch]);
 
   if (loading) {
     return (

@@ -146,39 +146,19 @@ export function DobitkaDnia() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <div className="space-y-3">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-28 rounded-xl bg-muted/30 animate-pulse" />
-        ))}
-      </div>
-    );
-  }
-
-  if (predictions.length === 0) {
-    return (
-      <div className="rounded-xl border border-border/20 bg-card p-6 text-center">
-        <p className="text-[14px] font-display text-muted-foreground/50">Brak predykcji na dzis</p>
-        <p className="text-[11px] text-muted-foreground/30 mt-1">
-          {analyzed > 0
-            ? `Przeanalizowano ${analyzed} meczow — za malo danych na pewne typy.`
-            : 'Brak zaplanowanych meczow w znanych ligach.'}
-        </p>
-      </div>
-    );
-  }
+  // Nie pokazuj nic gdy ladujemy lub brak predykcji — sekcja sie schowa
+  if (loading || predictions.length === 0) return null;
 
   return (
-    <div className="space-y-3">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/30">
-            {predictions.length} typow · {analyzed} meczow przeanalizowanych
-          </span>
-        </div>
-      </div>
+    <section id="dobitka" className="scroll-mt-16 space-y-3">
+      {/* Section header */}
+      <h2 className="flex items-center gap-3">
+        <span className="font-display text-[13px] font-normal tracking-wide text-primary">Dobitka dnia</span>
+        <span className="flex-1 border-t border-border/20" aria-hidden="true" />
+        <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/30">
+          {predictions.length} typow
+        </span>
+      </h2>
 
       {/* Prediction cards */}
       {predictions.map((p, i) => (
@@ -189,6 +169,6 @@ export function DobitkaDnia() {
       <p className="text-[9px] text-muted-foreground/20 text-center">
         Predykcje oparte o pozycje w tabeli, forme i statystyki. Nie stanowia porady bukmacherskiej.
       </p>
-    </div>
+    </section>
   );
 }

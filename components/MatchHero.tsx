@@ -9,9 +9,8 @@ function isLive(m: Match) {
   return m.status === 'LIVE' || m.status === 'IN_PLAY' || m.status === 'PAUSED';
 }
 
-// Priorytet lig do sortowania w bannerze
 const BANNER_PRIORITY: Record<string, number> = {
-  CL: 0, PL: 1, PD: 2, SA: 3, BL1: 4, FL1: 5,
+  CL: 0, ELC: 1, PL: 2, PD: 3, SA: 4, BL1: 5, FL1: 6, PPL: 7, DED: 8, BSA: 9, CLI: 10,
 };
 
 export function MatchHero() {

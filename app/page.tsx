@@ -64,11 +64,8 @@ export default function HomePage() {
           </Suspense>
         </section>
 
-        {/* DOBITKA DNIA — killer feature, above matches */}
-        <section id="dobitka" className="scroll-mt-16">
-          <SectionLabel text="Dobitka dnia" />
-          <DobitkaDnia />
-        </section>
+        {/* DOBITKA DNIA — komponent sam sie ukryje gdy brak predykcji */}
+        <DobitkaDnia />
 
         {/* MECZE DNIA */}
         <section id="mecze" className="scroll-mt-16">

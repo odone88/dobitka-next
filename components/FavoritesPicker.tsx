@@ -111,18 +111,13 @@ export function FavoritesPicker({ isOpen, onClose, onChanged }: Props) {
   );
 }
 
-// Hook do zarzadzania ulubionymi
+// Hook do zarzadzania ulubionymi — BEZ auto-popup
 export function useFavorites() {
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
   const [showPicker, setShowPicker] = useState(false);
 
   useEffect(() => {
     setFavoriteIds(getFavoriteIds());
-    // Pokaz onboarding przy pierwszej wizycie
-    if (isFirstVisit()) {
-      const t = setTimeout(() => setShowPicker(true), 2000);
-      return () => clearTimeout(t);
-    }
   }, []);
 
   return {
