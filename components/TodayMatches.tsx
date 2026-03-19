@@ -20,12 +20,11 @@ const LEAGUE_ACCENT: Record<string, string> = {
   CLI: 'border-l-amber-400',
 };
 
-// Priorytet lig — nizszy = wazniejszy
 const LEAGUE_PRIORITY: Record<string, number> = {
-  CL: 0, ELC: 1,           // pucharowe
-  PL: 2, PD: 3, SA: 4, BL1: 5, FL1: 6,  // top 5
-  PPL: 7, DED: 8,          // portugalia, holandia
-  BSA: 9, CLI: 10,         // brazylia, argentyna
+  CL: 0, ELC: 1,
+  PL: 2, PD: 3, SA: 4, BL1: 5, FL1: 6,
+  PPL: 7, DED: 8,
+  BSA: 9, CLI: 10,
 };
 
 function isLive(m: Match) {
@@ -39,7 +38,7 @@ function DayPicker({ selected, onChange }: { selected: string; onChange: (d: str
     d.setDate(d.getDate() + offset);
     return {
       date: d.toISOString().slice(0, 10),
-      label: offset === 0 ? 'Dziś' :
+      label: offset === 0 ? 'Dzis' :
              offset === -1 ? 'Wczoraj' :
              offset === 1 ? 'Jutro' :
              d.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric' }),
@@ -68,7 +67,7 @@ function DayPicker({ selected, onChange }: { selected: string; onChange: (d: str
   );
 }
 
-/* ─── Live minute counter — odlicza w czasie rzeczywistym ────────── */
+/* ─── Live minute counter ────────────────────────────────────────── */
 function LiveMinute({ minute, status }: { minute: number | null | undefined; status: string }) {
   const [display, setDisplay] = useState(minute ?? 0);
   const startRef = useRef(Date.now());
@@ -81,11 +80,11 @@ function LiveMinute({ minute, status }: { minute: number | null | undefined; sta
   }, [minute]);
 
   useEffect(() => {
-    if (status === 'PAUSED') return; // Przerwa — nie odliczaj
+    if (status === 'PAUSED') return;
     const id = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startRef.current) / 60000);
       setDisplay(baseMinuteRef.current + elapsed);
-    }, 15000); // Aktualizuj co 15s
+    }, 15000);
     return () => clearInterval(id);
   }, [status]);
 
@@ -96,8 +95,24 @@ function LiveMinute({ minute, status }: { minute: number | null | undefined; sta
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
         <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
       </span>
-      {status === 'PAUSED' ? 'PRZ' : display ? `${display}'` : '•'}
+      {status === 'PAUSED' ? 'PRZ' : display ? `${display}'` : '\u2022'}
     </span>
+  );
+}
+
+/* ─── Team crest image ───────────────────────────────────────────── */
+function Crest({ src, name, size = 18 }: { src?: string; name: string; size?: number }) {
+  if (!src) return null;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={name}
+      width={size}
+      height={size}
+      className="object-contain flex-shrink-0"
+      loading="lazy"
+    />
   );
 }
 
@@ -114,7 +129,6 @@ function GoalLine({ goals, teamId, isHome }: { goals: MatchGoal[]; teamId: numbe
           <span className="score-display text-muted-foreground/40"> {g.minute}&apos;</span>
           {g.type === 'PENALTY' && <span className="text-amber/50"> (k)</span>}
           {g.type === 'OWN_GOAL' && <span className="text-destructive/50"> (sam.)</span>}
-          {g.assist && <span className="text-muted-foreground/30"> ({g.assist})</span>}
         </span>
       ))}
     </div>
@@ -161,7 +175,6 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
   }
 
   function handleNavigate() {
-    // Otwórz match detail w nowej karcie lub nawiguj
     window.location.href = `/match/${match.id}`;
   }
 
@@ -176,7 +189,7 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
       style={{ animationDelay: `${index * 30}ms` }}
     >
       {/* Main row */}
-      <div className="flex items-center px-3 py-2" onClick={handleNavigate}>
+      <div className="flex items-center px-3 py-2.5 gap-2" onClick={handleNavigate}>
         {/* Time / Status */}
         <div className="w-12 flex-shrink-0 text-center">
           {live ? (
@@ -188,30 +201,42 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
           )}
         </div>
 
-        {/* Teams + Score */}
+        {/* Teams + Score — FotMob style with crests */}
         <div className="flex-1 grid grid-cols-[1fr_auto_1fr] gap-x-2 items-center min-w-0">
-          <span className={cn(
-            'text-[13px] text-right truncate transition-colors',
-            homeWin ? 'font-bold text-foreground' : finished ? 'text-foreground/50' : 'text-foreground/75'
+          <div className={cn(
+            'flex items-center gap-1.5 justify-end min-w-0',
           )}>
-            {match.homeTeam}
-          </span>
+            <span className={cn(
+              'text-[13px] text-right truncate transition-colors',
+              homeWin ? 'font-bold text-foreground' : finished ? 'text-foreground/50' : 'text-foreground/75'
+            )}>
+              {match.homeTeam}
+            </span>
+            <Crest src={match.homeCrest} name={match.homeTeam} />
+          </div>
+
           <span className={cn(
             'score-display text-[15px] font-black min-w-[44px] text-center',
             live ? 'text-destructive' : finished ? 'text-foreground' : 'text-muted-foreground/35'
           )}>
-            {hasScore ? `${match.homeScore} – ${match.awayScore}` : '–'}
+            {hasScore ? `${match.homeScore} \u2013 ${match.awayScore}` : '\u2013'}
           </span>
-          <span className={cn(
-            'text-[13px] truncate transition-colors',
-            awayWin ? 'font-bold text-foreground' : finished ? 'text-foreground/50' : 'text-foreground/75'
+
+          <div className={cn(
+            'flex items-center gap-1.5 min-w-0',
           )}>
-            {match.awayTeam}
-          </span>
+            <Crest src={match.awayCrest} name={match.awayTeam} />
+            <span className={cn(
+              'text-[13px] truncate transition-colors',
+              awayWin ? 'font-bold text-foreground' : finished ? 'text-foreground/50' : 'text-foreground/75'
+            )}>
+              {match.awayTeam}
+            </span>
+          </div>
         </div>
 
         {/* HT + expand */}
-        <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
+        <div className="flex items-center gap-1.5 ml-1 flex-shrink-0">
           {match.halfTime && finished && (
             <span className="text-[9px] text-muted-foreground/30 hidden sm:block score-display">
               ({match.halfTime})
@@ -225,7 +250,7 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
                 expanded ? 'rotate-180' : ''
               )}
             >
-              ▾
+              \u25BE
             </button>
           )}
         </div>
@@ -294,12 +319,7 @@ export function TodayMatches() {
     fetchData(date, true);
   }
 
-  // ─── SMART MATCH PRIORITY (wzor: FotMob) ───────────────────────
-  // 1. Grupuj po ligach
-  // 2. Ligi z meczami LIVE sortowane na gore (po priorytecie ligi)
-  // 3. Potem ligi z meczami zaplanowanymi (po priorytecie)
-  // 4. Na koncu ligi z samymi zakonczono (po priorytecie)
-  // 5. W kazdej lidze: LIVE > SCHEDULED > FINISHED, potem po czasie
+  // ─── SMART MATCH PRIORITY ──────────────────────────────────────
   const grouped = new Map<string, Match[]>();
   for (const m of matches) {
     const code = m.competitionCode;
@@ -310,24 +330,17 @@ export function TodayMatches() {
   const sortedLeagues = [...grouped.entries()].sort(([codeA, matchesA], [codeB, matchesB]) => {
     const hasLiveA = matchesA.some(isLive);
     const hasLiveB = matchesB.some(isLive);
-
-    // Ligi z LIVE zawsze wyzej
     if (hasLiveA && !hasLiveB) return -1;
     if (!hasLiveA && hasLiveB) return 1;
 
-    // Jesli obie maja live lub obie nie — sortuj po scheduled vs finished
     const hasScheduledA = matchesA.some((m) => m.status === 'SCHEDULED' || m.status === 'TIMED');
     const hasScheduledB = matchesB.some((m) => m.status === 'SCHEDULED' || m.status === 'TIMED');
     if (hasScheduledA && !hasScheduledB) return -1;
     if (!hasScheduledA && hasScheduledB) return 1;
 
-    // Na koniec: priorytet ligi
-    const pa = LEAGUE_PRIORITY[codeA] ?? 99;
-    const pb = LEAGUE_PRIORITY[codeB] ?? 99;
-    return pa - pb;
+    return (LEAGUE_PRIORITY[codeA] ?? 99) - (LEAGUE_PRIORITY[codeB] ?? 99);
   });
 
-  // Sortowanie meczow wewnatrz ligi: LIVE > SCHEDULED > FINISHED > czas
   for (const [, ms] of sortedLeagues) {
     ms.sort((a, b) => {
       const statusOrder = (m: Match) => isLive(m) ? 0 : (m.status === 'SCHEDULED' || m.status === 'TIMED') ? 1 : 2;
@@ -353,12 +366,18 @@ export function TodayMatches() {
           </div>
         ) : (
           <div className="rounded-xl border border-border/15 overflow-hidden">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-3 py-2.5 border-b border-border/10">
-                <Skeleton className="h-4 w-8" />
-                <Skeleton className="h-4 flex-1" />
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-3 py-3 border-b border-border/10">
                 <Skeleton className="h-4 w-10" />
-                <Skeleton className="h-4 flex-1" />
+                <div className="flex-1 flex items-center justify-end gap-1.5">
+                  <Skeleton className="h-3.5 w-20" />
+                  <Skeleton className="h-[18px] w-[18px] rounded-full" />
+                </div>
+                <Skeleton className="h-5 w-10" />
+                <div className="flex-1 flex items-center gap-1.5">
+                  <Skeleton className="h-[18px] w-[18px] rounded-full" />
+                  <Skeleton className="h-3.5 w-20" />
+                </div>
               </div>
             ))}
           </div>
@@ -382,12 +401,6 @@ export function TodayMatches() {
           )}
           {scheduledCount > 0 && <span>{scheduledCount} zaplanowanych</span>}
           {finishedCount > 0 && <span>{finishedCount} zakonczonych</span>}
-          {updatedAt && (() => {
-            const ago = Math.round((Date.now() - new Date(updatedAt).getTime()) / 60000);
-            return ago > 5 ? (
-              <span className="text-muted-foreground/25">· dane sprzed {ago} min</span>
-            ) : null;
-          })()}
         </div>
       )}
 
@@ -406,6 +419,7 @@ export function TodayMatches() {
             {sortedLeagues.map(([code, ms], leagueIdx) => {
               const league = getLeague(code);
               const hasLive = ms.some(isLive);
+              const firstMatch = ms[0];
               return (
                 <div key={code}>
                   {/* League header */}
@@ -414,7 +428,12 @@ export function TodayMatches() {
                     hasLive ? 'bg-destructive/[0.08]' : 'bg-white/[0.02]',
                     leagueIdx > 0 && 'border-t border-border/15'
                   )}>
-                    <span className="text-[13px] leading-none">{league?.flag ?? '⚽'}</span>
+                    {firstMatch?.competitionEmblem ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={firstMatch.competitionEmblem} alt={league?.name ?? code} className="h-4 w-4 object-contain" />
+                    ) : (
+                      <span className="text-[13px] leading-none">{league?.flag ?? '\u26BD'}</span>
+                    )}
                     <span className={cn(
                       'text-[10px] font-black uppercase tracking-widest',
                       league?.color ?? 'text-muted-foreground/60'

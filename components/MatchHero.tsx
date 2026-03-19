@@ -13,6 +13,14 @@ const BANNER_PRIORITY: Record<string, number> = {
   CL: 0, ELC: 1, PL: 2, PD: 3, SA: 4, BL1: 5, FL1: 6, PPL: 7, DED: 8, BSA: 9, CLI: 10,
 };
 
+function Crest({ src, name, size = 22 }: { src?: string; name: string; size?: number }) {
+  if (!src) return null;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={name} width={size} height={size} className="object-contain" loading="lazy" />
+  );
+}
+
 export function MatchHero() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +43,7 @@ export function MatchHero() {
     return () => clearInterval(id);
   }, [fetchData]);
 
-  // Detekcja zmiany wyniku — per mecz, nie globalnie
+  // Score change detection
   useEffect(() => {
     const liveMatches = matches.filter(isLive);
     if (liveMatches.length === 0) return;
@@ -65,11 +73,10 @@ export function MatchHero() {
 
   if (loading) return <Skeleton className="h-16 w-full rounded-xl" />;
 
-  // ─── MODE 1: LIVE — banner z pulsujaca ramka ──────────────────
+  // ─── MODE 1: LIVE ──────────────────────────────────────────────
   if (liveMatches.length > 0) {
     return (
       <div className="rounded-xl border border-destructive/40 border-live bg-gradient-to-r from-destructive/[0.08] via-card to-card overflow-hidden">
-        {/* Live header bar */}
         <div className="flex items-center gap-2 px-4 py-1.5 bg-destructive text-white text-[10px] font-black uppercase tracking-widest">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
@@ -78,7 +85,6 @@ export function MatchHero() {
           {liveMatches.length} {liveMatches.length === 1 ? 'mecz na zywo' : liveMatches.length < 5 ? 'mecze na zywo' : 'meczow na zywo'}
         </div>
 
-        {/* Live matches */}
         <div className="px-4 py-3 flex flex-wrap gap-x-6 gap-y-2.5">
           {liveMatches.map((m) => (
             <a
@@ -86,6 +92,7 @@ export function MatchHero() {
               href={`/match/${m.id}`}
               className="flex items-center gap-2 text-[14px] group hover:bg-white/[0.03] rounded-lg px-2 py-1 -mx-2 transition-colors"
             >
+              <Crest src={m.homeCrest} name={m.homeTeam} size={20} />
               <span className="font-bold text-foreground/90 group-hover:text-foreground transition-colors">
                 {m.homeTeam}
               </span>
@@ -93,11 +100,12 @@ export function MatchHero() {
                 'score-display text-[18px] font-black text-destructive',
                 changedIds.has(m.id) && 'score-just-changed'
               )}>
-                {m.homeScore}&thinsp;–&thinsp;{m.awayScore}
+                {m.homeScore}&thinsp;&ndash;&thinsp;{m.awayScore}
               </span>
               <span className="font-bold text-foreground/90 group-hover:text-foreground transition-colors">
                 {m.awayTeam}
               </span>
+              <Crest src={m.awayCrest} name={m.awayTeam} size={20} />
               {m.minute && (
                 <span className="text-[11px] font-black text-destructive/70 score-display live-dot">
                   {m.status === 'PAUSED' ? 'PRZ' : `${m.minute}'`}
@@ -111,11 +119,10 @@ export function MatchHero() {
     );
   }
 
-  // ─── MODE 2: WYNIKI DNIA — top rezultaty ──────────────────────
+  // ─── MODE 2: WYNIKI DNIA ───────────────────────────────────────
   if (finished.length > 0) {
     const top = finished
       .sort((a, b) => {
-        // Najpierw po wadze ligi, potem po liczbie goli
         const pa = BANNER_PRIORITY[a.competitionCode] ?? 99;
         const pb = BANNER_PRIORITY[b.competitionCode] ?? 99;
         if (pa !== pb) return pa - pb;
@@ -138,15 +145,17 @@ export function MatchHero() {
                 href={`/match/${m.id}`}
                 className="flex items-center gap-2 text-[14px] hover:bg-white/[0.03] rounded-lg px-2 py-1 -mx-2 transition-colors"
               >
+                <Crest src={m.homeCrest} name={m.homeTeam} size={20} />
                 <span className={cn('font-medium', homeWin ? 'text-foreground font-bold' : 'text-foreground/50')}>
                   {m.homeTeam}
                 </span>
                 <span className="score-display text-[16px] font-black text-foreground">
-                  {m.homeScore}&thinsp;–&thinsp;{m.awayScore}
+                  {m.homeScore}&thinsp;&ndash;&thinsp;{m.awayScore}
                 </span>
                 <span className={cn('font-medium', awayWin ? 'text-foreground font-bold' : 'text-foreground/50')}>
                   {m.awayTeam}
                 </span>
+                <Crest src={m.awayCrest} name={m.awayTeam} size={20} />
               </a>
             );
           })}
@@ -172,12 +181,14 @@ export function MatchHero() {
         </div>
         <div className="px-4 py-3 flex items-center gap-3">
           <div className="flex items-center gap-2 text-[16px]">
+            <Crest src={next.homeCrest} name={next.homeTeam} />
             <span className="font-bold text-foreground">{next.homeTeam}</span>
             <span className="text-muted-foreground/25 font-black score-display">vs</span>
             <span className="font-bold text-foreground">{next.awayTeam}</span>
+            <Crest src={next.awayCrest} name={next.awayTeam} />
           </div>
           <span className="text-[12px] text-muted-foreground/50 ml-auto score-display">
-            {isToday ? `dzis ${time}` : `${day} · ${time}`}
+            {isToday ? `dzis ${time}` : `${day} \u00B7 ${time}`}
           </span>
           <span className="text-[10px] font-bold uppercase tracking-wide text-primary/50">
             {next.competitionCode}

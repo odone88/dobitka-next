@@ -7,6 +7,8 @@ interface Prediction {
   matchId: number;
   homeTeam: string;
   awayTeam: string;
+  homeCrest?: string;
+  awayCrest?: string;
   utcDate: string;
   competition: string;
   competitionCode: string;
@@ -18,9 +20,9 @@ interface Prediction {
 }
 
 const CATEGORY_ICON: Record<string, string> = {
-  result: '🏆',
-  goals: '⚽',
-  btts: '🎯',
+  result: '\uD83C\uDFC6',
+  goals: '\u26BD',
+  btts: '\uD83C\uDFAF',
 };
 
 const CATEGORY_GRADIENT: Record<string, string> = {
@@ -51,6 +53,14 @@ function ConfidenceBar({ value }: { value: number }) {
   );
 }
 
+function Crest({ src, name, size = 20 }: { src?: string; name: string; size?: number }) {
+  if (!src) return null;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={name} width={size} height={size} className="object-contain flex-shrink-0" loading="lazy" />
+  );
+}
+
 function PredictionCard({ prediction, index }: { prediction: Prediction; index: number }) {
   const [expanded, setExpanded] = useState(false);
   const time = new Date(prediction.utcDate).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
@@ -71,13 +81,16 @@ function PredictionCard({ prediction, index }: { prediction: Prediction; index: 
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-lg">{CATEGORY_ICON[prediction.category]}</span>
-            <div className="min-w-0">
-              <div className="text-[13px] font-bold text-foreground truncate">
-                {prediction.homeTeam} vs {prediction.awayTeam}
-              </div>
-              <div className="text-[10px] text-muted-foreground/50">
-                {prediction.competition} · {time}
-              </div>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Crest src={prediction.homeCrest} name={prediction.homeTeam} />
+              <span className="text-[13px] font-bold text-foreground truncate">
+                {prediction.homeTeam}
+              </span>
+              <span className="text-[11px] text-muted-foreground/40">vs</span>
+              <span className="text-[13px] font-bold text-foreground truncate">
+                {prediction.awayTeam}
+              </span>
+              <Crest src={prediction.awayCrest} name={prediction.awayTeam} />
             </div>
           </div>
           <a
@@ -85,11 +98,16 @@ function PredictionCard({ prediction, index }: { prediction: Prediction; index: 
             onClick={(e) => e.stopPropagation()}
             className="text-[9px] text-primary/50 hover:text-primary transition-colors uppercase tracking-widest font-bold flex-shrink-0"
           >
-            Mecz →
+            Mecz &rarr;
           </a>
         </div>
 
-        {/* TIP — glowna predykcja */}
+        {/* Competition + time */}
+        <div className="text-[10px] text-muted-foreground/50 -mt-1">
+          {prediction.competition} &middot; {time}
+        </div>
+
+        {/* TIP */}
         <div className="flex items-center gap-3">
           <span className={cn(
             'text-[18px] sm:text-[22px] font-black font-display leading-tight',
@@ -131,7 +149,6 @@ function PredictionCard({ prediction, index }: { prediction: Prediction; index: 
 export function DobitkaDnia() {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [analyzed, setAnalyzed] = useState(0);
 
   useEffect(() => {
     fetch('/api/predictions')
@@ -139,19 +156,16 @@ export function DobitkaDnia() {
       .then((data) => {
         if (data?.predictions) {
           setPredictions(data.predictions);
-          setAnalyzed(data.matchesAnalyzed ?? 0);
         }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  // Nie pokazuj nic gdy ladujemy lub brak predykcji — sekcja sie schowa
   if (loading || predictions.length === 0) return null;
 
   return (
     <section id="dobitka" className="scroll-mt-16 space-y-3">
-      {/* Section header */}
       <h2 className="flex items-center gap-3">
         <span className="font-display text-[13px] font-normal tracking-wide text-primary">Dobitka dnia</span>
         <span className="flex-1 border-t border-border/20" aria-hidden="true" />
@@ -160,12 +174,10 @@ export function DobitkaDnia() {
         </span>
       </h2>
 
-      {/* Prediction cards */}
       {predictions.map((p, i) => (
         <PredictionCard key={p.matchId + p.category} prediction={p} index={i} />
       ))}
 
-      {/* Disclaimer */}
       <p className="text-[9px] text-muted-foreground/20 text-center">
         Predykcje oparte o pozycje w tabeli, forme i statystyki. Nie stanowia porady bukmacherskiej.
       </p>

@@ -304,6 +304,8 @@ function mapMatches(raw: Record<string, unknown>[]): Match[] {
       awayTeam: (awayTeamObj?.shortName as string) ?? (awayTeamObj?.name as string) ?? '',
       homeTeamId: (homeTeamObj?.id as number) ?? 0,
       awayTeamId: (awayTeamObj?.id as number) ?? 0,
+      homeCrest: (homeTeamObj?.crest as string) ?? undefined,
+      awayCrest: (awayTeamObj?.crest as string) ?? undefined,
       homeScore: fullTime ? (fullTime.home as number | null) : null,
       awayScore: fullTime ? (fullTime.away as number | null) : null,
       status: m.status as Match['status'],
@@ -311,6 +313,7 @@ function mapMatches(raw: Record<string, unknown>[]): Match[] {
       utcDate: m.utcDate as string,
       competition: (m.competition as Record<string, unknown>)?.name as string ?? '',
       competitionCode: (m.competition as Record<string, unknown>)?.code as string ?? '',
+      competitionEmblem: (m.competition as Record<string, unknown>)?.emblem as string ?? undefined,
       goals,
       halfTime: htHome !== null && htAway !== null ? `${htHome}–${htAway}` : undefined,
     };

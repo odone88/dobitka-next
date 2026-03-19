@@ -15,6 +15,8 @@ export interface Match {
   awayTeam: string;
   homeTeamId: number;
   awayTeamId: number;
+  homeCrest?: string;
+  awayCrest?: string;
   homeScore: number | null;
   awayScore: number | null;
   status: MatchStatus;
@@ -22,6 +24,7 @@ export interface Match {
   utcDate: string;
   competition: string;
   competitionCode: string;
+  competitionEmblem?: string;
   goals: MatchGoal[];
   halfTime?: string;
 }

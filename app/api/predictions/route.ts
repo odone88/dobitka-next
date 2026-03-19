@@ -63,7 +63,31 @@ function scorePredictions(matches: Match[], positions: Map<string, { pos: number
 
     const home = positions.get(match.homeTeam);
     const away = positions.get(match.awayTeam);
-    if (!home || !away) continue; // Pomijamy mecze z nieznanych lig
+
+    // Jesli brak standings — generuj prosty tip "przewaga gospodarza"
+    if (!home || !away) {
+      predictions.push({
+        matchId: match.id,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        homeCrest: match.homeCrest,
+        awayCrest: match.awayCrest,
+        utcDate: match.utcDate,
+        competition: match.competition,
+        competitionCode: match.competitionCode,
+        tip: `${match.homeTeam} nie przegra (1X)`,
+        confidence: 55,
+        reasoning: [
+          'Przewaga wlasnego boiska',
+          'Gospodarze statystycznie wygrywaja ~46% meczow',
+        ],
+        against: [
+          'Brak danych o formie — niska pewnosc',
+        ],
+        category: 'result',
+      });
+      continue;
+    }
 
     const homePos = home.pos;
     const awayPos = away.pos;
@@ -110,6 +134,8 @@ function scorePredictions(matches: Match[], positions: Map<string, { pos: number
         matchId: match.id,
         homeTeam: match.homeTeam,
         awayTeam: match.awayTeam,
+        homeCrest: match.homeCrest,
+        awayCrest: match.awayCrest,
         utcDate: match.utcDate,
         competition: match.competition,
         competitionCode: match.competitionCode,
@@ -148,6 +174,8 @@ function scorePredictions(matches: Match[], positions: Map<string, { pos: number
         matchId: match.id,
         homeTeam: match.homeTeam,
         awayTeam: match.awayTeam,
+        homeCrest: match.homeCrest,
+        awayCrest: match.awayCrest,
         utcDate: match.utcDate,
         competition: match.competition,
         competitionCode: match.competitionCode,
@@ -166,6 +194,8 @@ function scorePredictions(matches: Match[], positions: Map<string, { pos: number
         matchId: match.id,
         homeTeam: match.homeTeam,
         awayTeam: match.awayTeam,
+        homeCrest: match.homeCrest,
+        awayCrest: match.awayCrest,
         utcDate: match.utcDate,
         competition: match.competition,
         competitionCode: match.competitionCode,
