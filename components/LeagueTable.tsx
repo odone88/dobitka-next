@@ -112,7 +112,7 @@ export function LeagueTable({ leagueCode, delay = 0 }: { leagueCode: string; del
             {standings.leagueName}
           </span>
         </div>
-        <span className="text-[10px] text-muted-foreground/30 tabular-nums">{standings.season}</span>
+        <span className="text-[10px] text-muted-foreground tabular-nums">{standings.season}</span>
       </div>
 
       {/* Table */}
