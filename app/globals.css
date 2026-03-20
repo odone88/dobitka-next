@@ -212,14 +212,13 @@ html {
     box-shadow:
       0 1px 3px oklch(0 0 0 / 30%),
       inset 0 1px 0 oklch(1 0 0 / 3%);
-    transition: box-shadow 250ms ease, transform 250ms ease;
+    transition: box-shadow 200ms ease;
   }
   @media (hover: hover) {
     .card-elevated:hover {
       box-shadow:
-        0 6px 24px oklch(0 0 0 / 40%),
+        0 4px 16px oklch(0 0 0 / 40%),
         inset 0 1px 0 oklch(1 0 0 / 5%);
-      transform: translateY(-1px) scale(1.005);
     }
   }
 
@@ -245,31 +244,20 @@ html {
     transform: translateY(0);
   }
 
-  /* Score flash — gol! zielony błysk + scale */
+  /* Score flash — gol! zielony błysk */
   @keyframes scoreFlash {
-    0%   { color: var(--primary); transform: scale(1.3); text-shadow: 0 0 16px var(--primary); }
+    0%   { color: var(--primary); transform: scale(1.15); }
     30%  { color: oklch(0.9 0.28 150); }
-    100% { color: inherit; transform: scale(1); text-shadow: none; }
+    100% { color: inherit; transform: scale(1); }
   }
   .score-just-changed {
-    animation: scoreFlash 1000ms ease-out;
+    animation: scoreFlash 800ms ease-out;
   }
 
-  /* Live pulse ring — outer glow */
-  .live-ring {
-    box-shadow: 0 0 0 0 oklch(0.63 0.25 25 / 0.7);
-    animation: live-ring 2s infinite;
-  }
-  @keyframes live-ring {
-    0%   { box-shadow: 0 0 0 0 oklch(0.63 0.25 25 / 0.6); }
-    70%  { box-shadow: 0 0 0 8px oklch(0.63 0.25 25 / 0); }
-    100% { box-shadow: 0 0 0 0 oklch(0.63 0.25 25 / 0); }
-  }
-
-  /* Pulsing border for live cards */
+  /* Pulsing border for live cards — lightweight opacity-based */
   @keyframes liveBorder {
     0%, 100% { border-color: oklch(0.63 0.25 25 / 0.5); }
-    50%      { border-color: oklch(0.63 0.25 25 / 0.12); }
+    50%      { border-color: oklch(0.63 0.25 25 / 0.15); }
   }
   .border-live {
     animation: liveBorder 2.5s ease-in-out infinite;

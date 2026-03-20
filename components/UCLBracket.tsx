@@ -97,19 +97,23 @@ function BracketColumn({ round, isActive }: { round: BracketRound; isActive: boo
 export function UCLBracket() {
   const [rounds, setRounds] = useState<BracketRound[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
   const [subtitle, setSubtitle] = useState('');
 
   useEffect(() => {
     fetch('/api/ucl-bracket')
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('fetch failed');
+        return r.json();
+      })
       .then((d) => {
         const r: BracketRound[] = d.rounds ?? [];
         setRounds(r);
         setActiveIdx(d.defaultIdx ?? (r.length > 0 ? r.length - 1 : 0));
         setSubtitle(d.subtitle ?? '');
       })
-      .catch(() => {})
+      .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
 
@@ -121,11 +125,15 @@ export function UCLBracket() {
     );
   }
 
-  if (rounds.length === 0) {
+  if (error || rounds.length === 0) {
     return (
       <div className="py-6 text-center space-y-1.5">
-        <p className="text-[14px] text-muted-foreground">Przerwa w rozgrywkach Ligi Mistrzów</p>
-        <p className="text-[12px] text-muted-foreground/40">Następna runda wkrótce — dane pojawią się automatycznie.</p>
+        <p className="text-[14px] text-muted-foreground">
+          {error ? 'Nie udalo sie zaladowac drabinki LM' : 'Przerwa w rozgrywkach Ligi Mistrzow'}
+        </p>
+        <p className="text-[12px] text-muted-foreground/40">
+          {error ? 'Sprawdz za chwile.' : 'Nastepna runda wkrotce — dane pojawia sie automatycznie.'}
+        </p>
       </div>
     );
   }
