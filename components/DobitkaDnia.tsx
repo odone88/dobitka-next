@@ -68,7 +68,7 @@ function PredictionCard({ prediction, index }: { prediction: Prediction; index: 
   return (
     <div
       className={cn(
-        'rounded-xl border border-border/20 overflow-hidden card-elevated cursor-pointer transition-all',
+        'rounded-xl border border-border overflow-hidden card-elevated cursor-pointer transition-all',
         'bg-gradient-to-br',
         CATEGORY_GRADIENT[prediction.category],
         'animate-fade-in'
@@ -86,7 +86,7 @@ function PredictionCard({ prediction, index }: { prediction: Prediction; index: 
               <span className="text-[13px] font-bold text-foreground truncate">
                 {prediction.homeTeam}
               </span>
-              <span className="text-[11px] text-muted-foreground/40">vs</span>
+              <span className="text-[11px] text-muted-foreground">vs</span>
               <span className="text-[13px] font-bold text-foreground truncate">
                 {prediction.awayTeam}
               </span>
@@ -103,7 +103,7 @@ function PredictionCard({ prediction, index }: { prediction: Prediction; index: 
         </div>
 
         {/* Competition + time */}
-        <div className="text-[10px] text-muted-foreground/50 -mt-1">
+        <div className="text-[10px] text-muted-foreground -mt-1">
           {prediction.competition} &middot; {time}
         </div>
 
@@ -168,8 +168,8 @@ export function DobitkaDnia() {
     <section id="dobitka" className="scroll-mt-16 space-y-3">
       <h2 className="flex items-center gap-3">
         <span className="font-display text-[13px] font-normal tracking-wide text-primary">Dobitka dnia</span>
-        <span className="flex-1 border-t border-border/20" aria-hidden="true" />
-        <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/30">
+        <span className="flex-1 border-t border-border" aria-hidden="true" />
+        <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
           {predictions.length} typow
         </span>
       </h2>
@@ -178,7 +178,7 @@ export function DobitkaDnia() {
         <PredictionCard key={p.matchId + p.category} prediction={p} index={i} />
       ))}
 
-      <p className="text-[9px] text-muted-foreground/20 text-center">
+      <p className="text-[9px] text-muted-foreground text-center">
         Predykcje oparte o pozycje w tabeli, forme i statystyki. Nie stanowia porady bukmacherskiej.
       </p>
     </section>

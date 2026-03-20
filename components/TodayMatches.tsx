@@ -53,11 +53,11 @@ function DayPicker({ selected, onChange }: { selected: string; onChange: (d: str
           key={d.date}
           onClick={() => onChange(d.date)}
           className={cn(
-            'px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer',
+            'px-3 py-1.5 rounded-lg text-[12px] font-bold transition-all cursor-pointer',
             selected === d.date
               ? 'bg-primary text-primary-foreground shadow-sm'
-              : 'text-muted-foreground/60 hover:text-foreground hover:bg-white/5',
-            d.isToday && selected !== d.date && 'text-primary/60'
+              : 'text-muted-foreground hover:text-foreground hover:bg-accent',
+            d.isToday && selected !== d.date && 'text-primary'
           )}
         >
           {d.label}
@@ -89,7 +89,7 @@ function LiveMinute({ minute, status }: { minute: number | null | undefined; sta
   }, [status]);
 
   return (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-destructive/90
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-destructive
                      rounded text-[9px] font-black text-white tracking-wide">
       <span className="relative flex h-1.5 w-1.5">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
@@ -100,19 +100,14 @@ function LiveMinute({ minute, status }: { minute: number | null | undefined; sta
   );
 }
 
-/* ─── Team crest image ───────────────────────────────────────────── */
-function Crest({ src, name, size = 18 }: { src?: string; name: string; size?: number }) {
-  if (!src) return null;
+/* ─── Team crest ─────────────────────────────────────────────────── */
+function Crest({ src, name, size = 20 }: { src?: string; name: string; size?: number }) {
+  if (!src) {
+    return <span className="inline-flex items-center justify-center rounded-full bg-muted text-[8px] font-bold text-muted-foreground flex-shrink-0" style={{ width: size, height: size }}>{name.slice(0, 2)}</span>;
+  }
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={src}
-      alt={name}
-      width={size}
-      height={size}
-      className="object-contain flex-shrink-0"
-      loading="lazy"
-    />
+    <img src={src} alt={name} width={size} height={size} className="object-contain flex-shrink-0" loading="lazy" />
   );
 }
 
@@ -124,11 +119,11 @@ function GoalLine({ goals, teamId, isHome }: { goals: MatchGoal[]; teamId: numbe
   return (
     <div className={cn('flex flex-col gap-0.5', isHome ? 'items-end' : 'items-start')}>
       {teamGoals.map((g, i) => (
-        <span key={i} className="text-[10px] text-muted-foreground/60 leading-tight">
-          <span className="text-foreground/70">{g.scorer}</span>
-          <span className="score-display text-muted-foreground/40"> {g.minute}&apos;</span>
-          {g.type === 'PENALTY' && <span className="text-amber/50"> (k)</span>}
-          {g.type === 'OWN_GOAL' && <span className="text-destructive/50"> (sam.)</span>}
+        <span key={i} className="text-[10px] text-muted-foreground leading-tight">
+          <span className="text-foreground/80">{g.scorer}</span>
+          <span className="score-display text-muted-foreground/60"> {g.minute}&apos;</span>
+          {g.type === 'PENALTY' && <span className="text-amber"> (k)</span>}
+          {g.type === 'OWN_GOAL' && <span className="text-destructive"> (sam.)</span>}
         </span>
       ))}
     </div>
@@ -136,7 +131,7 @@ function GoalLine({ goals, teamId, isHome }: { goals: MatchGoal[]; teamId: numbe
 }
 
 /* ─── Single match row ───────────────────────────────────────────── */
-function MatchRow({ match, index }: { match: Match; index: number }) {
+function MatchRow({ match }: { match: Match }) {
   const [expanded, setExpanded] = useState(false);
   const [loadedGoals, setLoadedGoals] = useState<MatchGoal[] | null>(null);
   const [loadingGoals, setLoadingGoals] = useState(false);
@@ -156,10 +151,7 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
     e.stopPropagation();
     if (!canExpand) return;
 
-    if (expanded) {
-      setExpanded(false);
-      return;
-    }
+    if (expanded) { setExpanded(false); return; }
 
     setExpanded(true);
     if (goals.length > 0) return;
@@ -167,78 +159,69 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
     setLoadingGoals(true);
     fetch(`/api/match/${match.id}`)
       .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        if (data?.goals) setLoadedGoals(data.goals);
-      })
+      .then((data) => { if (data?.goals) setLoadedGoals(data.goals); })
       .catch(() => {})
       .finally(() => setLoadingGoals(false));
-  }
-
-  function handleNavigate() {
-    window.location.href = `/match/${match.id}`;
   }
 
   return (
     <div
       className={cn(
-        'border-b border-border/10 border-l-2 transition-all',
-        LEAGUE_ACCENT[match.competitionCode] ?? 'border-l-border/20',
-        live && 'bg-destructive/[0.06]',
-        'cursor-pointer hover:bg-white/[0.03]',
+        'border-b border-border last:border-0 border-l-2 transition-colors',
+        LEAGUE_ACCENT[match.competitionCode] ?? 'border-l-transparent',
+        live && 'bg-destructive/[0.08]',
+        'cursor-pointer hover:bg-accent/50',
       )}
-      style={{ animationDelay: `${index * 30}ms` }}
     >
       {/* Main row */}
-      <div className="flex items-center px-3 py-2.5 gap-2" onClick={handleNavigate}>
+      <a href={`/match/${match.id}`} className="flex items-center px-3 py-3 gap-2">
         {/* Time / Status */}
-        <div className="w-12 flex-shrink-0 text-center">
+        <div className="w-[52px] flex-shrink-0 text-center">
           {live ? (
             <LiveMinute minute={match.minute} status={match.status} />
           ) : finished ? (
-            <span className="text-[10px] font-bold text-muted-foreground/40">KON</span>
+            <span className="text-[10px] font-bold text-muted-foreground">KON</span>
           ) : (
-            <span className="text-[11px] score-display text-muted-foreground/50">{time}</span>
+            <span className="text-[12px] score-display text-foreground/60">{time}</span>
           )}
         </div>
 
-        {/* Teams + Score — FotMob style with crests */}
-        <div className="flex-1 grid grid-cols-[1fr_auto_1fr] gap-x-2 items-center min-w-0">
-          <div className={cn(
-            'flex items-center gap-1.5 justify-end min-w-0',
-          )}>
-            <span className={cn(
-              'text-[13px] text-right truncate transition-colors',
-              homeWin ? 'font-bold text-foreground' : finished ? 'text-foreground/50' : 'text-foreground/75'
-            )}>
-              {match.homeTeam}
-            </span>
-            <Crest src={match.homeCrest} name={match.homeTeam} />
-          </div>
-
+        {/* Home team */}
+        <div className="flex-1 flex items-center gap-2 justify-end min-w-0">
           <span className={cn(
-            'score-display text-[15px] font-black min-w-[44px] text-center',
-            live ? 'text-destructive' : finished ? 'text-foreground' : 'text-muted-foreground/35'
+            'text-[13px] text-right truncate',
+            homeWin ? 'font-bold text-foreground' : finished ? 'text-foreground/60' : 'text-foreground/90'
           )}>
-            {hasScore ? `${match.homeScore} \u2013 ${match.awayScore}` : '\u2013'}
+            {match.homeTeam}
           </span>
+          <Crest src={match.homeCrest} name={match.homeTeam} />
+        </div>
 
-          <div className={cn(
-            'flex items-center gap-1.5 min-w-0',
+        {/* Score */}
+        <div className="w-[52px] flex-shrink-0 text-center">
+          <span className={cn(
+            'score-display text-[15px] font-black',
+            live ? 'text-destructive' : finished ? 'text-foreground' : 'text-muted-foreground'
           )}>
-            <Crest src={match.awayCrest} name={match.awayTeam} />
-            <span className={cn(
-              'text-[13px] truncate transition-colors',
-              awayWin ? 'font-bold text-foreground' : finished ? 'text-foreground/50' : 'text-foreground/75'
-            )}>
-              {match.awayTeam}
-            </span>
-          </div>
+            {hasScore ? `${match.homeScore} - ${match.awayScore}` : '-'}
+          </span>
+        </div>
+
+        {/* Away team */}
+        <div className="flex-1 flex items-center gap-2 min-w-0">
+          <Crest src={match.awayCrest} name={match.awayTeam} />
+          <span className={cn(
+            'text-[13px] truncate',
+            awayWin ? 'font-bold text-foreground' : finished ? 'text-foreground/60' : 'text-foreground/90'
+          )}>
+            {match.awayTeam}
+          </span>
         </div>
 
         {/* HT + expand */}
-        <div className="flex items-center gap-1.5 ml-1 flex-shrink-0">
+        <div className="flex items-center gap-1 flex-shrink-0">
           {match.halfTime && finished && (
-            <span className="text-[9px] text-muted-foreground/30 hidden sm:block score-display">
+            <span className="text-[9px] text-muted-foreground hidden sm:block score-display">
               ({match.halfTime})
             </span>
           )}
@@ -246,7 +229,7 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
             <button
               onClick={handleExpand}
               className={cn(
-                'text-[10px] text-muted-foreground/30 transition-transform hover:text-muted-foreground/50 p-1',
+                'text-[10px] text-muted-foreground transition-transform hover:text-foreground p-1',
                 expanded ? 'rotate-180' : ''
               )}
             >
@@ -254,17 +237,17 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
             </button>
           )}
         </div>
-      </div>
+      </a>
 
       {/* Goal scorers */}
       {expanded && loadingGoals && (
         <div className="px-3 pb-2 text-center">
-          <span className="text-[10px] text-muted-foreground/40">Ladowanie strzelcow...</span>
+          <span className="text-[10px] text-muted-foreground">Ladowanie strzelcow...</span>
         </div>
       )}
       {hasGoals && (match.goals.length > 0 || expanded) && (finished || live) && (
-        <div className="px-3 pb-2 -mt-0.5 grid grid-cols-[1fr_44px_1fr] gap-x-2 items-start animate-fade-in"
-             style={{ paddingLeft: 'calc(0.75rem + 3rem)' }}>
+        <div className="px-3 pb-2 -mt-0.5 grid grid-cols-[1fr_52px_1fr] gap-x-2 items-start animate-fade-in"
+             style={{ paddingLeft: 'calc(0.75rem + 52px)' }}>
           <GoalLine goals={goals} teamId={match.homeTeamId} isHome={true} />
           <div />
           <GoalLine goals={goals} teamId={match.awayTeamId} isHome={false} />
@@ -280,7 +263,6 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
   const [loading, setLoading] = useState(!ssrLoaded && initialMatches.length === 0);
   const [timedOut, setTimedOut] = useState(false);
   const [switching, setSwitching] = useState(false);
-  const [updatedAt, setUpdatedAt] = useState('');
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
 
   const fetchData = useCallback(async (date: string, isSwitch = false) => {
@@ -290,7 +272,6 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
       if (!res.ok) return;
       const d = await res.json();
       setMatches(d.today ?? []);
-      if (d.updatedAt) setUpdatedAt(d.updatedAt);
     } catch { /* silent */ }
     finally {
       setLoading(false);
@@ -309,9 +290,8 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
   useEffect(() => {
     const isToday = selectedDate === new Date().toISOString().slice(0, 10);
 
-    // If SSR already loaded today's data, skip first fetch — just poll
     if (ssrLoadedRef.current && isToday) {
-      ssrLoadedRef.current = false; // Only skip once
+      ssrLoadedRef.current = false;
       const id = setInterval(() => fetchData(selectedDate), 90_000);
       return () => clearInterval(id);
     }
@@ -366,26 +346,26 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
 
   if (loading) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-3">
         <DayPicker selected={selectedDate} onChange={handleDateChange} />
         {timedOut ? (
-          <div className="py-4 text-center">
-            <p className="text-[12px] text-muted-foreground/50">Nie udalo sie zaladowac meczow.</p>
+          <div className="py-6 text-center">
+            <p className="text-[13px] text-muted-foreground">Nie udalo sie zaladowac meczow.</p>
             <button onClick={() => { setTimedOut(false); setLoading(true); fetchData(selectedDate); }}
-              className="mt-1.5 text-[11px] text-primary hover:underline cursor-pointer">Sprobuj ponownie</button>
+              className="mt-2 text-[12px] text-primary hover:underline cursor-pointer">Sprobuj ponownie</button>
           </div>
         ) : (
-          <div className="rounded-xl border border-border/15 overflow-hidden">
+          <div className="rounded-xl border border-border overflow-hidden bg-card">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-3 py-3 border-b border-border/10">
+              <div key={i} className="flex items-center gap-3 px-3 py-3.5 border-b border-border last:border-0">
                 <Skeleton className="h-4 w-10" />
-                <div className="flex-1 flex items-center justify-end gap-1.5">
+                <div className="flex-1 flex items-center justify-end gap-2">
                   <Skeleton className="h-3.5 w-20" />
-                  <Skeleton className="h-[18px] w-[18px] rounded-full" />
+                  <Skeleton className="h-5 w-5 rounded-full" />
                 </div>
-                <Skeleton className="h-5 w-10" />
-                <div className="flex-1 flex items-center gap-1.5">
-                  <Skeleton className="h-[18px] w-[18px] rounded-full" />
+                <Skeleton className="h-5 w-12" />
+                <div className="flex-1 flex items-center gap-2">
+                  <Skeleton className="h-5 w-5 rounded-full" />
                   <Skeleton className="h-3.5 w-20" />
                 </div>
               </div>
@@ -402,9 +382,9 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
 
       {/* Stats bar */}
       {matches.length > 0 && (
-        <div className="flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/30">
+        <div className="flex items-center justify-center gap-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
           {liveCount > 0 && (
-            <span className="text-destructive/80 flex items-center gap-1">
+            <span className="text-destructive flex items-center gap-1">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive live-dot" />
               {liveCount} live
             </span>
@@ -420,12 +400,12 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
         switching ? 'opacity-30' : 'opacity-100'
       )}>
         {sortedLeagues.length === 0 ? (
-          <div className="py-8 text-center space-y-1">
-            <p className="text-[14px] text-muted-foreground/50 font-display">Brak meczow na ten dzien</p>
-            <p className="text-[11px] text-muted-foreground/30">Wybierz inny dzien lub sprawdz newsy ponizej.</p>
+          <div className="py-10 text-center space-y-2">
+            <p className="text-[15px] text-foreground/60 font-display">Brak meczow na ten dzien</p>
+            <p className="text-[12px] text-muted-foreground">Wybierz inny dzien lub sprawdz tabele ponizej.</p>
           </div>
         ) : (
-          <div className="rounded-xl overflow-hidden border border-border/20 card-elevated">
+          <div className="rounded-xl overflow-hidden border border-border bg-card">
             {sortedLeagues.map(([code, ms], leagueIdx) => {
               const league = getLeague(code);
               const hasLive = ms.some(isLive);
@@ -434,29 +414,29 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
                 <div key={code}>
                   {/* League header */}
                   <div className={cn(
-                    'flex items-center gap-2 px-3 py-1.5 border-b border-border/10',
-                    hasLive ? 'bg-destructive/[0.08]' : 'bg-white/[0.02]',
-                    leagueIdx > 0 && 'border-t border-border/15'
+                    'flex items-center gap-2 px-3 py-2 border-b border-border',
+                    hasLive ? 'bg-destructive/[0.1]' : 'bg-accent/50',
+                    leagueIdx > 0 && 'border-t border-border'
                   )}>
                     {firstMatch?.competitionEmblem ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={firstMatch.competitionEmblem} alt={league?.name ?? code} className="h-4 w-4 object-contain" />
+                      <img src={firstMatch.competitionEmblem} alt="" className="h-4 w-4 object-contain" />
                     ) : (
-                      <span className="text-[13px] leading-none">{league?.flag ?? '\u26BD'}</span>
+                      <span className="text-sm leading-none">{league?.flag ?? '\u26BD'}</span>
                     )}
                     <span className={cn(
-                      'text-[10px] font-black uppercase tracking-widest',
-                      league?.color ?? 'text-muted-foreground/60'
+                      'text-[11px] font-black uppercase tracking-widest',
+                      league?.color ?? 'text-muted-foreground'
                     )}>
                       {league?.name ?? code}
                     </span>
                     {hasLive && (
                       <span className="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-destructive live-dot" />
                     )}
-                    <span className="text-[9px] text-muted-foreground/30 ml-auto score-display">{ms.length}</span>
+                    <span className="text-[10px] text-muted-foreground ml-auto score-display">{ms.length}</span>
                   </div>
 
-                  {ms.map((m, i) => <MatchRow key={m.id} match={m} index={i} />)}
+                  {ms.map((m) => <MatchRow key={m.id} match={m} />)}
                 </div>
               );
             })}

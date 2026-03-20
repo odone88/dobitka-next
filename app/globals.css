@@ -90,62 +90,62 @@ html {
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* ─── DOBITKA DARK THEME ─────────────────────────────────────────────── */
+/* ─── DOBITKA DARK THEME — FotMob/SofaScore inspired ─────────────────── */
 .dark {
-  /* Base: deep navy — nie czarny, a granatowy z charakterem */
-  --background: oklch(0.08 0.025 265);
-  --foreground: oklch(0.93 0.005 260);
+  /* Base: ciepły ciemny szary — nie czarny, nie granatowy */
+  --background: oklch(0.14 0.005 260);
+  --foreground: oklch(0.95 0.005 260);
 
-  /* Cards: ciemna powierzchnia z lekkim granatowym odcieniem */
-  --card: oklch(0.13 0.02 265);
-  --card-foreground: oklch(0.93 0.005 260);
+  /* Cards: wyraźnie jaśniejsze od tła — widoczna separacja */
+  --card: oklch(0.19 0.008 260);
+  --card-foreground: oklch(0.95 0.005 260);
 
-  --popover: oklch(0.13 0.02 265);
-  --popover-foreground: oklch(0.93 0.005 260);
+  --popover: oklch(0.19 0.008 260);
+  --popover-foreground: oklch(0.95 0.005 260);
 
-  /* Primary: DOBITKA green — żywy, energetyczny, gol */
-  --primary: oklch(0.72 0.24 150);
-  --primary-foreground: oklch(0.08 0.025 265);
+  /* Primary: DOBITKA green — żywy, energetyczny */
+  --primary: oklch(0.72 0.22 155);
+  --primary-foreground: oklch(0.10 0.02 265);
 
-  /* Secondary: ciemny slate */
-  --secondary: oklch(0.18 0.02 260);
-  --secondary-foreground: oklch(0.93 0.005 260);
+  /* Secondary: jaśniejsza powierzchnia */
+  --secondary: oklch(0.22 0.008 260);
+  --secondary-foreground: oklch(0.95 0.005 260);
 
-  /* Muted: wyciszony tekst z niebieskim tonem */
-  --muted: oklch(0.16 0.015 260);
-  --muted-foreground: oklch(0.60 0.02 250);
+  /* Muted: czytelny szary tekst */
+  --muted: oklch(0.22 0.008 260);
+  --muted-foreground: oklch(0.65 0.01 260);
 
-  /* Accent: subtle surface */
-  --accent: oklch(0.20 0.02 260);
-  --accent-foreground: oklch(0.93 0.005 260);
+  /* Accent: hover/focus */
+  --accent: oklch(0.24 0.01 260);
+  --accent-foreground: oklch(0.95 0.005 260);
 
-  /* Amber: żółte kartki, ostrzeżenia, wyróżnienia */
+  /* Amber: żółte kartki, ostrzeżenia */
   --amber: oklch(0.80 0.16 75);
 
-  /* Destructive: LIVE red — mocny, widoczny */
+  /* Destructive: LIVE red */
   --destructive: oklch(0.63 0.25 25);
 
-  /* Borders: subtelne ale czytelne */
-  --border: oklch(1 0 0 / 7%);
-  --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.72 0.24 150);
+  /* Borders: widoczne, nie ukryte */
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.72 0.22 155);
 
   /* Charts */
-  --chart-1: oklch(0.72 0.24 150);
+  --chart-1: oklch(0.72 0.22 155);
   --chart-2: oklch(0.80 0.16 75);
   --chart-3: oklch(0.63 0.25 25);
   --chart-4: oklch(0.60 0.18 260);
-  --chart-5: oklch(0.60 0.02 250);
+  --chart-5: oklch(0.65 0.01 260);
 
   /* Sidebar */
-  --sidebar: oklch(0.11 0.02 265);
-  --sidebar-foreground: oklch(0.93 0.005 260);
-  --sidebar-primary: oklch(0.72 0.24 150);
-  --sidebar-primary-foreground: oklch(0.08 0.025 265);
-  --sidebar-accent: oklch(0.16 0.015 260);
-  --sidebar-accent-foreground: oklch(0.93 0.005 260);
-  --sidebar-border: oklch(1 0 0 / 7%);
-  --sidebar-ring: oklch(0.72 0.24 150);
+  --sidebar: oklch(0.16 0.005 260);
+  --sidebar-foreground: oklch(0.95 0.005 260);
+  --sidebar-primary: oklch(0.72 0.22 155);
+  --sidebar-primary-foreground: oklch(0.10 0.02 265);
+  --sidebar-accent: oklch(0.22 0.008 260);
+  --sidebar-accent-foreground: oklch(0.95 0.005 260);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.72 0.22 155);
 }
 
 @layer base {

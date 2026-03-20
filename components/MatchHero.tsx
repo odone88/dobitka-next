@@ -116,7 +116,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
                   {m.status === 'PAUSED' ? 'PRZ' : `${m.minute}'`}
                 </span>
               )}
-              <span className="text-[9px] font-bold text-muted-foreground/30 uppercase">{m.competitionCode}</span>
+              <span className="text-[9px] font-bold text-muted-foreground uppercase">{m.competitionCode}</span>
             </a>
           ))}
         </div>
@@ -137,7 +137,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
 
     return (
       <div className="rounded-xl border border-border/30 bg-card overflow-hidden card-elevated">
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-white/[0.02] text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">
+        <div className="flex items-center gap-2 px-4 py-1.5 bg-white/[0.02] text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           Wyniki dnia
         </div>
         <div className="px-4 py-3 flex flex-wrap gap-x-6 gap-y-2">
@@ -151,13 +151,13 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
                 className="flex items-center gap-2 text-[14px] hover:bg-white/[0.03] rounded-lg px-2 py-1 -mx-2 transition-colors"
               >
                 <Crest src={m.homeCrest} name={m.homeTeam} size={20} />
-                <span className={cn('font-medium', homeWin ? 'text-foreground font-bold' : 'text-foreground/50')}>
+                <span className={cn('font-medium', homeWin ? 'text-foreground font-bold' : 'text-foreground/70')}>
                   {m.homeTeam}
                 </span>
                 <span className="score-display text-[16px] font-black text-foreground">
                   {m.homeScore}&thinsp;&ndash;&thinsp;{m.awayScore}
                 </span>
-                <span className={cn('font-medium', awayWin ? 'text-foreground font-bold' : 'text-foreground/50')}>
+                <span className={cn('font-medium', awayWin ? 'text-foreground font-bold' : 'text-foreground/70')}>
                   {m.awayTeam}
                 </span>
                 <Crest src={m.awayCrest} name={m.awayTeam} size={20} />
@@ -181,18 +181,18 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
         href={`/match/${next.id}`}
         className="block rounded-xl border border-border/30 bg-card overflow-hidden card-elevated hover:border-primary/20 transition-colors"
       >
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-white/[0.02] text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">
+        <div className="flex items-center gap-2 px-4 py-1.5 bg-white/[0.02] text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           Najblizszy mecz
         </div>
         <div className="px-4 py-3 flex items-center gap-3">
           <div className="flex items-center gap-2 text-[16px]">
             <Crest src={next.homeCrest} name={next.homeTeam} />
             <span className="font-bold text-foreground">{next.homeTeam}</span>
-            <span className="text-muted-foreground/25 font-black score-display">vs</span>
+            <span className="text-muted-foreground font-black score-display">vs</span>
             <span className="font-bold text-foreground">{next.awayTeam}</span>
             <Crest src={next.awayCrest} name={next.awayTeam} />
           </div>
-          <span className="text-[12px] text-muted-foreground/50 ml-auto score-display">
+          <span className="text-[12px] text-muted-foreground ml-auto score-display">
             {isToday ? `dzis ${time}` : `${day} \u00B7 ${time}`}
           </span>
           <span className="text-[10px] font-bold uppercase tracking-wide text-primary/50">

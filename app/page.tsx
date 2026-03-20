@@ -23,7 +23,7 @@ function SectionLabel({ text, id }: { text: string; id?: string }) {
   return (
     <h2 id={id} className="mb-3 flex items-center gap-3 scroll-mt-16">
       <span className="font-display text-[13px] font-normal tracking-wide text-primary">{text}</span>
-      <span className="flex-1 border-t border-border/20" aria-hidden="true" />
+      <span className="flex-1 border-t border-border" aria-hidden="true" />
     </h2>
   );
 }
@@ -65,7 +65,7 @@ export default async function HomePage() {
       <LiveToastContainer />
 
       {/* HEADER */}
-      <header className="sticky top-0 z-50 border-b border-border/30 bg-background/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-xl">
         <div className="max-w-screen-xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <a href="/" className="flex items-center gap-2 group">
@@ -73,7 +73,7 @@ export default async function HomePage() {
                 DOBITKA
               </h1>
             </a>
-            <span className="text-[11px] text-muted-foreground/40 hidden sm:block capitalize font-medium">{todayStr}</span>
+            <span className="text-[11px] text-muted-foreground hidden sm:block capitalize font-medium">{todayStr}</span>
           </div>
           <HomeClient />
         </div>
@@ -179,13 +179,13 @@ export default async function HomePage() {
 
         {/* FOOTER */}
         <div className="divider-retro my-6" />
-        <footer className="text-[11px] text-muted-foreground/30 pb-6 space-y-1">
+        <footer className="text-[11px] text-muted-foreground pb-6 space-y-1">
           <p>
-            <span className="text-muted-foreground/50 font-semibold">Zrodla:</span>{' '}
+            <span className="text-foreground/60 font-semibold">Zrodla:</span>{' '}
             football-data.org &middot; TheSportsDB &middot; BBC Sport &middot; The Guardian &middot; Weszlo.com &middot; Tifo Football
           </p>
           <p>Live: 90s &middot; UCL: 5min &middot; Tabele: 2h &middot; Newsy: 15min</p>
-          <p className="text-primary/30 font-bold uppercase tracking-widest text-[9px]">DOBITKA &mdash; codziennie, bezkompromisowo</p>
+          <p className="text-primary/60 font-bold uppercase tracking-widest text-[9px]">DOBITKA &mdash; codziennie, bezkompromisowo</p>
         </footer>
       </main>
     </div>

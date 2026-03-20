@@ -119,7 +119,7 @@ export function LeagueTable({ leagueCode, delay = 0 }: { leagueCode: string; del
       <div className="overflow-x-auto -mx-0.5">
         <table className="w-full min-w-[300px]" style={{ fontSize: '13px' }}>
           <thead>
-            <tr className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-wider border-b border-border/40">
+            <tr className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider border-b border-border">
               <th className="w-7 text-left pb-1.5 pl-2">#</th>
               <th className="text-left pb-1.5">Drużyna</th>
               <th className="text-center pb-1.5 w-7 hidden sm:table-cell">M</th>
@@ -138,12 +138,12 @@ export function LeagueTable({ leagueCode, delay = 0 }: { leagueCode: string; del
                 <tr
                   key={row.position}
                   className={cn(
-                    'hover:bg-white/[0.03] transition-colors',
+                    'hover:bg-accent/50 transition-colors',
                     ZONE_BORDER[zone]
                   )}
                 >
                   <td className="py-1.5 pl-2">
-                    <span className="tabular-nums text-muted-foreground/60 w-5 inline-block text-center">{row.position}</span>
+                    <span className="tabular-nums text-muted-foreground w-5 inline-block text-center">{row.position}</span>
                   </td>
                   <td className="py-1.5 pr-2 max-w-[140px]">
                     <div className="flex items-center gap-1.5 min-w-0">
@@ -153,16 +153,16 @@ export function LeagueTable({ leagueCode, delay = 0 }: { leagueCode: string; del
                       <span className="truncate text-foreground font-medium leading-tight">{row.teamName}</span>
                     </div>
                   </td>
-                  <td className="py-1.5 text-center text-muted-foreground/70 hidden sm:table-cell">{row.played}</td>
+                  <td className="py-1.5 text-center text-muted-foreground hidden sm:table-cell">{row.played}</td>
                   <td className="py-1.5 text-center text-emerald-400 font-semibold">{row.won}</td>
-                  <td className="py-1.5 text-center text-muted-foreground/60 hidden sm:table-cell">{row.draw}</td>
-                  <td className="py-1.5 text-center text-red-400/70 hidden sm:table-cell">{row.lost}</td>
-                  <td className="py-1.5 text-center text-muted-foreground/70 tabular-nums">
+                  <td className="py-1.5 text-center text-muted-foreground hidden sm:table-cell">{row.draw}</td>
+                  <td className="py-1.5 text-center text-red-400 hidden sm:table-cell">{row.lost}</td>
+                  <td className="py-1.5 text-center text-muted-foreground tabular-nums">
                     {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
                   </td>
                   <td className="py-1.5 text-center relative">
                     <div
-                      className="absolute inset-y-0.5 left-0 bg-primary/[0.07] rounded-r"
+                      className="absolute inset-y-0.5 left-0 bg-primary/[0.12] rounded-r"
                       style={{ width: `${(row.points / maxPoints) * 100}%` }}
                     />
                     <span className="relative score-display font-black text-[15px] text-foreground">{row.points}</span>
@@ -181,7 +181,7 @@ export function LeagueTable({ leagueCode, delay = 0 }: { leagueCode: string; del
       {total > 10 && (
         <button
           onClick={() => setShowFull(!showFull)}
-          className="w-full text-[11px] text-muted-foreground/60 hover:text-muted-foreground py-1.5 border border-dashed border-border/40 hover:border-border/70 rounded-lg transition-colors"
+          className="w-full text-[11px] text-muted-foreground hover:text-foreground py-1.5 border border-dashed border-border hover:border-primary/40 rounded-lg transition-colors cursor-pointer"
         >
           {showFull ? 'Zwiń ↑' : `Pokaż wszystkie ${total} drużyn ↓`}
         </button>
@@ -201,21 +201,21 @@ export function LeagueTable({ leagueCode, delay = 0 }: { leagueCode: string; del
           .map(({ label, color }) => (
             <div key={label} className="flex items-center gap-1">
               <span className={`w-2 h-2 rounded-sm ${color}`} />
-              <span className="text-[10px] text-muted-foreground/60">{label}</span>
+              <span className="text-[10px] text-muted-foreground">{label}</span>
             </div>
           ))}
       </div>
 
       {/* Scorers */}
       {scorers.length > 0 && (
-        <div className="pt-2 border-t border-border/30">
+        <div className="pt-2 border-t border-border">
           <p className="label-retro mb-1.5">Strzelcy</p>
           <div className="space-y-1">
             {scorers.slice(0, 5).map((s, i) => (
               <div key={s.playerName} className="flex items-center gap-2 text-[13px]">
-                <span className="text-[10px] text-muted-foreground/40 w-4 tabular-nums text-right">{i + 1}.</span>
+                <span className="text-[10px] text-muted-foreground w-4 tabular-nums text-right">{i + 1}.</span>
                 <span className="text-foreground flex-1 truncate">{s.playerName}</span>
-                <span className="text-muted-foreground/60 text-[11px] truncate max-w-[60px]">{s.teamName}</span>
+                <span className="text-muted-foreground text-[11px] truncate max-w-[60px]">{s.teamName}</span>
                 <Badge variant="secondary" className="text-[11px] h-5 px-1.5 font-black score-display">{s.goals}</Badge>
               </div>
             ))}
