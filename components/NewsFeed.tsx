@@ -37,7 +37,7 @@ function ArticleCard({ item }: { item: NewsItem }) {
       href={item.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex flex-col gap-1.5 py-3 border-b border-border/30 last:border-0 hover:bg-white/[0.02] -mx-1 px-1 rounded transition-colors"
+      className="group flex flex-col gap-1.5 py-3 border-b border-border last:border-0 hover:bg-white/[0.02] -mx-1 px-1 rounded transition-colors"
     >
       <p className="text-[14px] leading-snug text-foreground group-hover:text-primary transition-colors font-medium">
         {item.title}
@@ -53,8 +53,8 @@ function ArticleCard({ item }: { item: NewsItem }) {
             {meta.flag} {meta.label}
           </span>
         )}
-        <span className="text-[11px] text-muted-foreground/50">·</span>
-        <span className="text-[11px] text-muted-foreground/60">{formatDistanceToNow(item.publishedAt)}</span>
+        <span className="text-[11px] text-muted-foreground">·</span>
+        <span className="text-[11px] text-muted-foreground">{formatDistanceToNow(item.publishedAt)}</span>
         {isRecent(item.publishedAt) && (
           <span className="text-[9px] font-black uppercase tracking-wider text-red-400 bg-red-400/10 px-1.5 py-0.5 rounded">NEW</span>
         )}
@@ -69,7 +69,7 @@ function TifoCard({ item }: { item: NewsItem }) {
       href={item.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex gap-3 py-3 border-b border-border/30 last:border-0 hover:bg-white/[0.02] -mx-1 px-1 rounded transition-colors"
+      className="group flex gap-3 py-3 border-b border-border last:border-0 hover:bg-white/[0.02] -mx-1 px-1 rounded transition-colors"
     >
       {item.thumbnail && (
         <img
@@ -97,7 +97,7 @@ function RedditCard({ item }: { item: NewsItem }) {
       href={item.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex flex-col gap-1.5 py-3 border-b border-border/30 last:border-0 hover:bg-white/[0.02] -mx-1 px-1 rounded transition-colors"
+      className="group flex flex-col gap-1.5 py-3 border-b border-border last:border-0 hover:bg-white/[0.02] -mx-1 px-1 rounded transition-colors"
     >
       <p className="text-[14px] leading-snug text-foreground group-hover:text-primary transition-colors font-medium">
         {item.title}
@@ -108,20 +108,20 @@ function RedditCard({ item }: { item: NewsItem }) {
         </span>
         {item.score != null && (
           <>
-            <span className="text-[11px] text-muted-foreground/50">·</span>
+            <span className="text-[11px] text-muted-foreground">·</span>
             <span className="text-[11px] text-orange-300/70 font-bold">{item.score} ▲</span>
           </>
         )}
         {item.comments != null && (
           <>
-            <span className="text-[11px] text-muted-foreground/50">·</span>
-            <span className="text-[11px] text-muted-foreground/60">{item.comments} komentarzy</span>
+            <span className="text-[11px] text-muted-foreground">·</span>
+            <span className="text-[11px] text-muted-foreground">{item.comments} komentarzy</span>
           </>
         )}
         {item.description && (
           <>
-            <span className="text-[11px] text-muted-foreground/50">·</span>
-            <span className="text-[10px] text-muted-foreground/40 uppercase">{item.description}</span>
+            <span className="text-[11px] text-muted-foreground">·</span>
+            <span className="text-[10px] text-muted-foreground uppercase">{item.description}</span>
           </>
         )}
       </div>
@@ -202,7 +202,7 @@ export function NewsFeed() {
     <div>
       {/* Tabs */}
       {activeTabs.length > 1 && (
-        <div className="flex gap-1 mb-1 flex-wrap border-b border-border/30 pb-2">
+        <div className="flex gap-1 mb-1 flex-wrap border-b border-border pb-2">
           {activeTabs.map((t) => {
             const m = TAB_META[t];
             const isActive = currentTab === t;

@@ -24,18 +24,18 @@ function ScoreHeader({ match }: { match: MatchDetail }) {
   return (
     <div className={cn(
       'rounded-xl overflow-hidden',
-      live ? 'border border-destructive/40 border-live' : 'border border-border/20'
+      live ? 'border border-destructive/40 border-live' : 'border border-border'
     )}>
       {/* Competition bar */}
       <div className={cn(
         'flex items-center justify-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-widest',
-        live ? 'bg-destructive text-white' : 'bg-white/[0.03] text-muted-foreground/50'
+        live ? 'bg-destructive text-white' : 'bg-white/[0.03] text-muted-foreground'
       )}>
         {match.competitionEmblem && (
           <img src={match.competitionEmblem} alt="" className="w-4 h-4" loading="lazy" />
         )}
         {match.competition}
-        {match.matchday && <span className="text-muted-foreground/30">· Kolejka {match.matchday}</span>}
+        {match.matchday && <span className="text-muted-foreground">· Kolejka {match.matchday}</span>}
       </div>
 
       {/* Score area */}
@@ -68,14 +68,14 @@ function ScoreHeader({ match }: { match: MatchDetail }) {
                   {match.homeScore}&thinsp;–&thinsp;{match.awayScore}
                 </div>
                 {match.halfTimeHome !== null && match.halfTimeAway !== null && (
-                  <span className="text-[11px] score-display text-muted-foreground/40">
+                  <span className="text-[11px] score-display text-muted-foreground">
                     Polowa: {match.halfTimeHome}–{match.halfTimeAway}
                   </span>
                 )}
               </>
             ) : (
               <div className="flex flex-col items-center gap-0.5">
-                <span className="score-display text-[28px] font-black text-muted-foreground/30">vs</span>
+                <span className="score-display text-[28px] font-black text-muted-foreground">vs</span>
               </div>
             )}
 
@@ -90,7 +90,7 @@ function ScoreHeader({ match }: { match: MatchDetail }) {
               </span>
             )}
             {finished && (
-              <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest mt-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">
                 Zakonczony
               </span>
             )}
@@ -114,7 +114,7 @@ function ScoreHeader({ match }: { match: MatchDetail }) {
         </div>
 
         {/* Date */}
-        <p className="text-center text-[11px] text-muted-foreground/40 mt-4 capitalize">{date}</p>
+        <p className="text-center text-[11px] text-muted-foreground mt-4 capitalize">{date}</p>
       </div>
     </div>
   );
@@ -137,13 +137,13 @@ function EventsTimeline({ goals, homeTeamId }: { goals: MatchGoal[]; homeTeamId:
               <div
                 key={i}
                 className={cn(
-                  'flex items-center gap-3 py-2 border-b border-border/10 last:border-0',
+                  'flex items-center gap-3 py-2 border-b border-border last:border-0',
                   'animate-fade-in'
                 )}
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 {/* Minuta */}
-                <span className="score-display text-[12px] font-bold text-muted-foreground/50 w-8 text-right flex-shrink-0">
+                <span className="score-display text-[12px] font-bold text-muted-foreground w-8 text-right flex-shrink-0">
                   {goal.minute}&apos;
                 </span>
 
@@ -162,7 +162,7 @@ function EventsTimeline({ goals, homeTeamId }: { goals: MatchGoal[]; homeTeamId:
                     <span className="text-[10px] text-destructive ml-1">(samobojczy)</span>
                   )}
                   {goal.assist && (
-                    <span className="text-[11px] text-muted-foreground/50 ml-1.5">
+                    <span className="text-[11px] text-muted-foreground ml-1.5">
                       ← {goal.assist}
                     </span>
                   )}
@@ -171,7 +171,7 @@ function EventsTimeline({ goals, homeTeamId }: { goals: MatchGoal[]; homeTeamId:
                 {/* Strona boiska */}
                 <span className={cn(
                   'text-[9px] font-bold uppercase tracking-widest flex-shrink-0',
-                  isHome ? 'text-primary/50' : 'text-muted-foreground/30'
+                  isHome ? 'text-primary' : 'text-muted-foreground'
                 )}>
                   {isHome ? 'DOM' : 'WYJ'}
                 </span>
@@ -204,13 +204,13 @@ function H2HSection({ h2h, homeTeam, awayTeam }: { h2h: MatchDetail['head2head']
         <div className="mb-4">
           <div className="flex items-center justify-between text-[11px] font-bold mb-1.5">
             <span className="text-primary">{homeTeam} {h2h.homeWins}</span>
-            <span className="text-muted-foreground/40">{h2h.draws} remisy</span>
+            <span className="text-muted-foreground">{h2h.draws} remisy</span>
             <span className="text-foreground/60">{awayTeam} {h2h.awayWins}</span>
           </div>
           <div className="flex h-2 rounded-full overflow-hidden bg-muted">
             <div className="bg-primary transition-all" style={{ width: `${homePercent}%` }} />
-            <div className="bg-muted-foreground/30 transition-all" style={{ width: `${drawPercent}%` }} />
-            <div className="bg-foreground/40 transition-all" style={{ width: `${awayPercent}%` }} />
+            <div className="bg-muted-foreground/50 transition-all" style={{ width: `${drawPercent}%` }} />
+            <div className="bg-foreground/50 transition-all" style={{ width: `${awayPercent}%` }} />
           </div>
         </div>
 
@@ -221,14 +221,14 @@ function H2HSection({ h2h, homeTeam, awayTeam }: { h2h: MatchDetail['head2head']
               day: 'numeric', month: 'short', year: 'numeric'
             });
             return (
-              <div key={i} className="flex items-center gap-2 py-1.5 border-b border-border/10 last:border-0 text-[12px]">
-                <span className="text-muted-foreground/40 w-20 flex-shrink-0 text-[10px]">{date}</span>
+              <div key={i} className="flex items-center gap-2 py-1.5 border-b border-border last:border-0 text-[12px]">
+                <span className="text-muted-foreground w-20 flex-shrink-0 text-[10px]">{date}</span>
                 <span className="flex-1 text-right truncate text-foreground/70">{m.homeTeam}</span>
                 <span className="score-display font-bold text-foreground min-w-[36px] text-center">
                   {m.homeScore}–{m.awayScore}
                 </span>
                 <span className="flex-1 truncate text-foreground/70">{m.awayTeam}</span>
-                <span className="text-[9px] text-muted-foreground/30 w-12 text-right flex-shrink-0 truncate">
+                <span className="text-[9px] text-muted-foreground w-12 text-right flex-shrink-0 truncate">
                   {m.competition}
                 </span>
               </div>
@@ -260,8 +260,8 @@ function MatchInfo({ match }: { match: MatchDetail }) {
         <div className="grid grid-cols-2 gap-x-4 gap-y-2">
           {infoPairs.map(([label, value]) => (
             <div key={label}>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 block">{label}</span>
-              <span className="text-[13px] text-foreground/80">{value}</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block">{label}</span>
+              <span className="text-[13px] text-foreground">{value}</span>
             </div>
           ))}
         </div>
@@ -327,7 +327,7 @@ export function MatchDetailView({ matchId, initialMatch = null }: { matchId: str
   if (error || !match) {
     return (
       <div className="py-16 text-center">
-        <p className="text-[16px] font-display text-muted-foreground/50">Nie znaleziono meczu</p>
+        <p className="text-[16px] font-display text-muted-foreground">Nie znaleziono meczu</p>
         <a href="/" className="text-[13px] text-primary hover:underline mt-2 inline-block">
           ← Wstecz do strony glownej
         </a>
@@ -344,7 +344,7 @@ export function MatchDetailView({ matchId, initialMatch = null }: { matchId: str
 
       {/* Link do powrotu */}
       <div className="text-center py-4">
-        <a href="/" className="text-[12px] text-muted-foreground/40 hover:text-primary transition-colors">
+        <a href="/" className="text-[12px] text-muted-foreground hover:text-primary transition-colors">
           ← Wstecz do strony glownej
         </a>
       </div>

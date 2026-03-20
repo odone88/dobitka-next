@@ -13,7 +13,7 @@ function TieRow({ tie }: { tie: BracketTie }) {
   return (
     <div className={cn(
       'rounded-lg border overflow-hidden',
-      tie.isLive ? 'border-red-500/60 shadow-[0_0_8px_oklch(0.62_0.22_25/0.15)]' : 'border-border/40',
+      tie.isLive ? 'border-red-500/60 shadow-[0_0_8px_oklch(0.62_0.22_25/0.15)]' : 'border-border',
     )}>
       {/* Team rows */}
       {[
@@ -24,7 +24,7 @@ function TieRow({ tie }: { tie: BracketTie }) {
           key={i}
           className={cn(
             'flex items-center gap-2 px-3 py-1.5',
-            i === 0 && 'border-b border-border/20',
+            i === 0 && 'border-b border-border',
             side.isWinner && 'bg-blue-500/10',
           )}
         >
@@ -52,7 +52,7 @@ function TieRow({ tie }: { tie: BracketTie }) {
 
       {/* Leg scores */}
       {hasAnyScore && (
-        <div className="px-3 py-1 bg-white/[0.02] border-t border-border/20 flex items-center gap-3 text-[10px] text-muted-foreground/50">
+        <div className="px-3 py-1 bg-white/[0.02] border-t border-border flex items-center gap-3 text-[10px] text-muted-foreground">
           {tie.leg1 && tie.leg1.homeScore !== null && (
             <span>
               Mecz 1: <span className="text-foreground/60 tabular-nums">{tie.leg1.homeScore}–{tie.leg1.awayScore}</span>
@@ -87,7 +87,7 @@ function BracketColumn({ round, isActive }: { round: BracketRound; isActive: boo
       {round.ties.length > 0 ? (
         round.ties.map((tie, i) => <TieRow key={i} tie={tie} />)
       ) : (
-        <p className="text-[12px] text-muted-foreground/40 text-center py-3">Brak meczów w tej rundzie</p>
+        <p className="text-[12px] text-muted-foreground text-center py-3">Brak meczów w tej rundzie</p>
       )}
     </div>
   );
@@ -131,7 +131,7 @@ export function UCLBracket() {
         <p className="text-[14px] text-muted-foreground">
           {error ? 'Nie udalo sie zaladowac drabinki LM' : 'Przerwa w rozgrywkach Ligi Mistrzow'}
         </p>
-        <p className="text-[12px] text-muted-foreground/40">
+        <p className="text-[12px] text-muted-foreground">
           {error ? 'Sprawdz za chwile.' : 'Nastepna runda wkrotce — dane pojawia sie automatycznie.'}
         </p>
       </div>
@@ -158,8 +158,8 @@ export function UCLBracket() {
                     ? 'bg-blue-600 text-white'
                     : hasLive
                     ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                    : 'text-muted-foreground/60 hover:text-foreground hover:bg-white/5',
-                  allDone && activeIdx !== i && 'text-muted-foreground/40',
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/5',
+                  allDone && activeIdx !== i && 'text-muted-foreground',
                 )}
               >
                 {r.label}
@@ -174,7 +174,7 @@ export function UCLBracket() {
           })}
           {/* Bracket progression arrows */}
           {rounds.length > 1 && (
-            <div className="flex-shrink-0 text-[10px] text-muted-foreground/20 px-1 hidden sm:block">
+            <div className="flex-shrink-0 text-[10px] text-muted-foreground/50 px-1 hidden sm:block">
               → Finał
             </div>
           )}
@@ -183,7 +183,7 @@ export function UCLBracket() {
 
       {/* Subtitle */}
       {subtitle && (
-        <p className="text-[11px] text-muted-foreground/60 italic">{subtitle}</p>
+        <p className="text-[11px] text-muted-foreground italic">{subtitle}</p>
       )}
 
       {/* Ties */}

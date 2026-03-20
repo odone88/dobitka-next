@@ -136,7 +136,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
       .slice(0, 4);
 
     return (
-      <div className="rounded-xl border border-border/30 bg-card overflow-hidden card-elevated">
+      <div className="rounded-xl border border-border bg-card overflow-hidden card-elevated">
         <div className="flex items-center gap-2 px-4 py-1.5 bg-white/[0.02] text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           Wyniki dnia
         </div>
@@ -179,7 +179,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
     return (
       <a
         href={`/match/${next.id}`}
-        className="block rounded-xl border border-border/30 bg-card overflow-hidden card-elevated hover:border-primary/20 transition-colors"
+        className="block rounded-xl border border-border bg-card overflow-hidden card-elevated hover:border-primary/20 transition-colors"
       >
         <div className="flex items-center gap-2 px-4 py-1.5 bg-white/[0.02] text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           Najblizszy mecz
