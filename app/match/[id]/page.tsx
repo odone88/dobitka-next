@@ -1,6 +1,5 @@
-import { Suspense } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
 import { MatchDetailView } from '@/components/MatchDetail';
+import { getMatchFull } from '@/lib/data-sources/football-data';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -8,18 +7,31 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
+  const matchId = parseInt(id, 10);
+  if (isNaN(matchId)) {
+    return { title: 'Mecz — DOBITKA' };
+  }
+
+  const match = await getMatchFull(matchId);
+  if (!match) {
+    return { title: `Mecz #${id} — DOBITKA` };
+  }
+
   return {
-    title: `Mecz #${id} — DOBITKA`,
-    description: 'Szczegoly meczu, strzelcy, statystyki — DOBITKA',
+    title: `${match.homeTeam} vs ${match.awayTeam} — DOBITKA`,
+    description: `${match.competition}${match.homeScore !== null ? ` | ${match.homeScore}:${match.awayScore}` : ''} — DOBITKA`,
   };
 }
 
 export default async function MatchPage({ params }: Props) {
   const { id } = await params;
+  const matchId = parseInt(id, 10);
+
+  // SSR fetch — match detail renders immediately, no skeleton
+  const initialMatch = !isNaN(matchId) ? await getMatchFull(matchId) : null;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Compact header */}
       <header className="sticky top-0 z-50 border-b border-border/30 bg-background/90 backdrop-blur-xl">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-4">
           <a
@@ -36,20 +48,8 @@ export default async function MatchPage({ params }: Props) {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-6">
-        <Suspense fallback={<MatchSkeleton />}>
-          <MatchDetailView matchId={id} />
-        </Suspense>
+        <MatchDetailView matchId={id} initialMatch={initialMatch} />
       </main>
-    </div>
-  );
-}
-
-function MatchSkeleton() {
-  return (
-    <div className="space-y-6">
-      <Skeleton className="h-48 w-full rounded-xl" />
-      <Skeleton className="h-32 w-full rounded-xl" />
-      <Skeleton className="h-24 w-full rounded-xl" />
     </div>
   );
 }

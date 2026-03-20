@@ -271,40 +271,49 @@ function MatchInfo({ match }: { match: MatchDetail }) {
 }
 
 /* ─── Main MatchDetailView ───────────────────────────────────────── */
-export function MatchDetailView({ matchId }: { matchId: string }) {
-  const [match, setMatch] = useState<MatchDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+export function MatchDetailView({ matchId, initialMatch = null }: { matchId: string; initialMatch?: MatchDetail | null }) {
+  const [match, setMatch] = useState<MatchDetail | null>(initialMatch);
+  const [loading, setLoading] = useState(!initialMatch);
   const [error, setError] = useState(false);
-  const matchRef = useRef<MatchDetail | null>(null);
+  const matchRef = useRef<MatchDetail | null>(initialMatch);
 
   const fetchMatch = useCallback(async () => {
     try {
       const res = await fetch(`/api/match/${matchId}`);
       if (!res.ok) {
-        setError(true);
+        if (!match) setError(true);
         return;
       }
       const data = await res.json();
       setMatch(data);
       matchRef.current = data;
     } catch {
-      setError(true);
+      if (!match) setError(true);
     } finally {
       setLoading(false);
     }
-  }, [matchId]);
+  }, [matchId, match]);
 
   useEffect(() => {
-    fetchMatch();
+    // If we have SSR data, skip initial fetch — just poll for live
+    if (initialMatch) {
+      const id = setInterval(() => {
+        if (matchRef.current && isLive(matchRef.current.status)) {
+          fetchMatch();
+        }
+      }, 60_000);
+      return () => clearInterval(id);
+    }
 
-    // Auto-refresh — uzywam ref zeby uniknac stale closure
+    fetchMatch();
     const id = setInterval(() => {
       if (matchRef.current && isLive(matchRef.current.status)) {
         fetchMatch();
       }
     }, 60_000);
     return () => clearInterval(id);
-  }, [fetchMatch]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return (
