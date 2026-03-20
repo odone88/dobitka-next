@@ -54,11 +54,11 @@ export function FavoritesPicker({ isOpen, onClose, onChanged }: Props) {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleDone} />
 
       {/* Modal */}
-      <div className="relative bg-card border border-border/30 rounded-2xl max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl animate-fade-in">
+      <div className="relative bg-card border border-border rounded-2xl max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl animate-fade-in">
         {/* Header */}
-        <div className="p-5 pb-3 border-b border-border/20">
+        <div className="p-5 pb-3 border-b border-border">
           <h2 className="font-display text-xl text-primary">Moje druzyny</h2>
-          <p className="text-[12px] text-muted-foreground/50 mt-1">
+          <p className="text-[12px] text-muted-foreground mt-1">
             Wybierz ulubione — ich mecze beda zawsze na gorze.
           </p>
         </div>
@@ -67,7 +67,7 @@ export function FavoritesPicker({ isOpen, onClose, onChanged }: Props) {
         <div className="p-4 overflow-y-auto max-h-[55vh] space-y-4">
           {[...byLeague.entries()].map(([league, teams]) => (
             <div key={league}>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 block mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block mb-2">
                 {LEAGUE_LABELS[league] ?? league}
               </span>
               <div className="flex flex-wrap gap-2">
@@ -82,7 +82,7 @@ export function FavoritesPicker({ isOpen, onClose, onChanged }: Props) {
                         'border',
                         isSelected
                           ? 'bg-primary/20 border-primary/50 text-primary'
-                          : 'bg-white/[0.03] border-border/20 text-foreground/60 hover:border-border/40 hover:text-foreground'
+                          : 'bg-white/[0.03] border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
                       )}
                     >
                       {team.shortName}
@@ -95,8 +95,8 @@ export function FavoritesPicker({ isOpen, onClose, onChanged }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-border/20 flex items-center justify-between">
-          <span className="text-[11px] text-muted-foreground/40">
+        <div className="p-4 border-t border-border flex items-center justify-between">
+          <span className="text-[11px] text-muted-foreground">
             {selected.length > 0 ? `${selected.length} wybranych` : 'Zadna nie wybrana'}
           </span>
           <button

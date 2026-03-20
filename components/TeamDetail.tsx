@@ -61,7 +61,7 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
   if (error || !team) {
     return (
       <div className="py-16 text-center">
-        <p className="text-[16px] font-display text-muted-foreground/50">Nie znaleziono druzyny</p>
+        <p className="text-[16px] font-display text-muted-foreground">Nie znaleziono druzyny</p>
         <a href="/" className="text-[13px] text-primary hover:underline mt-2 inline-block">← Strona glowna</a>
       </div>
     );
@@ -76,14 +76,14 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
   return (
     <div className="space-y-4">
       {/* Team Header */}
-      <div className="rounded-xl border border-border/20 bg-card overflow-hidden">
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="p-6 flex items-center gap-5">
           {team.crest && (
             <img src={team.crest} alt={team.name} className="w-20 h-20 object-contain flex-shrink-0" />
           )}
           <div className="min-w-0">
             <h1 className="font-display text-2xl text-foreground leading-tight">{team.name}</h1>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[11px] text-muted-foreground/50">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[11px] text-muted-foreground">
               {team.venue && <span>🏟 {team.venue}</span>}
               {team.founded && <span>📅 Zal. {team.founded}</span>}
               {team.coach && <span>👔 {team.coach.name}</span>}
@@ -91,7 +91,7 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
             {team.competitions.length > 0 && (
               <div className="flex gap-1.5 mt-2">
                 {team.competitions.map((c) => (
-                  <span key={c.code} className="text-[9px] px-2 py-0.5 rounded bg-white/[0.05] text-muted-foreground/60 font-bold uppercase tracking-widest">
+                  <span key={c.code} className="text-[9px] px-2 py-0.5 rounded bg-white/[0.05] text-muted-foreground font-bold uppercase tracking-widest">
                     {c.code}
                   </span>
                 ))}
@@ -127,7 +127,7 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
                   <a
                     key={m.id}
                     href={`/match/${m.id}`}
-                    className="flex items-center gap-2 py-1.5 border-b border-border/10 last:border-0 text-[12px] hover:bg-white/[0.02] transition-colors"
+                    className="flex items-center gap-2 py-1.5 border-b border-border last:border-0 text-[12px] hover:bg-white/[0.02] transition-colors"
                   >
                     <span className={cn(
                       'w-5 h-5 rounded flex items-center justify-center text-[9px] font-black flex-shrink-0',
@@ -135,11 +135,11 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
                     )}>
                       {m.result}
                     </span>
-                    <span className="text-muted-foreground/40 w-12 flex-shrink-0 text-[10px]">{d}</span>
-                    <span className="flex-1 truncate text-foreground/70">
+                    <span className="text-muted-foreground w-12 flex-shrink-0 text-[10px]">{d}</span>
+                    <span className="flex-1 truncate text-foreground">
                       {m.homeTeam} <span className="score-display font-bold text-foreground">{m.homeScore}–{m.awayScore}</span> {m.awayTeam}
                     </span>
-                    <span className="text-[9px] text-muted-foreground/30 flex-shrink-0 truncate max-w-[60px]">{m.competition}</span>
+                    <span className="text-[9px] text-muted-foreground flex-shrink-0 truncate max-w-[60px]">{m.competition}</span>
                   </a>
                 );
               })}
@@ -162,13 +162,13 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
                   <a
                     key={m.id}
                     href={`/match/${m.id}`}
-                    className="flex items-center gap-2 py-2 border-b border-border/10 last:border-0 text-[12px] hover:bg-white/[0.02] transition-colors"
+                    className="flex items-center gap-2 py-2 border-b border-border last:border-0 text-[12px] hover:bg-white/[0.02] transition-colors"
                   >
-                    <span className="text-muted-foreground/40 w-20 flex-shrink-0 text-[10px]">{dateStr}</span>
-                    <span className="flex-1 truncate font-medium text-foreground/80">
+                    <span className="text-muted-foreground w-20 flex-shrink-0 text-[10px]">{dateStr}</span>
+                    <span className="flex-1 truncate font-medium text-foreground">
                       {m.homeTeam} vs {m.awayTeam}
                     </span>
-                    <span className="score-display text-[11px] text-primary/60 flex-shrink-0">{timeStr}</span>
+                    <span className="score-display text-[11px] text-primary flex-shrink-0">{timeStr}</span>
                   </a>
                 );
               })}
@@ -187,15 +187,15 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
               if (players.length === 0) return null;
               return (
                 <div key={pos} className="mb-3 last:mb-0">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40 block mb-1.5">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground block mb-1.5">
                     {POSITION_PL[pos] ?? pos}
                   </span>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
                     {players.map((p) => (
                       <div key={p.id} className="text-[12px] py-1 px-2 rounded bg-white/[0.02] flex items-center gap-1.5">
-                        <span className="text-foreground/80 truncate">{p.name}</span>
+                        <span className="text-foreground truncate">{p.name}</span>
                         {p.dateOfBirth && (
-                          <span className="text-[9px] text-muted-foreground/30 flex-shrink-0">{age(p.dateOfBirth)}</span>
+                          <span className="text-[9px] text-muted-foreground flex-shrink-0">{age(p.dateOfBirth)}</span>
                         )}
                       </div>
                     ))}
@@ -214,32 +214,32 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
           <div className="grid grid-cols-2 gap-3 text-[12px]">
             {team.venue && (
               <div>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40 block">Stadion</span>
-                <span className="text-foreground/70">{team.venue}</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground block">Stadion</span>
+                <span className="text-foreground">{team.venue}</span>
               </div>
             )}
             {team.founded && (
               <div>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40 block">Zalozony</span>
-                <span className="text-foreground/70">{team.founded}</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground block">Zalozony</span>
+                <span className="text-foreground">{team.founded}</span>
               </div>
             )}
             {team.clubColors && (
               <div>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40 block">Barwy</span>
-                <span className="text-foreground/70">{team.clubColors}</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground block">Barwy</span>
+                <span className="text-foreground">{team.clubColors}</span>
               </div>
             )}
             {team.address && (
               <div>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40 block">Adres</span>
-                <span className="text-foreground/70">{team.address}</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground block">Adres</span>
+                <span className="text-foreground">{team.address}</span>
               </div>
             )}
           </div>
           {team.website && (
             <a href={team.website} target="_blank" rel="noopener noreferrer"
-               className="text-[11px] text-primary/60 hover:text-primary transition-colors mt-3 inline-block">
+               className="text-[11px] text-primary hover:text-primary transition-colors mt-3 inline-block">
               {team.website} ↗
             </a>
           )}
@@ -247,7 +247,7 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
       </Card>
 
       <div className="text-center py-4">
-        <a href="/" className="text-[12px] text-muted-foreground/40 hover:text-primary transition-colors">← Strona glowna</a>
+        <a href="/" className="text-[12px] text-muted-foreground hover:text-primary transition-colors">← Strona glowna</a>
       </div>
     </div>
   );
