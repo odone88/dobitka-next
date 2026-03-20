@@ -275,9 +275,9 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
 }
 
 /* ─── Main Component ─────────────────────────────────────────────── */
-export function TodayMatches({ initialMatches = [] }: { initialMatches?: Match[] }) {
+export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initialMatches?: Match[]; ssrLoaded?: boolean }) {
   const [matches, setMatches] = useState<Match[]>(initialMatches);
-  const [loading, setLoading] = useState(initialMatches.length === 0);
+  const [loading, setLoading] = useState(!ssrLoaded && initialMatches.length === 0);
   const [timedOut, setTimedOut] = useState(false);
   const [switching, setSwitching] = useState(false);
   const [updatedAt, setUpdatedAt] = useState('');
@@ -304,19 +304,23 @@ export function TodayMatches({ initialMatches = [] }: { initialMatches?: Match[]
     return () => clearTimeout(t);
   }, [loading]);
 
+  const ssrLoadedRef = useRef(ssrLoaded);
+
   useEffect(() => {
-    // If we have SSR data for today, skip initial fetch — just poll
     const isToday = selectedDate === new Date().toISOString().slice(0, 10);
-    if (initialMatches.length > 0 && isToday && !switching) {
+
+    // If SSR already loaded today's data, skip first fetch — just poll
+    if (ssrLoadedRef.current && isToday) {
+      ssrLoadedRef.current = false; // Only skip once
       const id = setInterval(() => fetchData(selectedDate), 90_000);
       return () => clearInterval(id);
     }
+
     fetchData(selectedDate);
     if (isToday) {
       const id = setInterval(() => fetchData(selectedDate), 90_000);
       return () => clearInterval(id);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, fetchData]);
 
   function handleDateChange(date: string) {

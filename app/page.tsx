@@ -32,10 +32,6 @@ function Skel({ rows = 4 }: { rows?: number }) {
   return <div className="space-y-2">{[...Array(rows)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>;
 }
 
-const todayStr = new Date().toLocaleDateString('pl-PL', {
-  weekday: 'long', day: 'numeric', month: 'long',
-});
-
 // Merge live + today matches, dedup by id
 async function fetchInitialMatches(): Promise<Match[]> {
   try {
@@ -55,6 +51,11 @@ export default async function HomePage() {
   const leagueOrder = ['PL', 'PD', 'SA', 'BL1', 'FL1'];
   const leagues = LEAGUES.filter((l) => leagueOrder.includes(l.code))
     .sort((a, b) => leagueOrder.indexOf(a.code) - leagueOrder.indexOf(b.code));
+
+  // Compute date inside async function so ISR revalidation gets fresh date
+  const todayStr = new Date().toLocaleDateString('pl-PL', {
+    weekday: 'long', day: 'numeric', month: 'long',
+  });
 
   // Server-side fetch — no skeleton for above-the-fold content
   const initialMatches = await fetchInitialMatches();
@@ -82,7 +83,7 @@ export default async function HomePage() {
 
         {/* SMART BANNER — SSR with initial data */}
         <section id="live" className="scroll-mt-16">
-          <MatchHero initialMatches={initialMatches} />
+          <MatchHero initialMatches={initialMatches} ssrLoaded />
         </section>
 
         {/* DOBITKA DNIA */}
@@ -91,7 +92,7 @@ export default async function HomePage() {
         {/* MECZE DNIA — SSR with initial data */}
         <section id="mecze" className="scroll-mt-16">
           <SectionLabel text="Mecze" />
-          <TodayMatches initialMatches={initialMatches} />
+          <TodayMatches initialMatches={initialMatches} ssrLoaded />
         </section>
 
         {/* MAIN GRID */}

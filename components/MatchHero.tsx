@@ -21,9 +21,9 @@ function Crest({ src, name, size = 22 }: { src?: string; name: string; size?: nu
   );
 }
 
-export function MatchHero({ initialMatches = [] }: { initialMatches?: Match[] }) {
+export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialMatches?: Match[]; ssrLoaded?: boolean }) {
   const [matches, setMatches] = useState<Match[]>(initialMatches);
-  const [loading, setLoading] = useState(initialMatches.length === 0);
+  const [loading, setLoading] = useState(!ssrLoaded && initialMatches.length === 0);
   const [changedIds, setChangedIds] = useState<Set<number>>(new Set());
   const prevScoresRef = useRef<Map<number, string>>(new Map());
 
@@ -38,15 +38,15 @@ export function MatchHero({ initialMatches = [] }: { initialMatches?: Match[] })
   }, []);
 
   useEffect(() => {
-    // If we have initial data, skip first fetch — just start polling
-    if (initialMatches.length > 0) {
+    // If SSR loaded data (even empty), skip first fetch — just poll
+    if (ssrLoaded) {
       const id = setInterval(fetchData, 90_000);
       return () => clearInterval(id);
     }
     fetchData();
     const id = setInterval(fetchData, 90_000);
     return () => clearInterval(id);
-  }, [fetchData, initialMatches.length]);
+  }, [fetchData, ssrLoaded]);
 
   // Score change detection
   useEffect(() => {
