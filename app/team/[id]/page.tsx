@@ -1,16 +1,33 @@
-import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamDetailView } from '@/components/TeamDetail';
+import { FOOTBALL_DATA_KEY } from '@/config/sources';
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
+async function fetchTeamName(id: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://api.football-data.org/v4/teams/${id}`, {
+      headers: { 'X-Auth-Token': FOOTBALL_DATA_KEY },
+      next: { revalidate: 86400 },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.name ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
+  const name = await fetchTeamName(id);
   return {
-    title: `Druzyna #${id} — DOBITKA`,
-    description: 'Profil druzyny, sklad, wyniki, forma — DOBITKA',
+    title: name ? `${name} — DOBITKA` : `Druzyna #${id} — DOBITKA`,
+    description: name
+      ? `${name} — profil, sklad, wyniki, forma — DOBITKA`
+      : 'Profil druzyny, sklad, wyniki, forma — DOBITKA',
   };
 }
 
@@ -32,20 +49,8 @@ export default async function TeamPage({ params }: Props) {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-6">
-        <Suspense fallback={<TeamSkeleton />}>
-          <TeamDetailView teamId={id} />
-        </Suspense>
+        <TeamDetailView teamId={id} />
       </main>
-    </div>
-  );
-}
-
-function TeamSkeleton() {
-  return (
-    <div className="space-y-4">
-      <Skeleton className="h-40 w-full rounded-xl" />
-      <Skeleton className="h-32 w-full rounded-xl" />
-      <Skeleton className="h-48 w-full rounded-xl" />
     </div>
   );
 }
