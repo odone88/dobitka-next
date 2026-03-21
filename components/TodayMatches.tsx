@@ -173,8 +173,8 @@ function MatchRow({ match }: { match: Match }) {
       className={cn(
         'border-b border-border last:border-0 border-l-3 transition-all',
         LEAGUE_ACCENT[match.competitionCode] ?? 'border-l-transparent',
-        live && 'bg-gradient-to-r from-destructive/[0.12] to-transparent',
-        'cursor-pointer hover:bg-accent/50',
+        live && 'bg-gradient-to-r from-destructive/[0.12] via-destructive/[0.04] to-transparent border-l-destructive',
+        'cursor-pointer hover:bg-accent/40',
       )}
     >
       {/* Main row */}
@@ -204,16 +204,19 @@ function MatchRow({ match }: { match: Match }) {
         </div>
 
         {/* Score */}
-        <div className="w-[56px] flex-shrink-0 text-center">
+        <div className={cn(
+          'w-[60px] flex-shrink-0 text-center py-0.5 rounded-lg',
+          live && 'bg-destructive/15',
+        )}>
           {hasScore ? (
             <span className={cn(
-              'score-display text-[18px] font-black inline-block',
-              live ? 'text-destructive scale-110' : 'text-foreground'
+              'score-display font-black inline-block',
+              live ? 'text-[22px] text-destructive' : 'text-[18px] text-foreground'
             )}>
-              {match.homeScore} <span className="text-muted-foreground text-[14px]">:</span> {match.awayScore}
+              {match.homeScore}<span className={cn('mx-0.5', live ? 'text-destructive/40' : 'text-muted-foreground')}>:</span>{match.awayScore}
             </span>
           ) : (
-            <span className="text-[13px] text-muted-foreground">vs</span>
+            <span className="text-[12px] text-muted-foreground font-bold uppercase">vs</span>
           )}
         </div>
 

@@ -78,19 +78,23 @@ export default async function HomePage() {
       {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-xl">
         <div className="max-w-screen-xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <a href="/" className="flex items-center gap-2 group">
+          <div className="flex items-center gap-4">
+            <a href="/" className="flex items-center gap-2.5 group">
+              <span className="text-xl" aria-hidden="true">⚽</span>
               <h1 className="font-display text-2xl tracking-tight text-primary transition-all group-hover:text-primary/80">
                 DOBITKA
               </h1>
             </a>
-            <span className="text-[11px] text-muted-foreground hidden sm:block capitalize font-medium">{todayStr}</span>
+            <div className="hidden sm:flex flex-col">
+              <span className="text-[11px] text-muted-foreground capitalize font-medium leading-tight">{todayStr}</span>
+              <span className="text-[9px] text-primary/50 font-bold uppercase tracking-widest leading-tight">Twój serwis piłkarski</span>
+            </div>
           </div>
           <HomeClient />
         </div>
       </header>
 
-      <main className="max-w-screen-xl mx-auto px-4 py-4 space-y-5">
+      <main className="max-w-screen-xl mx-auto px-4 py-5 space-y-6">
 
         {/* SMART BANNER — SSR with initial data */}
         <section id="live" className="scroll-mt-16" aria-live="polite" aria-atomic="false">
