@@ -47,20 +47,23 @@ function DayPicker({ selected, onChange }: { selected: string; onChange: (d: str
   });
 
   return (
-    <div className="flex gap-1 justify-center">
+    <div className="flex gap-1.5 justify-center bg-card/50 rounded-xl p-1.5 border border-border">
       {days.map((d) => (
         <button
           key={d.date}
           onClick={() => onChange(d.date)}
           className={cn(
-            'px-3 py-1.5 rounded-lg text-[12px] font-bold transition-all cursor-pointer',
+            'px-3.5 py-2 rounded-lg text-[12px] font-bold transition-all cursor-pointer relative',
             selected === d.date
-              ? 'bg-primary text-primary-foreground shadow-sm'
+              ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
               : 'text-muted-foreground hover:text-foreground hover:bg-accent',
             d.isToday && selected !== d.date && 'text-primary'
           )}
         >
           {d.label}
+          {d.isToday && selected !== d.date && (
+            <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+          )}
         </button>
       ))}
     </div>
@@ -89,12 +92,13 @@ function LiveMinute({ minute, status }: { minute: number | null | undefined; sta
   }, [status]);
 
   return (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-destructive
-                     rounded text-[9px] font-black text-white tracking-wide animate-pulse">
-      <span className="relative flex h-1.5 w-1.5">
-        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+    <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-destructive
+                     rounded-md text-[10px] font-black text-white tracking-wide">
+      <span className="relative flex h-2 w-2" aria-hidden="true">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
       </span>
-      {status === 'PAUSED' ? 'PRZ' : display ? `${display}'` : '\u2022'}
+      {status === 'PAUSED' ? 'PRZERWA' : display ? `${display}'` : 'LIVE'}
     </span>
   );
 }
@@ -118,11 +122,12 @@ function GoalLine({ goals, teamId, isHome }: { goals: MatchGoal[]; teamId: numbe
   return (
     <div className={cn('flex flex-col gap-0.5', isHome ? 'items-end' : 'items-start')}>
       {teamGoals.map((g, i) => (
-        <span key={i} className="text-[10px] text-muted-foreground leading-tight">
-          <span className="text-foreground">{g.scorer}</span>
-          <span className="score-display text-muted-foreground"> {g.minute}&apos;</span>
-          {g.type === 'PENALTY' && <span className="text-amber"> (k)</span>}
-          {g.type === 'OWN_GOAL' && <span className="text-destructive"> (sam.)</span>}
+        <span key={i} className="text-[10px] leading-tight flex items-center gap-1">
+          <span className="text-primary" aria-hidden="true">⚽</span>
+          <span className="text-foreground font-medium">{g.scorer}</span>
+          <span className="score-display text-muted-foreground">{g.minute}&apos;</span>
+          {g.type === 'PENALTY' && <span className="text-amber font-bold">(k)</span>}
+          {g.type === 'OWN_GOAL' && <span className="text-destructive font-bold">(sam.)</span>}
         </span>
       ))}
     </div>
@@ -166,22 +171,24 @@ function MatchRow({ match }: { match: Match }) {
   return (
     <div
       className={cn(
-        'border-b border-border last:border-0 border-l-2 transition-all',
+        'border-b border-border last:border-0 border-l-3 transition-all',
         LEAGUE_ACCENT[match.competitionCode] ?? 'border-l-transparent',
-        live && 'bg-destructive/[0.08]',
-        'cursor-pointer hover:bg-accent/50 hover:shadow-sm',
+        live && 'bg-gradient-to-r from-destructive/[0.12] to-transparent',
+        'cursor-pointer hover:bg-accent/50',
       )}
     >
       {/* Main row */}
-      <a href={`/match/${match.id}`} className="flex items-center px-3 py-3 gap-2">
+      <a href={`/match/${match.id}`} className="flex items-center px-3 py-3.5 gap-2">
         {/* Time / Status */}
-        <div className="w-[52px] flex-shrink-0 text-center">
+        <div className="w-[56px] flex-shrink-0 text-center">
           {live ? (
             <LiveMinute minute={match.minute} status={match.status} />
           ) : finished ? (
-            <span className="text-[10px] font-bold text-muted-foreground">KON</span>
+            <span className="inline-flex px-2 py-0.5 rounded bg-muted text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
+              Koniec
+            </span>
           ) : (
-            <span className="text-[12px] score-display text-muted-foreground">{time}</span>
+            <span className="text-[13px] score-display text-foreground font-bold">{time}</span>
           )}
         </div>
 
@@ -193,22 +200,26 @@ function MatchRow({ match }: { match: Match }) {
           )}>
             {match.homeTeam}
           </span>
-          <Crest src={match.homeCrest} name={match.homeTeam} />
+          <Crest src={match.homeCrest} name={match.homeTeam} size={22} />
         </div>
 
         {/* Score */}
-        <div className="w-[52px] flex-shrink-0 text-center">
-          <span className={cn(
-            'score-display text-[15px] font-black',
-            live ? 'text-destructive' : finished ? 'text-foreground' : 'text-muted-foreground'
-          )}>
-            {hasScore ? `${match.homeScore} - ${match.awayScore}` : '-'}
-          </span>
+        <div className="w-[56px] flex-shrink-0 text-center">
+          {hasScore ? (
+            <span className={cn(
+              'score-display text-[18px] font-black inline-block',
+              live ? 'text-destructive scale-110' : 'text-foreground'
+            )}>
+              {match.homeScore} <span className="text-muted-foreground text-[14px]">:</span> {match.awayScore}
+            </span>
+          ) : (
+            <span className="text-[13px] text-muted-foreground">vs</span>
+          )}
         </div>
 
         {/* Away team */}
         <div className="flex-1 flex items-center gap-2 min-w-0">
-          <Crest src={match.awayCrest} name={match.awayTeam} />
+          <Crest src={match.awayCrest} name={match.awayTeam} size={22} />
           <span className={cn(
             'text-[13px] truncate',
             awayWin ? 'font-bold text-foreground' : finished ? 'text-muted-foreground' : 'text-foreground'
@@ -218,21 +229,23 @@ function MatchRow({ match }: { match: Match }) {
         </div>
 
         {/* HT + expand */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           {match.halfTime && finished && (
-            <span className="text-[9px] text-muted-foreground hidden sm:block score-display">
-              ({match.halfTime})
+            <span className="text-[9px] text-muted-foreground hidden sm:block score-display bg-muted px-1.5 py-0.5 rounded">
+              {match.halfTime}
             </span>
           )}
           {canExpand && (
             <button
               onClick={handleExpand}
               className={cn(
-                'text-[10px] text-muted-foreground transition-transform hover:text-foreground p-1',
-                expanded ? 'rotate-180' : ''
+                'w-6 h-6 flex items-center justify-center rounded-full text-muted-foreground transition-all hover:text-foreground hover:bg-accent',
+                expanded ? 'rotate-180 bg-accent' : ''
               )}
             >
-              \u25BE
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
             </button>
           )}
         </div>
@@ -240,13 +253,13 @@ function MatchRow({ match }: { match: Match }) {
 
       {/* Goal scorers */}
       {expanded && loadingGoals && (
-        <div className="px-3 pb-2 text-center">
-          <span className="text-[10px] text-muted-foreground">Ładowanie strzelców...</span>
+        <div className="px-3 pb-3 text-center">
+          <span className="text-[10px] text-muted-foreground animate-pulse">Ładowanie strzelców...</span>
         </div>
       )}
       {hasGoals && (match.goals.length > 0 || expanded) && (finished || live) && (
-        <div className="px-3 pb-2 -mt-0.5 grid grid-cols-[1fr_52px_1fr] gap-x-2 items-start animate-fade-in"
-             style={{ paddingLeft: 'calc(0.75rem + 52px)' }}>
+        <div className="px-3 pb-3 -mt-1 grid grid-cols-[1fr_56px_1fr] gap-x-2 items-start animate-fade-in"
+             style={{ paddingLeft: 'calc(0.75rem + 56px)' }}>
           <GoalLine goals={goals} teamId={match.homeTeamId} isHome={true} />
           <div />
           <GoalLine goals={goals} teamId={match.awayTeamId} isHome={false} />
@@ -381,15 +394,26 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
 
       {/* Stats bar */}
       {matches.length > 0 && (
-        <div className="flex items-center justify-center gap-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+        <div className="flex items-center justify-center gap-3 text-[11px] font-bold">
           {liveCount > 0 && (
-            <span className="text-destructive flex items-center gap-1">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive live-dot" />
-              {liveCount} live
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/15 text-destructive">
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive/60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive" />
+              </span>
+              {liveCount} na żywo
             </span>
           )}
-          {scheduledCount > 0 && <span>{scheduledCount} zaplanowanych</span>}
-          {finishedCount > 0 && <span>{finishedCount} zakończonych</span>}
+          {scheduledCount > 0 && (
+            <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary">
+              {scheduledCount} zaplanowanych
+            </span>
+          )}
+          {finishedCount > 0 && (
+            <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+              {finishedCount} zakończonych
+            </span>
+          )}
         </div>
       )}
 
@@ -413,26 +437,34 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
                 <div key={code}>
                   {/* League header */}
                   <div className={cn(
-                    'flex items-center gap-2 px-3 py-2 border-b border-border',
-                    hasLive ? 'bg-destructive/[0.1]' : 'bg-accent/50',
+                    'flex items-center gap-2.5 px-3 py-2.5 border-b border-border',
+                    hasLive ? 'bg-gradient-to-r from-destructive/[0.12] to-transparent' : 'bg-accent/30',
                     leagueIdx > 0 && 'border-t border-border'
                   )}>
                     {firstMatch?.competitionEmblem ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={firstMatch.competitionEmblem} alt="" className="h-4 w-4 object-contain" />
+                      <img src={firstMatch.competitionEmblem} alt="" className="h-5 w-5 object-contain" />
                     ) : (
-                      <span className="text-sm leading-none">{league?.flag ?? '\u26BD'}</span>
+                      <span className="text-base leading-none">{league?.flag ?? '\u26BD'}</span>
                     )}
-                    <span className={cn(
-                      'text-[11px] font-black uppercase tracking-widest',
-                      league?.color ?? 'text-muted-foreground'
-                    )}>
-                      {league?.name ?? code}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className={cn(
+                        'text-[12px] font-black uppercase tracking-wide leading-tight',
+                        league?.color ?? 'text-muted-foreground'
+                      )}>
+                        {league?.name ?? code}
+                      </span>
+                      {league?.country && (
+                        <span className="text-[9px] text-muted-foreground leading-tight">{league.country}</span>
+                      )}
+                    </div>
                     {hasLive && (
-                      <span className="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-destructive live-dot" />
+                      <span className="ml-1 inline-flex items-center gap-1 px-1.5 py-0.5 bg-destructive/20 rounded text-[8px] font-black text-destructive uppercase tracking-wider">
+                        <span className="w-1.5 h-1.5 rounded-full bg-destructive live-dot" />
+                        Live
+                      </span>
                     )}
-                    <span className="text-[10px] text-muted-foreground ml-auto score-display">{ms.length}</span>
+                    <span className="text-[10px] text-muted-foreground ml-auto score-display font-bold">{ms.length} {ms.length === 1 ? 'mecz' : ms.length < 5 ? 'mecze' : 'meczów'}</span>
                   </div>
 
                   {ms.map((m) => <MatchRow key={m.id} match={m} />)}

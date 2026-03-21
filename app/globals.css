@@ -330,4 +330,24 @@ html {
   .glow-primary {
     box-shadow: 0 0 16px oklch(0.72 0.24 150 / 0.25);
   }
+
+  /* Glass card effect */
+  .glass {
+    background: oklch(0.19 0.008 260 / 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--primary), oklch(0.80 0.16 75));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Border width 3px */
+  .border-l-3 {
+    border-left-width: 3px;
+  }
 }

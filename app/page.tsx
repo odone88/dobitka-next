@@ -14,15 +14,26 @@ import { HomeClient } from '@/components/HomeClient';
 import { LazySection } from '@/components/LazySection';
 import { LEAGUES } from '@/config/leagues';
 import { getLiveMatches, getTodayMatches } from '@/lib/data-sources/football-data';
+import { cn } from '@/lib/utils';
 import type { Match } from '@/types';
 
 // Revalidate every 90 seconds (matching live poll interval)
 export const revalidate = 90;
 
-function SectionLabel({ text, id }: { text: string; id?: string }) {
+function SectionLabel({ text, id, count, accent }: { text: string; id?: string; count?: number; accent?: boolean }) {
   return (
-    <h2 id={id} className="mb-3 flex items-center gap-3 scroll-mt-16">
-      <span className="font-display text-[13px] font-normal tracking-wide text-primary">{text}</span>
+    <h2 id={id} className="mb-4 flex items-center gap-3 scroll-mt-16">
+      <span className={cn(
+        'font-display text-[15px] tracking-wide',
+        accent ? 'text-primary font-bold' : 'text-foreground font-semibold'
+      )}>
+        {text}
+      </span>
+      {count !== undefined && (
+        <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full score-display">
+          {count}
+        </span>
+      )}
       <span className="flex-1 border-t border-border" aria-hidden="true" />
     </h2>
   );
@@ -91,7 +102,7 @@ export default async function HomePage() {
 
         {/* MECZE DNIA — SSR with initial data */}
         <section id="mecze" className="scroll-mt-16">
-          <SectionLabel text="Mecze" />
+          <SectionLabel text="Mecze dnia" accent />
           <TodayMatches initialMatches={initialMatches} ssrLoaded />
         </section>
 
@@ -103,7 +114,7 @@ export default async function HomePage() {
 
             <LazySection>
               <section id="ucl" className="scroll-mt-16">
-                <SectionLabel text="Liga Mistrzów" />
+                <SectionLabel text="Liga Mistrzów" accent />
                 <Card>
                   <CardContent className="pt-4">
                     <Suspense fallback={<Skel rows={4} />}>

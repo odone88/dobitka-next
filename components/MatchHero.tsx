@@ -81,42 +81,50 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
   // ─── MODE 1: LIVE ──────────────────────────────────────────────
   if (liveMatches.length > 0) {
     return (
-      <div className="rounded-xl border border-destructive/40 border-live bg-gradient-to-r from-destructive/[0.08] via-card to-card overflow-hidden">
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-destructive text-white text-[10px] font-black uppercase tracking-widest" role="status" aria-live="polite">
-          <span className="relative flex h-2 w-2" aria-hidden="true">
+      <div className="rounded-2xl border-2 border-destructive/50 border-live bg-gradient-to-br from-destructive/[0.15] via-card to-card overflow-hidden shadow-lg shadow-destructive/10">
+        <div className="flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-destructive to-destructive/80 text-white text-[11px] font-black uppercase tracking-widest" role="status" aria-live="polite">
+          <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white" />
           </span>
           {liveMatches.length} {liveMatches.length === 1 ? 'mecz na żywo' : liveMatches.length < 5 ? 'mecze na żywo' : 'meczów na żywo'}
         </div>
 
-        <div className="px-4 py-3 flex flex-wrap gap-x-6 gap-y-2.5">
+        <div className="px-4 py-4 space-y-1">
           {liveMatches.map((m) => (
             <a
               key={m.id}
               href={`/match/${m.id}`}
-              className="flex items-center gap-2 text-[14px] group hover:bg-white/[0.03] rounded-lg px-2 py-1 -mx-2 transition-colors"
+              className="group flex items-center gap-3 hover:bg-white/[0.05] rounded-xl px-3 py-2.5 -mx-1 transition-all"
             >
-              <Crest src={m.homeCrest} name={m.homeTeam} size={20} />
-              <span className="font-bold text-foreground group-hover:text-foreground transition-colors">
-                {m.homeTeam}
-              </span>
-              <span className={cn(
-                'score-display text-[18px] font-black text-destructive',
-                changedIds.has(m.id) && 'score-just-changed'
-              )}>
-                {m.homeScore}&thinsp;&ndash;&thinsp;{m.awayScore}
-              </span>
-              <span className="font-bold text-foreground group-hover:text-foreground transition-colors">
-                {m.awayTeam}
-              </span>
-              <Crest src={m.awayCrest} name={m.awayTeam} size={20} />
-              {m.minute && (
-                <span className="text-[11px] font-black text-destructive/70 score-display live-dot">
-                  {m.status === 'PAUSED' ? 'PRZ' : `${m.minute}'`}
+              {/* Home */}
+              <div className="flex-1 flex items-center gap-2.5 justify-end min-w-0">
+                <span className="font-bold text-[14px] text-foreground truncate">{m.homeTeam}</span>
+                <Crest src={m.homeCrest} name={m.homeTeam} size={28} />
+              </div>
+
+              {/* Score — big and dramatic */}
+              <div className="flex flex-col items-center px-3">
+                <span className={cn(
+                  'score-display text-[26px] font-black text-destructive leading-none',
+                  changedIds.has(m.id) && 'score-just-changed'
+                )}>
+                  {m.homeScore} <span className="text-[18px] text-destructive/50">:</span> {m.awayScore}
                 </span>
-              )}
-              <span className="text-[9px] font-bold text-muted-foreground uppercase">{m.competitionCode}</span>
+                {m.minute && (
+                  <span className="text-[10px] font-black text-destructive score-display mt-0.5 live-dot">
+                    {m.status === 'PAUSED' ? 'PRZERWA' : `${m.minute}'`}
+                  </span>
+                )}
+              </div>
+
+              {/* Away */}
+              <div className="flex-1 flex items-center gap-2.5 min-w-0">
+                <Crest src={m.awayCrest} name={m.awayTeam} size={28} />
+                <span className="font-bold text-[14px] text-foreground truncate">{m.awayTeam}</span>
+              </div>
+
+              <span className="text-[9px] font-bold text-muted-foreground uppercase flex-shrink-0 hidden sm:block">{m.competitionCode}</span>
             </a>
           ))}
         </div>
@@ -136,11 +144,14 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
       .slice(0, 4);
 
     return (
-      <div className="rounded-xl border border-border bg-card overflow-hidden card-elevated">
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-white/[0.02] text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-          Wyniki dnia
+      <div className="rounded-2xl border border-border bg-card overflow-hidden card-elevated">
+        <div className="flex items-center gap-2 px-5 py-2 bg-accent/30 text-[11px] font-black uppercase tracking-widest text-muted-foreground">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          </svg>
+          Najlepsze wyniki dnia
         </div>
-        <div className="px-4 py-3 flex flex-wrap gap-x-6 gap-y-2">
+        <div className="p-4 space-y-1">
           {top.map((m) => {
             const homeWin = m.homeScore! > m.awayScore!;
             const awayWin = m.awayScore! > m.homeScore!;
@@ -148,19 +159,24 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
               <a
                 key={m.id}
                 href={`/match/${m.id}`}
-                className="flex items-center gap-2 text-[14px] hover:bg-white/[0.03] rounded-lg px-2 py-1 -mx-2 transition-colors"
+                className="group flex items-center gap-3 hover:bg-accent/50 rounded-xl px-3 py-2.5 -mx-1 transition-all"
               >
-                <Crest src={m.homeCrest} name={m.homeTeam} size={20} />
-                <span className={cn('font-medium', homeWin ? 'text-foreground font-bold' : 'text-muted-foreground')}>
-                  {m.homeTeam}
+                <div className="flex-1 flex items-center gap-2 justify-end min-w-0">
+                  <span className={cn('text-[13px] truncate', homeWin ? 'font-bold text-foreground' : 'text-muted-foreground')}>
+                    {m.homeTeam}
+                  </span>
+                  <Crest src={m.homeCrest} name={m.homeTeam} size={24} />
+                </div>
+                <span className="score-display text-[20px] font-black text-foreground w-[60px] text-center">
+                  {m.homeScore} <span className="text-muted-foreground text-[14px]">:</span> {m.awayScore}
                 </span>
-                <span className="score-display text-[16px] font-black text-foreground">
-                  {m.homeScore}&thinsp;&ndash;&thinsp;{m.awayScore}
-                </span>
-                <span className={cn('font-medium', awayWin ? 'text-foreground font-bold' : 'text-muted-foreground')}>
-                  {m.awayTeam}
-                </span>
-                <Crest src={m.awayCrest} name={m.awayTeam} size={20} />
+                <div className="flex-1 flex items-center gap-2 min-w-0">
+                  <Crest src={m.awayCrest} name={m.awayTeam} size={24} />
+                  <span className={cn('text-[13px] truncate', awayWin ? 'font-bold text-foreground' : 'text-muted-foreground')}>
+                    {m.awayTeam}
+                  </span>
+                </div>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase flex-shrink-0 hidden sm:block">{m.competitionCode}</span>
               </a>
             );
           })}
@@ -179,23 +195,30 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
     return (
       <a
         href={`/match/${next.id}`}
-        className="block rounded-xl border border-border bg-card overflow-hidden card-elevated hover:border-primary/20 transition-colors"
+        className="group block rounded-2xl border border-border bg-gradient-to-r from-primary/[0.06] to-card overflow-hidden card-elevated hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all"
       >
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-white/[0.02] text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+        <div className="flex items-center gap-2 px-5 py-2 bg-primary/[0.08] text-[11px] font-black uppercase tracking-widest text-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
           Najbliższy mecz
         </div>
-        <div className="px-4 py-3 flex items-center gap-3">
-          <div className="flex items-center gap-2 text-[16px]">
-            <Crest src={next.homeCrest} name={next.homeTeam} />
-            <span className="font-bold text-foreground">{next.homeTeam}</span>
-            <span className="text-muted-foreground font-black score-display">vs</span>
-            <span className="font-bold text-foreground">{next.awayTeam}</span>
-            <Crest src={next.awayCrest} name={next.awayTeam} />
+        <div className="px-5 py-4 flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <Crest src={next.homeCrest} name={next.homeTeam} size={32} />
+            <span className="font-bold text-[16px] text-foreground">{next.homeTeam}</span>
           </div>
-          <span className="text-[12px] text-muted-foreground ml-auto score-display">
-            {isToday ? `dziś ${time}` : `${day} \u00B7 ${time}`}
-          </span>
-          <span className="text-[10px] font-bold uppercase tracking-wide text-primary/50">
+          <div className="flex flex-col items-center px-3">
+            <span className="text-[22px] font-black score-display text-primary">vs</span>
+            <span className="text-[11px] text-muted-foreground score-display mt-0.5">
+              {isToday ? `dziś ${time}` : `${day} · ${time}`}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="font-bold text-[16px] text-foreground">{next.awayTeam}</span>
+            <Crest src={next.awayCrest} name={next.awayTeam} size={32} />
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wide text-primary ml-auto hidden sm:block">
             {next.competitionCode}
           </span>
         </div>
