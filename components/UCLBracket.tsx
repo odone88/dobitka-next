@@ -35,14 +35,14 @@ function TieRow({ tie }: { tie: BracketTie }) {
           )}
           <span className={cn(
             'text-[13px] flex-1 truncate',
-            side.isWinner ? 'font-bold text-foreground' : decided ? 'text-muted-foreground' : 'text-foreground/80',
+            side.isWinner ? 'font-bold text-foreground' : decided ? 'text-muted-foreground' : 'text-foreground',
           )}>
             {side.team}
           </span>
           {hasAnyScore && (
             <span className={cn(
               'score-display text-[15px] font-black tabular-nums',
-              tie.isLive ? 'text-red-300' : side.isWinner ? 'text-primary' : 'text-foreground/60',
+              tie.isLive ? 'text-red-300' : side.isWinner ? 'text-primary' : 'text-muted-foreground',
             )}>
               {side.agg}
             </span>
@@ -55,12 +55,12 @@ function TieRow({ tie }: { tie: BracketTie }) {
         <div className="px-3 py-1 bg-white/[0.02] border-t border-border flex items-center gap-3 text-[10px] text-muted-foreground">
           {tie.leg1 && tie.leg1.homeScore !== null && (
             <span>
-              Mecz 1: <span className="text-foreground/60 tabular-nums">{tie.leg1.homeScore}–{tie.leg1.awayScore}</span>
+              Mecz 1: <span className="text-foreground tabular-nums">{tie.leg1.homeScore}–{tie.leg1.awayScore}</span>
             </span>
           )}
           {tie.leg2 && tie.leg2.homeScore !== null && (
             <span>
-              Mecz 2: <span className="text-foreground/60 tabular-nums">{tie.leg2.homeScore}–{tie.leg2.awayScore}</span>
+              Mecz 2: <span className="text-foreground tabular-nums">{tie.leg2.homeScore}–{tie.leg2.awayScore}</span>
             </span>
           )}
           {tie.isLive && (
@@ -174,7 +174,7 @@ export function UCLBracket() {
           })}
           {/* Bracket progression arrows */}
           {rounds.length > 1 && (
-            <div className="flex-shrink-0 text-[10px] text-muted-foreground/50 px-1 hidden sm:block">
+            <div className="flex-shrink-0 text-[10px] text-muted-foreground px-1 hidden sm:block">
               → Finał
             </div>
           )}

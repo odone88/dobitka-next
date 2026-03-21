@@ -39,7 +39,7 @@ export function MatchStrip() {
             >
               {isLive && <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />}
               <span className={cn('font-medium', isLive ? 'text-foreground' : '')}>{m.homeTeam}</span>
-              <span className={cn('font-mono font-bold tabular-nums', isLive ? 'text-red-300' : isFinished ? 'text-foreground' : 'text-muted-foreground/60')}>
+              <span className={cn('font-mono font-bold tabular-nums', isLive ? 'text-red-300' : isFinished ? 'text-foreground' : 'text-muted-foreground')}>
                 {hasScore ? `${m.homeScore}–${m.awayScore}` : time}
               </span>
               <span className={cn('font-medium', isLive ? 'text-foreground' : '')}>{m.awayTeam}</span>

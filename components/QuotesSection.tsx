@@ -41,7 +41,19 @@ export function QuotesSection() {
       });
   }, []);
 
-  if (quotes.length === 0) return null;
+  if (quotes.length === 0) {
+    return (
+      <div className="space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="pl-4 border-l-2 border-primary/20 space-y-1.5">
+            <div className="h-4 w-full bg-muted rounded animate-pulse" />
+            <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+            <div className="h-3 w-1/3 bg-muted rounded animate-pulse" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">

@@ -82,7 +82,7 @@ export default async function HomePage() {
       <main className="max-w-screen-xl mx-auto px-4 py-4 space-y-5">
 
         {/* SMART BANNER — SSR with initial data */}
-        <section id="live" className="scroll-mt-16">
+        <section id="live" className="scroll-mt-16" aria-live="polite" aria-atomic="false">
           <MatchHero initialMatches={initialMatches} ssrLoaded />
         </section>
 
@@ -181,11 +181,17 @@ export default async function HomePage() {
         <div className="divider-retro my-6" />
         <footer className="text-[11px] text-muted-foreground pb-6 space-y-1">
           <p>
-            <span className="text-foreground/60 font-semibold">Źródła:</span>{' '}
-            football-data.org &middot; TheSportsDB &middot; BBC Sport &middot; The Guardian &middot; Weszlo.com &middot; Tifo Football
+            <span className="text-muted-foreground font-semibold">Źródła:</span>{' '}
+            football-data.org &middot; TheSportsDB &middot; BBC Sport &middot; The Guardian &middot; Weszło.com &middot; TVP Sport &middot; Sport.pl &middot; Tifo Football
           </p>
           <p>Live: 90s &middot; UCL: 5min &middot; Tabele: 2h &middot; Newsy: 15min</p>
-          <p className="text-primary/60 font-bold uppercase tracking-widest text-[9px]">DOBITKA &mdash; codziennie, bezkompromisowo</p>
+          <div className="flex items-center gap-3 mt-1">
+            <a href="/archive" className="text-primary/70 hover:text-primary font-bold uppercase tracking-widest text-[9px] transition-colors">
+              Archiwum meczów →
+            </a>
+            <span className="text-border">|</span>
+            <span className="text-primary/60 font-bold uppercase tracking-widest text-[9px]">DOBITKA &mdash; codziennie, bezkompromisowo</span>
+          </div>
         </footer>
       </main>
     </div>

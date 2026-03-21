@@ -22,7 +22,7 @@ export function LazySection({ children, className, fallback }: {
           observer.disconnect();
         }
       },
-      { rootMargin: '200px 0px' } // Zacznij ladowac 200px przed widocznoscia
+      { rootMargin: '200px 0px' } // Zacznij ładować 200px przed widocznością
     );
 
     observer.observe(ref.current);

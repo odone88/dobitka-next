@@ -7,12 +7,14 @@ export function HomeClient() {
 
   return (
     <>
-      <nav aria-label="Nawigacja glowna" className="flex items-center gap-3 sm:gap-4 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-        <a href="#live"   className="tab-underline hover:text-primary transition-colors py-1">Live</a>
-        <a href="#mecze"  className="tab-underline hover:text-primary transition-colors py-1">Mecze</a>
-        <a href="#ucl"    className="tab-underline hover:text-primary transition-colors py-1 hidden sm:inline">UCL</a>
-        <a href="#tabele" className="tab-underline hover:text-primary transition-colors py-1 hidden sm:inline">Tabele</a>
-        <a href="#newsy"  className="tab-underline hover:text-primary transition-colors py-1">Newsy</a>
+      <nav aria-label="Nawigacja główna" className="flex items-center gap-2 sm:gap-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <a href="#live"   className="tab-underline hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1">Live</a>
+        <a href="#mecze"  className="tab-underline hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1">Mecze</a>
+        <a href="#ucl"    className="tab-underline hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1 hidden sm:inline">UCL</a>
+        <a href="#tabele" className="tab-underline hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1 hidden sm:inline">Tabele</a>
+        <a href="#newsy"  className="tab-underline hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1">Newsy</a>
+        <span className="text-border hidden sm:inline" aria-hidden="true">|</span>
+        <a href="/archive" className="hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1 hidden sm:inline">Archiwum</a>
 
         {/* Favorites — dyskretny przycisk */}
         <button

@@ -128,7 +128,7 @@ export function LeagueTable({ leagueCode, delay = 0 }: { leagueCode: string; del
               <th className="text-center pb-1.5 w-6 hidden sm:table-cell">R</th>
               <th className="text-center pb-1.5 w-6 hidden sm:table-cell">P</th>
               <th className="text-center pb-1.5 w-9">GD</th>
-              <th className="text-center pb-1.5 w-10 text-foreground/80">Pkt</th>
+              <th className="text-center pb-1.5 w-10 text-foreground">Pkt</th>
               <th className="text-center pb-1.5 w-24 hidden md:table-cell">Forma</th>
             </tr>
           </thead>

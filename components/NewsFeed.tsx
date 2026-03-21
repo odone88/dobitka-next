@@ -240,6 +240,7 @@ export function NewsFeed() {
               <button
                 key={t}
                 onClick={() => switchTab(t)}
+                aria-current={isActive ? 'true' : undefined}
                 className={cn(
                   'flex items-center gap-1.5 px-2.5 py-1 text-[11px] rounded font-bold uppercase tracking-wide transition-all cursor-pointer',
                   isActive

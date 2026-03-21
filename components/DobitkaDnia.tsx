@@ -45,7 +45,7 @@ function ConfidenceBar({ value }: { value: number }) {
       </div>
       <span className={cn(
         'score-display text-[11px] font-black',
-        value >= 70 ? 'text-primary' : value >= 55 ? 'text-amber' : 'text-muted-foreground/60'
+        value >= 70 ? 'text-primary' : value >= 55 ? 'text-amber' : 'text-muted-foreground'
       )}>
         {value}%
       </span>
@@ -127,7 +127,7 @@ function PredictionCard({ prediction, index }: { prediction: Prediction; index: 
               <div>
                 <span className="text-[9px] font-bold uppercase tracking-widest text-primary/60 block mb-1">Za</span>
                 {prediction.reasoning.map((r, i) => (
-                  <p key={i} className="text-[11px] text-foreground/70 leading-relaxed">+ {r}</p>
+                  <p key={i} className="text-[11px] text-foreground leading-relaxed">+ {r}</p>
                 ))}
               </div>
             )}
@@ -135,7 +135,7 @@ function PredictionCard({ prediction, index }: { prediction: Prediction; index: 
               <div>
                 <span className="text-[9px] font-bold uppercase tracking-widest text-destructive/60 block mb-1">Przeciw</span>
                 {prediction.against.map((r, i) => (
-                  <p key={i} className="text-[11px] text-muted-foreground/60 leading-relaxed">- {r}</p>
+                  <p key={i} className="text-[11px] text-muted-foreground leading-relaxed">- {r}</p>
                 ))}
               </div>
             )}

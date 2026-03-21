@@ -82,8 +82,8 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
   if (liveMatches.length > 0) {
     return (
       <div className="rounded-xl border border-destructive/40 border-live bg-gradient-to-r from-destructive/[0.08] via-card to-card overflow-hidden">
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-destructive text-white text-[10px] font-black uppercase tracking-widest">
-          <span className="relative flex h-2 w-2">
+        <div className="flex items-center gap-2 px-4 py-1.5 bg-destructive text-white text-[10px] font-black uppercase tracking-widest" role="status" aria-live="polite">
+          <span className="relative flex h-2 w-2" aria-hidden="true">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
           </span>
@@ -98,7 +98,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
               className="flex items-center gap-2 text-[14px] group hover:bg-white/[0.03] rounded-lg px-2 py-1 -mx-2 transition-colors"
             >
               <Crest src={m.homeCrest} name={m.homeTeam} size={20} />
-              <span className="font-bold text-foreground/90 group-hover:text-foreground transition-colors">
+              <span className="font-bold text-foreground group-hover:text-foreground transition-colors">
                 {m.homeTeam}
               </span>
               <span className={cn(
@@ -107,7 +107,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
               )}>
                 {m.homeScore}&thinsp;&ndash;&thinsp;{m.awayScore}
               </span>
-              <span className="font-bold text-foreground/90 group-hover:text-foreground transition-colors">
+              <span className="font-bold text-foreground group-hover:text-foreground transition-colors">
                 {m.awayTeam}
               </span>
               <Crest src={m.awayCrest} name={m.awayTeam} size={20} />
@@ -151,13 +151,13 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
                 className="flex items-center gap-2 text-[14px] hover:bg-white/[0.03] rounded-lg px-2 py-1 -mx-2 transition-colors"
               >
                 <Crest src={m.homeCrest} name={m.homeTeam} size={20} />
-                <span className={cn('font-medium', homeWin ? 'text-foreground font-bold' : 'text-foreground/70')}>
+                <span className={cn('font-medium', homeWin ? 'text-foreground font-bold' : 'text-muted-foreground')}>
                   {m.homeTeam}
                 </span>
                 <span className="score-display text-[16px] font-black text-foreground">
                   {m.homeScore}&thinsp;&ndash;&thinsp;{m.awayScore}
                 </span>
-                <span className={cn('font-medium', awayWin ? 'text-foreground font-bold' : 'text-foreground/70')}>
+                <span className={cn('font-medium', awayWin ? 'text-foreground font-bold' : 'text-muted-foreground')}>
                   {m.awayTeam}
                 </span>
                 <Crest src={m.awayCrest} name={m.awayTeam} size={20} />

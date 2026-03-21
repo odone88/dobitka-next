@@ -43,7 +43,7 @@ function Toast({ event, onDismiss }: { event: GoalEvent; onDismiss: () => void }
           {event.type === 'PENALTY' && <span className="text-amber text-[10px] ml-1">(k)</span>}
           {event.type === 'OWN_GOAL' && <span className="text-destructive text-[10px] ml-1">(sam.)</span>}
         </div>
-        <div className="text-[11px] text-muted-foreground/60">
+        <div className="text-[11px] text-muted-foreground">
           {event.homeTeam} <span className="score-display font-bold text-foreground">{event.homeScore}–{event.awayScore}</span> {event.awayTeam}
         </div>
       </div>

@@ -51,7 +51,7 @@ function ScoreHeader({ match }: { match: MatchDetail }) {
             )}
             <span className={cn(
               'text-[14px] sm:text-[16px] font-bold text-center leading-tight group-hover:text-primary transition-colors',
-              hasScore && match.homeScore! > match.awayScore! ? 'text-foreground' : 'text-foreground/70'
+              hasScore && match.homeScore! > match.awayScore! ? 'text-foreground' : 'text-muted-foreground'
             )}>
               {match.homeTeam}
             </span>
@@ -106,7 +106,7 @@ function ScoreHeader({ match }: { match: MatchDetail }) {
             )}
             <span className={cn(
               'text-[14px] sm:text-[16px] font-bold text-center leading-tight group-hover:text-primary transition-colors',
-              hasScore && match.awayScore! > match.homeScore! ? 'text-foreground' : 'text-foreground/70'
+              hasScore && match.awayScore! > match.homeScore! ? 'text-foreground' : 'text-muted-foreground'
             )}>
               {match.awayTeam}
             </span>
@@ -205,12 +205,12 @@ function H2HSection({ h2h, homeTeam, awayTeam }: { h2h: MatchDetail['head2head']
           <div className="flex items-center justify-between text-[11px] font-bold mb-1.5">
             <span className="text-primary">{homeTeam} {h2h.homeWins}</span>
             <span className="text-muted-foreground">{h2h.draws} remisy</span>
-            <span className="text-foreground/60">{awayTeam} {h2h.awayWins}</span>
+            <span className="text-foreground">{awayTeam} {h2h.awayWins}</span>
           </div>
           <div className="flex h-2 rounded-full overflow-hidden bg-muted">
             <div className="bg-primary transition-all" style={{ width: `${homePercent}%` }} />
-            <div className="bg-muted-foreground/50 transition-all" style={{ width: `${drawPercent}%` }} />
-            <div className="bg-foreground/50 transition-all" style={{ width: `${awayPercent}%` }} />
+            <div className="bg-muted-foreground transition-all" style={{ width: `${drawPercent}%` }} />
+            <div className="bg-foreground transition-all" style={{ width: `${awayPercent}%` }} />
           </div>
         </div>
 
@@ -223,11 +223,11 @@ function H2HSection({ h2h, homeTeam, awayTeam }: { h2h: MatchDetail['head2head']
             return (
               <div key={i} className="flex items-center gap-2 py-1.5 border-b border-border last:border-0 text-[12px]">
                 <span className="text-muted-foreground w-20 flex-shrink-0 text-[10px]">{date}</span>
-                <span className="flex-1 text-right truncate text-foreground/70">{m.homeTeam}</span>
+                <span className="flex-1 text-right truncate text-foreground">{m.homeTeam}</span>
                 <span className="score-display font-bold text-foreground min-w-[36px] text-center">
                   {m.homeScore}–{m.awayScore}
                 </span>
-                <span className="flex-1 truncate text-foreground/70">{m.awayTeam}</span>
+                <span className="flex-1 truncate text-foreground">{m.awayTeam}</span>
                 <span className="text-[9px] text-muted-foreground w-12 text-right flex-shrink-0 truncate">
                   {m.competition}
                 </span>

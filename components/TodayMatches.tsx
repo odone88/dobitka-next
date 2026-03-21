@@ -119,8 +119,8 @@ function GoalLine({ goals, teamId, isHome }: { goals: MatchGoal[]; teamId: numbe
     <div className={cn('flex flex-col gap-0.5', isHome ? 'items-end' : 'items-start')}>
       {teamGoals.map((g, i) => (
         <span key={i} className="text-[10px] text-muted-foreground leading-tight">
-          <span className="text-foreground/80">{g.scorer}</span>
-          <span className="score-display text-muted-foreground/60"> {g.minute}&apos;</span>
+          <span className="text-foreground">{g.scorer}</span>
+          <span className="score-display text-muted-foreground"> {g.minute}&apos;</span>
           {g.type === 'PENALTY' && <span className="text-amber"> (k)</span>}
           {g.type === 'OWN_GOAL' && <span className="text-destructive"> (sam.)</span>}
         </span>
@@ -181,7 +181,7 @@ function MatchRow({ match }: { match: Match }) {
           ) : finished ? (
             <span className="text-[10px] font-bold text-muted-foreground">KON</span>
           ) : (
-            <span className="text-[12px] score-display text-foreground/60">{time}</span>
+            <span className="text-[12px] score-display text-muted-foreground">{time}</span>
           )}
         </div>
 
@@ -189,7 +189,7 @@ function MatchRow({ match }: { match: Match }) {
         <div className="flex-1 flex items-center gap-2 justify-end min-w-0">
           <span className={cn(
             'text-[13px] text-right truncate',
-            homeWin ? 'font-bold text-foreground' : finished ? 'text-foreground/60' : 'text-foreground/90'
+            homeWin ? 'font-bold text-foreground' : finished ? 'text-muted-foreground' : 'text-foreground'
           )}>
             {match.homeTeam}
           </span>
@@ -211,7 +211,7 @@ function MatchRow({ match }: { match: Match }) {
           <Crest src={match.awayCrest} name={match.awayTeam} />
           <span className={cn(
             'text-[13px] truncate',
-            awayWin ? 'font-bold text-foreground' : finished ? 'text-foreground/60' : 'text-foreground/90'
+            awayWin ? 'font-bold text-foreground' : finished ? 'text-muted-foreground' : 'text-foreground'
           )}>
             {match.awayTeam}
           </span>
@@ -400,7 +400,7 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
       )}>
         {sortedLeagues.length === 0 ? (
           <div className="py-10 text-center space-y-2">
-            <p className="text-[15px] text-foreground/60 font-display">Brak meczów na ten dzień</p>
+            <p className="text-[15px] text-muted-foreground font-display">Brak meczów na ten dzień</p>
             <p className="text-[12px] text-muted-foreground">Wybierz inny dzień lub sprawdź tabelę poniżej.</p>
           </div>
         ) : (
