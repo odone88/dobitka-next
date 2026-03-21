@@ -78,11 +78,11 @@ function scorePredictions(matches: Match[], positions: Map<string, { pos: number
         tip: `${match.homeTeam} nie przegra (1X)`,
         confidence: 55,
         reasoning: [
-          'Przewaga wlasnego boiska',
-          'Gospodarze statystycznie wygrywaja ~46% meczow',
+          'Przewaga własnego boiska',
+          'Gospodarze statystycznie wygrywają ~46% meczów',
         ],
         against: [
-          'Brak danych o formie — niska pewnosc',
+          'Brak danych o formie — niska pewność',
         ],
         category: 'result',
       });
@@ -91,7 +91,7 @@ function scorePredictions(matches: Match[], positions: Map<string, { pos: number
 
     const homePos = home.pos;
     const awayPos = away.pos;
-    const posDiff = awayPos - homePos; // >0 = gospodarz wyzej
+    const posDiff = awayPos - homePos; // >0 = gospodarz wyżej
 
     // Srednia goli
     const homeGamesPlayed = Math.max(1, (home.goalsFor + home.goalsAgainst) / 3);
@@ -124,11 +124,11 @@ function scorePredictions(matches: Match[], positions: Map<string, { pos: number
       if (awayGoalsPerGame > 1.5) reasoning.push(`${match.awayTeam} strzela sr. ${awayGoalsPerGame.toFixed(1)} gola/mecz`);
       if (homeConcedePerGame > 1.2) reasoning.push(`${match.homeTeam} traci sr. ${homeConcedePerGame.toFixed(1)} gola/mecz`);
       if (awayConcedePerGame > 1.2) reasoning.push(`${match.awayTeam} traci sr. ${awayConcedePerGame.toFixed(1)} gola/mecz`);
-      if (reasoning.length === 0) reasoning.push('Wysoka srednia goli obu druzyn');
+      if (reasoning.length === 0) reasoning.push('Wysoka średnia goli obu drużyn');
 
-      if (homeForm < 5) against.push(`${match.homeTeam} w slabej formie`);
-      if (awayForm < 5) against.push(`${match.awayTeam} w slabej formie`);
-      if (against.length === 0) against.push('Obie druzyny moga grac zachowawczo');
+      if (homeForm < 5) against.push(`${match.homeTeam} w słabej formie`);
+      if (awayForm < 5) against.push(`${match.awayTeam} w słabej formie`);
+      if (against.length === 0) against.push('Obie drużyny mogą grać zachowawczo');
 
       predictions.push({
         matchId: match.id,
@@ -162,13 +162,13 @@ function scorePredictions(matches: Match[], positions: Map<string, { pos: number
       const reasoning = [];
       const against = [];
 
-      reasoning.push(`${favorite} jest ${Math.abs(posDiff)} pozycji wyzej w tabeli`);
-      if (favoriteIsHome) reasoning.push('Przewaga wlasnego boiska');
+      reasoning.push(`${favorite} jest ${Math.abs(posDiff)} pozycji wyżej w tabeli`);
+      if (favoriteIsHome) reasoning.push('Przewaga własnego boiska');
       if (favForm >= 10) reasoning.push(`${favorite} w dobrej formie (${favForm}/15 pkt)`);
 
-      if (undForm >= 10) against.push(`${underdog} tez w dobrej formie`);
-      if (!favoriteIsHome) against.push(`${favorite} gra na wyjezdzie`);
-      if (against.length === 0) against.push('Pilka jest okragla');
+      if (undForm >= 10) against.push(`${underdog} też w dobrej formie`);
+      if (!favoriteIsHome) against.push(`${favorite} gra na wyjeździe`);
+      if (against.length === 0) against.push('Piłka jest okrągła');
 
       predictions.push({
         matchId: match.id,
@@ -199,15 +199,15 @@ function scorePredictions(matches: Match[], positions: Map<string, { pos: number
         utcDate: match.utcDate,
         competition: match.competition,
         competitionCode: match.competitionCode,
-        tip: 'Obie druzyny strzelą (BTTS)',
+        tip: 'Obie drużyny strzelą (BTTS)',
         confidence: conf,
         reasoning: [
           `${match.homeTeam}: ${homeGoalsPerGame.toFixed(1)} gola/mecz`,
           `${match.awayTeam}: ${awayGoalsPerGame.toFixed(1)} gola/mecz`,
-          'Obie druzyny regularnie traciają bramki',
+          'Obie drużyny regularnie tracą bramki',
         ],
         against: [
-          Math.abs(posDiff) > 8 ? 'Duza roznica klas moze zamknac mecz' : 'Takie mecze bywaja tez 1-0',
+          Math.abs(posDiff) > 8 ? 'Duża różnica klas może zamknąć mecz' : 'Takie mecze bywaja tez 1-0',
         ],
         category: 'btts',
       });

@@ -69,7 +69,7 @@ function ScoreHeader({ match }: { match: MatchDetail }) {
                 </div>
                 {match.halfTimeHome !== null && match.halfTimeAway !== null && (
                   <span className="text-[11px] score-display text-muted-foreground">
-                    Polowa: {match.halfTimeHome}–{match.halfTimeAway}
+                    Połowa: {match.halfTimeHome}–{match.halfTimeAway}
                   </span>
                 )}
               </>
@@ -91,7 +91,7 @@ function ScoreHeader({ match }: { match: MatchDetail }) {
             )}
             {finished && (
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">
-                Zakonczony
+                Zakończony
               </span>
             )}
             {scheduled && (
@@ -246,7 +246,7 @@ function MatchInfo({ match }: { match: MatchDetail }) {
 
   const infoPairs = [
     match.venue && ['Stadion', match.venue],
-    mainRef && ['Sedzia', `${mainRef.name}${mainRef.nationality ? ` (${mainRef.nationality})` : ''}`],
+    mainRef && ['Sędzia', `${mainRef.name}${mainRef.nationality ? ` (${mainRef.nationality})` : ''}`],
     match.matchday && ['Kolejka', `${match.matchday}`],
     match.competitionCode && ['Rozgrywki', match.competition],
   ].filter(Boolean) as [string, string][];
@@ -329,7 +329,7 @@ export function MatchDetailView({ matchId, initialMatch = null }: { matchId: str
       <div className="py-16 text-center">
         <p className="text-[16px] font-display text-muted-foreground">Nie znaleziono meczu</p>
         <a href="/" className="text-[13px] text-primary hover:underline mt-2 inline-block">
-          ← Wstecz do strony glownej
+          ← Wstecz do strony głównej
         </a>
       </div>
     );
@@ -345,7 +345,7 @@ export function MatchDetailView({ matchId, initialMatch = null }: { matchId: str
       {/* Link do powrotu */}
       <div className="text-center py-4">
         <a href="/" className="text-[12px] text-muted-foreground hover:text-primary transition-colors">
-          ← Wstecz do strony glownej
+          ← Wstecz do strony głównej
         </a>
       </div>
     </div>

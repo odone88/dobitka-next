@@ -170,7 +170,7 @@ export function DobitkaDnia() {
         <span className="font-display text-[13px] font-normal tracking-wide text-primary">Dobitka dnia</span>
         <span className="flex-1 border-t border-border" aria-hidden="true" />
         <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
-          {predictions.length} typow
+          {predictions.length} typów
         </span>
       </h2>
 
@@ -179,7 +179,7 @@ export function DobitkaDnia() {
       ))}
 
       <p className="text-[9px] text-muted-foreground text-center">
-        Predykcje oparte o pozycje w tabeli, forme i statystyki. Nie stanowia porady bukmacherskiej.
+        Predykcje oparte o pozycje w tabeli, forme i statystyki. Nie stanowią porady bukmacherskiej.
       </p>
     </section>
   );

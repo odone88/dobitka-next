@@ -129,10 +129,10 @@ export function UCLBracket() {
     return (
       <div className="py-6 text-center space-y-1.5">
         <p className="text-[14px] text-muted-foreground">
-          {error ? 'Nie udalo sie zaladowac drabinki LM' : 'Przerwa w rozgrywkach Ligi Mistrzow'}
+          {error ? 'Nie udało się załadować drabinki LM' : 'Przerwa w rozgrywkach Ligi Mistrzów'}
         </p>
         <p className="text-[12px] text-muted-foreground">
-          {error ? 'Sprawdz za chwile.' : 'Nastepna runda wkrotce — dane pojawia sie automatycznie.'}
+          {error ? 'Sprawdź za chwilę.' : 'Następna runda wkrótce — dane pojawia sie automatycznie.'}
         </p>
       </div>
     );

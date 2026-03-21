@@ -57,9 +57,9 @@ export function FavoritesPicker({ isOpen, onClose, onChanged }: Props) {
       <div className="relative bg-card border border-border rounded-2xl max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl animate-fade-in">
         {/* Header */}
         <div className="p-5 pb-3 border-b border-border">
-          <h2 className="font-display text-xl text-primary">Moje druzyny</h2>
+          <h2 className="font-display text-xl text-primary">Moje drużyny</h2>
           <p className="text-[12px] text-muted-foreground mt-1">
-            Wybierz ulubione — ich mecze beda zawsze na gorze.
+            Wybierz ulubione — ich mecze będą zawsze na górze.
           </p>
         </div>
 

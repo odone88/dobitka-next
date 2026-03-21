@@ -18,7 +18,7 @@ export function HomeClient() {
         <button
           onClick={() => setShowPicker(true)}
           className="relative ml-1 p-1.5 rounded-lg hover:bg-white/[0.05] transition-colors cursor-pointer"
-          title="Moje druzyny"
+          title="Moje drużyny"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill={favoriteIds.length > 0 ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                className={favoriteIds.length > 0 ? 'text-primary' : 'text-muted-foreground'}>

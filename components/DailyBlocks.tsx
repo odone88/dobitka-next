@@ -63,17 +63,17 @@ export async function HistoricalMatchBlock() {
     <div className="p-3 rounded-lg border border-border/60 bg-white/[0.02]">
       {framing ? (
         <div className="mb-2">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-blue-400/80 mb-1">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-blue-400 mb-1">
             Kontekst meczu
           </p>
-          <p className="text-[12px] text-muted-foreground/90 italic leading-relaxed">{framing}</p>
+          <p className="text-[12px] text-muted-foreground italic leading-relaxed">{framing}</p>
         </div>
       ) : (
         <BlockHeader label={match.score ? 'Mecz historyczny' : 'Wydarzenie dnia'} />
       )}
       <div className="space-y-1.5">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[12px] font-bold text-primary/80 tabular-nums">{match.year}</span>
+          <span className="text-[12px] font-bold text-primary tabular-nums">{match.year}</span>
           {hasScore && (
             <>
               <span className="text-[13px] font-bold text-foreground">{match.home}</span>
@@ -85,10 +85,11 @@ export async function HistoricalMatchBlock() {
             <span className="text-[13px] font-bold text-foreground">{match.home || match.competition}</span>
           )}
         </div>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
           {match.competition}
         </span>
         <p className="text-[12px] text-muted-foreground leading-relaxed">{match.note}</p>
+        <span className="text-[9px] text-muted-foreground italic">źródło: archiwum DOBITKA</span>
       </div>
     </div>
   );
@@ -108,10 +109,13 @@ export async function FactsBlock() {
         <>
           <BlockHeader label="Tego dnia w piłce" />
           {wikiEvents.map((e, i) => (
-            <p key={i} className="text-[13px] text-muted-foreground leading-relaxed border-l-2 border-primary/30 pl-3">
-              <span className="text-primary/70 font-bold tabular-nums">{e.year}</span>{' '}
-              {e.text}
-            </p>
+            <div key={i} className="text-[13px] text-muted-foreground leading-relaxed border-l-2 border-primary/30 pl-3">
+              <p>
+                <span className="text-primary font-bold tabular-nums">{e.year}</span>{' '}
+                {e.text}
+              </p>
+              <span className="text-[9px] text-muted-foreground italic">źródło: Wikipedia</span>
+            </div>
           ))}
         </>
       ) : (

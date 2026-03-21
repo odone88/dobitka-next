@@ -103,7 +103,7 @@ export default async function HomePage() {
 
             <LazySection>
               <section id="ucl" className="scroll-mt-16">
-                <SectionLabel text="Liga Mistrzow" />
+                <SectionLabel text="Liga Mistrzów" />
                 <Card>
                   <CardContent className="pt-4">
                     <Suspense fallback={<Skel rows={4} />}>
@@ -149,7 +149,7 @@ export default async function HomePage() {
             </LazySection>
 
             <section>
-              <SectionLabel text="Glosy futbolu" />
+              <SectionLabel text="Głosy futbolu" />
               <Card>
                 <CardContent className="pt-4">
                   <QuotesSection />
@@ -158,7 +158,7 @@ export default async function HomePage() {
             </section>
 
             <section>
-              <SectionLabel text="Dzis w pilce" />
+              <SectionLabel text="Dziś w piłce" />
               <div className="space-y-3">
                 <Card>
                   <CardContent className="pt-4">
@@ -181,7 +181,7 @@ export default async function HomePage() {
         <div className="divider-retro my-6" />
         <footer className="text-[11px] text-muted-foreground pb-6 space-y-1">
           <p>
-            <span className="text-foreground/60 font-semibold">Zrodla:</span>{' '}
+            <span className="text-foreground/60 font-semibold">Źródła:</span>{' '}
             football-data.org &middot; TheSportsDB &middot; BBC Sport &middot; The Guardian &middot; Weszlo.com &middot; Tifo Football
           </p>
           <p>Live: 90s &middot; UCL: 5min &middot; Tabele: 2h &middot; Newsy: 15min</p>

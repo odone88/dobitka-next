@@ -61,8 +61,8 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
   if (error || !team) {
     return (
       <div className="py-16 text-center">
-        <p className="text-[16px] font-display text-muted-foreground">Nie znaleziono druzyny</p>
-        <a href="/" className="text-[13px] text-primary hover:underline mt-2 inline-block">← Strona glowna</a>
+        <p className="text-[16px] font-display text-muted-foreground">Nie znaleziono drużyny</p>
+        <a href="/" className="text-[13px] text-primary hover:underline mt-2 inline-block">← Strona główna</a>
       </div>
     );
   }
@@ -148,11 +148,11 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
         </Card>
       )}
 
-      {/* Najblizsze mecze */}
+      {/* Najbliższe mecze */}
       {team.upcomingMatches.length > 0 && (
         <Card>
           <CardContent className="pt-4">
-            <h3 className="font-display text-[13px] text-primary mb-3">Najblizsze mecze</h3>
+            <h3 className="font-display text-[13px] text-primary mb-3">Najbliższe mecze</h3>
             <div className="space-y-0">
               {team.upcomingMatches.map((m) => {
                 const d = new Date(m.date);
@@ -220,7 +220,7 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
             )}
             {team.founded && (
               <div>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground block">Zalozony</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground block">Założony</span>
                 <span className="text-foreground">{team.founded}</span>
               </div>
             )}
@@ -247,7 +247,7 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
       </Card>
 
       <div className="text-center py-4">
-        <a href="/" className="text-[12px] text-muted-foreground hover:text-primary transition-colors">← Strona glowna</a>
+        <a href="/" className="text-[12px] text-muted-foreground hover:text-primary transition-colors">← Strona główna</a>
       </div>
     </div>
   );

@@ -87,7 +87,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
           </span>
-          {liveMatches.length} {liveMatches.length === 1 ? 'mecz na zywo' : liveMatches.length < 5 ? 'mecze na zywo' : 'meczow na zywo'}
+          {liveMatches.length} {liveMatches.length === 1 ? 'mecz na żywo' : liveMatches.length < 5 ? 'mecze na żywo' : 'meczów na żywo'}
         </div>
 
         <div className="px-4 py-3 flex flex-wrap gap-x-6 gap-y-2.5">
@@ -182,7 +182,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
         className="block rounded-xl border border-border bg-card overflow-hidden card-elevated hover:border-primary/20 transition-colors"
       >
         <div className="flex items-center gap-2 px-4 py-1.5 bg-white/[0.02] text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-          Najblizszy mecz
+          Najbliższy mecz
         </div>
         <div className="px-4 py-3 flex items-center gap-3">
           <div className="flex items-center gap-2 text-[16px]">
@@ -193,7 +193,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
             <Crest src={next.awayCrest} name={next.awayTeam} />
           </div>
           <span className="text-[12px] text-muted-foreground ml-auto score-display">
-            {isToday ? `dzis ${time}` : `${day} \u00B7 ${time}`}
+            {isToday ? `dziś ${time}` : `${day} \u00B7 ${time}`}
           </span>
           <span className="text-[10px] font-bold uppercase tracking-wide text-primary/50">
             {next.competitionCode}

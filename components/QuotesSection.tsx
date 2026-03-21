@@ -54,9 +54,10 @@ export function QuotesSection() {
             &ldquo;{q.text}&rdquo;
           </p>
           <footer className="text-[11px] text-muted-foreground">
-            <span className="font-semibold text-foreground/80">{q.author}</span>
+            <span className="font-semibold text-foreground">{q.author}</span>
             {q.context && <span className="text-muted-foreground"> · {q.context}</span>}
-            {q.date && <span className="text-muted-foreground/60"> · {q.date}</span>}
+            {q.date && <span className="text-muted-foreground"> · {q.date}</span>}
+            <span className="text-[9px] text-muted-foreground italic ml-1">cytat</span>
           </footer>
         </blockquote>
       ))}

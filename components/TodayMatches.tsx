@@ -38,7 +38,7 @@ function DayPicker({ selected, onChange }: { selected: string; onChange: (d: str
     d.setDate(d.getDate() + offset);
     return {
       date: d.toISOString().slice(0, 10),
-      label: offset === 0 ? 'Dzis' :
+      label: offset === 0 ? 'Dziś' :
              offset === -1 ? 'Wczoraj' :
              offset === 1 ? 'Jutro' :
              d.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric' }),
@@ -241,7 +241,7 @@ function MatchRow({ match }: { match: Match }) {
       {/* Goal scorers */}
       {expanded && loadingGoals && (
         <div className="px-3 pb-2 text-center">
-          <span className="text-[10px] text-muted-foreground">Ladowanie strzelcow...</span>
+          <span className="text-[10px] text-muted-foreground">Ładowanie strzelców...</span>
         </div>
       )}
       {hasGoals && (match.goals.length > 0 || expanded) && (finished || live) && (
@@ -349,9 +349,9 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
         <DayPicker selected={selectedDate} onChange={handleDateChange} />
         {timedOut ? (
           <div className="py-6 text-center">
-            <p className="text-[13px] text-muted-foreground">Nie udalo sie zaladowac meczow.</p>
+            <p className="text-[13px] text-muted-foreground">Nie udało się załadować meczów.</p>
             <button onClick={() => { setTimedOut(false); setLoading(true); fetchData(selectedDate); }}
-              className="mt-2 text-[12px] text-primary hover:underline cursor-pointer">Sprobuj ponownie</button>
+              className="mt-2 text-[12px] text-primary hover:underline cursor-pointer">Spróbuj ponownie</button>
           </div>
         ) : (
           <div className="rounded-xl border border-border overflow-hidden bg-card">
@@ -389,7 +389,7 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
             </span>
           )}
           {scheduledCount > 0 && <span>{scheduledCount} zaplanowanych</span>}
-          {finishedCount > 0 && <span>{finishedCount} zakonczonych</span>}
+          {finishedCount > 0 && <span>{finishedCount} zakończonych</span>}
         </div>
       )}
 
@@ -400,8 +400,8 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
       )}>
         {sortedLeagues.length === 0 ? (
           <div className="py-10 text-center space-y-2">
-            <p className="text-[15px] text-foreground/60 font-display">Brak meczow na ten dzien</p>
-            <p className="text-[12px] text-muted-foreground">Wybierz inny dzien lub sprawdz tabele ponizej.</p>
+            <p className="text-[15px] text-foreground/60 font-display">Brak meczów na ten dzień</p>
+            <p className="text-[12px] text-muted-foreground">Wybierz inny dzień lub sprawdź tabelę poniżej.</p>
           </div>
         ) : (
           <div className="rounded-xl overflow-hidden border border-border bg-card shadow-sm">
