@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLiveMatches, getTodayMatches, getMatchesByDate } from '@/lib/data-sources/football-data';
 
-export const dynamic = 'force-dynamic';
+// ISR cache — user requests never hit football-data.org directly
+export const revalidate = 30;
 
 export async function GET(request: NextRequest) {
   const dateParam = request.nextUrl.searchParams.get('date');

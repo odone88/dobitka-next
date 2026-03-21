@@ -10,28 +10,41 @@ interface NewsData {
   bbc: NewsItem[];
   guardian: NewsItem[];
   weszlo: NewsItem[];
+  tvpsport: NewsItem[];
+  sportpl: NewsItem[];
   tifo: NewsItem[];
   reddit: NewsItem[];
 }
 
-type TabId = 'bbc' | 'guardian' | 'weszlo' | 'tifo' | 'reddit';
+type TabId = 'polska' | 'bbc' | 'guardian' | 'tifo' | 'reddit';
 
 const TAB_META: Record<TabId, { label: string; flag: string; color: string }> = {
-  weszlo:   { label: 'Weszło',    flag: '🇵🇱',          color: 'text-amber-400' },
+  polska:   { label: 'Polska',    flag: '🇵🇱',          color: 'text-red-500' },
   reddit:   { label: 'Reddit',    flag: '🔥',          color: 'text-orange-400' },
   bbc:      { label: 'BBC',       flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'text-red-400' },
   guardian: { label: 'Guardian',  flag: '📰',          color: 'text-blue-400' },
   tifo:     { label: 'Tifo',      flag: '🎬',           color: 'text-purple-400' },
 };
 
-const TAB_ORDER: TabId[] = ['weszlo', 'reddit', 'bbc', 'guardian', 'tifo'];
+const TAB_ORDER: TabId[] = ['polska', 'reddit', 'bbc', 'guardian', 'tifo'];
+
+// Source-level labels for ArticleCard (maps individual source IDs to display info)
+const SOURCE_META: Record<string, { label: string; flag: string; color: string }> = {
+  weszlo:   { label: 'Weszło',      flag: '🇵🇱', color: 'text-amber-400' },
+  tvpsport: { label: 'TVP Sport',   flag: '🇵🇱', color: 'text-red-500' },
+  sportpl:  { label: 'Sport.pl',    flag: '🇵🇱', color: 'text-blue-500' },
+  bbc:      { label: 'BBC',         flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'text-red-400' },
+  guardian: { label: 'Guardian',    flag: '📰', color: 'text-blue-400' },
+  reddit:   { label: 'Reddit',      flag: '🔥', color: 'text-orange-400' },
+  youtube:  { label: 'Tifo',        flag: '🎬', color: 'text-purple-400' },
+};
 
 function isRecent(dateStr: string): boolean {
   return Date.now() - new Date(dateStr).getTime() < 30 * 60 * 1000; // <30 min
 }
 
 function ArticleCard({ item }: { item: NewsItem }) {
-  const meta = TAB_META[item.source as TabId];
+  const meta = SOURCE_META[item.source];
   return (
     <a
       href={item.url}
@@ -131,9 +144,9 @@ function RedditCard({ item }: { item: NewsItem }) {
 
 function EmptyState({ tab }: { tab: TabId }) {
   const msgs: Record<TabId, string> = {
+    polska:   'Brak polskich newsów. Sprawdź za chwilę.',
     bbc:      'BBC Sport nie odpowiada. Sprawdź za chwilę.',
     guardian: 'Guardian niedostępny. Spróbuj za chwilę.',
-    weszlo:   'Weszło niedostępne. Sprawdź za chwilę.',
     tifo:     'Brak nowych wideo Tifo Football.',
     reddit:   'Reddit niedostępny. Sprawdź za chwilę.',
   };
@@ -148,7 +161,7 @@ export function NewsFeed() {
   const [data, setData] = useState<NewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<TabId>('weszlo');
+  const [selectedTab, setSelectedTab] = useState<TabId>('polska');
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
@@ -160,8 +173,14 @@ export function NewsFeed() {
       })
       .then((d: NewsData) => {
         setData(d);
-        const first = TAB_ORDER.find((t) => (d[t]?.length ?? 0) > 0);
-        if (first) setSelectedTab(first);
+        // Default to 'polska' if any PL sources have content
+        const plCount = (d.weszlo?.length ?? 0) + (d.tvpsport?.length ?? 0) + (d.sportpl?.length ?? 0);
+        if (plCount > 0) {
+          setSelectedTab('polska');
+        } else {
+          const first = TAB_ORDER.find((t) => t !== 'polska' && ((d as unknown as Record<string, unknown[]>)[t]?.length ?? 0) > 0);
+          if (first) setSelectedTab(first);
+        }
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
@@ -189,14 +208,25 @@ export function NewsFeed() {
     return <p className="text-[13px] text-muted-foreground py-4 text-center">Błąd ładowania newsów.</p>;
   }
 
-  const activeTabs = TAB_ORDER.filter((t) => (data[t]?.length ?? 0) > 0);
+  // "polska" tab merges weszlo + tvpsport + sportpl, sorted by date
+  function getTabItems(tab: TabId): NewsItem[] {
+    if (!data) return [];
+    if (tab === 'polska') {
+      return [...(data.weszlo ?? []), ...(data.tvpsport ?? []), ...(data.sportpl ?? [])]
+        .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+        .slice(0, 15);
+    }
+    return (data as unknown as Record<string, NewsItem[]>)[tab] ?? [];
+  }
+
+  const activeTabs = TAB_ORDER.filter((t) => getTabItems(t).length > 0);
 
   if (activeTabs.length === 0) {
     return <p className="text-[13px] text-muted-foreground py-4 text-center">Brak newsów — sprawdź za chwilę.</p>;
   }
 
   const currentTab: TabId = activeTabs.includes(selectedTab) ? selectedTab : activeTabs[0];
-  const items: NewsItem[] = data[currentTab] ?? [];
+  const items: NewsItem[] = getTabItems(currentTab);
 
   return (
     <div>
@@ -219,7 +249,7 @@ export function NewsFeed() {
               >
                 <span>{m.flag}</span>
                 <span>{m.label}</span>
-                <span className={cn('opacity-50', isActive && 'opacity-80')}>({data[t]?.length})</span>
+                <span className={cn('opacity-50', isActive && 'opacity-80')}>({getTabItems(t).length})</span>
               </button>
             );
           })}

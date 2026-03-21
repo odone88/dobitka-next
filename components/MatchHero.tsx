@@ -10,7 +10,7 @@ function isLive(m: Match) {
 }
 
 const BANNER_PRIORITY: Record<string, number> = {
-  CL: 0, ELC: 1, PL: 2, PD: 3, SA: 4, BL1: 5, FL1: 6, PPL: 7, DED: 8, BSA: 9, CLI: 10,
+  CL: 0, ELC: 1, PPL: 2, PL: 3, PD: 4, SA: 5, BL1: 6, FL1: 7, DED: 8, BSA: 9, CLI: 10,
 };
 
 function Crest({ src, name, size = 22 }: { src?: string; name: string; size?: number }) {

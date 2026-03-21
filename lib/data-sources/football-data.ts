@@ -4,13 +4,53 @@ import { FOOTBALL_DATA_KEY } from '@/config/sources';
 const BASE = 'https://api.football-data.org/v4';
 const HEADERS = { 'X-Auth-Token': FOOTBALL_DATA_KEY };
 
+// ─── IN-MEMORY FALLBACK CACHE ────────────────────────────────────────────────
+// Stores last successful response per path so 429/5xx still returns stale data.
+const memCache = new Map<string, { data: unknown; ts: number }>();
+const MEM_TTL = 5 * 60 * 1000; // 5 min max staleness
+
 async function fdFetch(path: string, cacheSec = 120) {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: HEADERS,
-    next: { revalidate: cacheSec },
-  });
-  if (!res.ok) throw new Error(`football-data ${path}: ${res.status}`);
-  return res.json();
+  const cacheKey = path;
+
+  try {
+    const res = await fetch(`${BASE}${path}`, {
+      headers: HEADERS,
+      next: { revalidate: cacheSec },
+    });
+
+    // Rate limited — retry once after 2s
+    if (res.status === 429) {
+      await new Promise((r) => setTimeout(r, 2000));
+      const retry = await fetch(`${BASE}${path}`, {
+        headers: HEADERS,
+        next: { revalidate: cacheSec },
+      });
+      if (retry.ok) {
+        const data = await retry.json();
+        memCache.set(cacheKey, { data, ts: Date.now() });
+        return data;
+      }
+      // Retry also failed — fall through to mem cache
+    } else if (res.ok) {
+      const data = await res.json();
+      memCache.set(cacheKey, { data, ts: Date.now() });
+      return data;
+    }
+
+    // Non-OK, non-429 — try mem cache
+    const cached = memCache.get(cacheKey);
+    if (cached && Date.now() - cached.ts < MEM_TTL) {
+      return cached.data;
+    }
+    throw new Error(`football-data ${path}: ${res.status}`);
+  } catch (err) {
+    // Network error — try mem cache before giving up
+    const cached = memCache.get(cacheKey);
+    if (cached && Date.now() - cached.ts < MEM_TTL) {
+      return cached.data;
+    }
+    throw err;
+  }
 }
 
 // ─── LIVE / TODAY MATCHES ────────────────────────────────────────────────────

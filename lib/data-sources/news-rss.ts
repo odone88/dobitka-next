@@ -20,6 +20,18 @@ const RSS_SOURCES: RssSource[] = [
     url: 'https://www.theguardian.com/football/rss',
     source: 'guardian' as NewsItem['source'],
   },
+  {
+    id: 'tvpsport',
+    name: 'TVP Sport',
+    url: 'https://sport.tvp.pl/rss/pilka-nozna.xml',
+    source: 'tvpsport' as NewsItem['source'],
+  },
+  {
+    id: 'sportpl',
+    name: 'Sport.pl Piłka Nożna',
+    url: 'https://www.sport.pl/rss/pilka-nozna.xml',
+    source: 'sportpl' as NewsItem['source'],
+  },
 ];
 
 async function fetchRss(src: RssSource, limit: number): Promise<NewsItem[]> {
@@ -59,17 +71,24 @@ function parseRss(xml: string, src: RssSource, limit: number): NewsItem[] {
   return items;
 }
 
-export async function getNewsFeeds(): Promise<{ bbc: NewsItem[]; guardian: NewsItem[]; weszlo: NewsItem[] }> {
+export async function getNewsFeeds(): Promise<{
+  bbc: NewsItem[]; guardian: NewsItem[]; weszlo: NewsItem[];
+  tvpsport: NewsItem[]; sportpl: NewsItem[];
+}> {
   const { getWeszloFeed } = await import('./weszlo');
   const results = await Promise.allSettled([
-    fetchRss(RSS_SOURCES[0], 8),
-    fetchRss(RSS_SOURCES[1], 8),
-    getWeszloFeed(8),
+    fetchRss(RSS_SOURCES[0], 8),   // bbc
+    fetchRss(RSS_SOURCES[1], 8),   // guardian
+    getWeszloFeed(8),              // weszlo
+    fetchRss(RSS_SOURCES[2], 8),   // tvpsport
+    fetchRss(RSS_SOURCES[3], 8),   // sportpl
   ]);
   return {
     bbc: results[0].status === 'fulfilled' ? results[0].value : [],
     guardian: results[1].status === 'fulfilled' ? results[1].value : [],
     weszlo: results[2].status === 'fulfilled' ? results[2].value : [],
+    tvpsport: results[3].status === 'fulfilled' ? results[3].value : [],
+    sportpl: results[4].status === 'fulfilled' ? results[4].value : [],
   };
 }
 

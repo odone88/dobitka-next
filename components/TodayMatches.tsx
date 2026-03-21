@@ -14,7 +14,7 @@ const LEAGUE_ACCENT: Record<string, string> = {
   BL1: 'border-l-yellow-400',
   FL1: 'border-l-sky-400',
   ELC: 'border-l-orange-400',
-  PPL: 'border-l-emerald-400',
+  PPL: 'border-l-red-500',
   DED: 'border-l-orange-300',
   BSA: 'border-l-yellow-300',
   CLI: 'border-l-amber-400',
@@ -22,9 +22,9 @@ const LEAGUE_ACCENT: Record<string, string> = {
 
 const LEAGUE_PRIORITY: Record<string, number> = {
   CL: 0, ELC: 1,
-  PL: 2, PD: 3, SA: 4, BL1: 5, FL1: 6,
-  PPL: 7, DED: 8,
-  BSA: 9, CLI: 10,
+  PPL: 2,
+  PL: 3, PD: 4, SA: 5, BL1: 6, FL1: 7,
+  DED: 8, BSA: 9, CLI: 10,
 };
 
 function isLive(m: Match) {
@@ -90,9 +90,8 @@ function LiveMinute({ minute, status }: { minute: number | null | undefined; sta
 
   return (
     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-destructive
-                     rounded text-[9px] font-black text-white tracking-wide">
+                     rounded text-[9px] font-black text-white tracking-wide animate-pulse">
       <span className="relative flex h-1.5 w-1.5">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
         <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
       </span>
       {status === 'PAUSED' ? 'PRZ' : display ? `${display}'` : '\u2022'}
@@ -167,10 +166,10 @@ function MatchRow({ match }: { match: Match }) {
   return (
     <div
       className={cn(
-        'border-b border-border last:border-0 border-l-2 transition-colors',
+        'border-b border-border last:border-0 border-l-2 transition-all',
         LEAGUE_ACCENT[match.competitionCode] ?? 'border-l-transparent',
         live && 'bg-destructive/[0.08]',
-        'cursor-pointer hover:bg-accent/50',
+        'cursor-pointer hover:bg-accent/50 hover:shadow-sm',
       )}
     >
       {/* Main row */}
@@ -405,7 +404,7 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
             <p className="text-[12px] text-muted-foreground">Wybierz inny dzien lub sprawdz tabele ponizej.</p>
           </div>
         ) : (
-          <div className="rounded-xl overflow-hidden border border-border bg-card">
+          <div className="rounded-xl overflow-hidden border border-border bg-card shadow-sm">
             {sortedLeagues.map(([code, ms], leagueIdx) => {
               const league = getLeague(code);
               const hasLive = ms.some(isLive);

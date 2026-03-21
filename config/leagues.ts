@@ -11,6 +11,16 @@ export interface LeagueConfig {
 
 export const LEAGUES: LeagueConfig[] = [
   {
+    code: 'PPL',
+    name: 'Ekstraklasa',
+    shortName: 'EKL',
+    country: 'Polska',
+    flag: '🇵🇱',
+    color: 'text-red-500',
+    bgColor: 'bg-red-950',
+    understatSlug: undefined,
+  },
+  {
     code: 'CL',
     name: 'Liga Mistrzów',
     shortName: 'UCL',

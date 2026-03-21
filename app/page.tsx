@@ -48,7 +48,7 @@ async function fetchInitialMatches(): Promise<Match[]> {
 }
 
 export default async function HomePage() {
-  const leagueOrder = ['PL', 'PD', 'SA', 'BL1', 'FL1'];
+  const leagueOrder = ['PPL', 'PL', 'PD', 'SA', 'BL1', 'FL1'];
   const leagues = LEAGUES.filter((l) => leagueOrder.includes(l.code))
     .sort((a, b) => leagueOrder.indexOf(a.code) - leagueOrder.indexOf(b.code));
 

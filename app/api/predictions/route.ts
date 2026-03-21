@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { getTodayMatches, getStandings } from '@/lib/data-sources/football-data';
 import type { Match, StandingRow } from '@/types';
 
-// Force-dynamic — predykcje zależa od dzisiejszych meczow
-export const dynamic = 'force-dynamic';
+// ISR cache — predictions update every 2 min, never hit API directly per-user
+export const revalidate = 120;
 
 interface Prediction {
   matchId: number;

@@ -27,6 +27,9 @@ export interface Match {
   competitionEmblem?: string;
   goals: MatchGoal[];
   halfTime?: string;
+  // Future enrichment — TV broadcast & odds
+  tvBroadcast?: string[];       // e.g. ['Canal+', 'Eleven Sports']
+  odds?: { home: number; draw: number; away: number };
 }
 
 // ─── STANDINGS ───────────────────────────────────────────────────────────────
@@ -70,7 +73,7 @@ export interface NewsItem {
   id: string;
   title: string;
   url: string;
-  source: 'reddit' | 'youtube' | 'weszlo' | 'editorial' | 'bbc' | 'guardian';
+  source: 'reddit' | 'youtube' | 'weszlo' | 'editorial' | 'bbc' | 'guardian' | 'tvpsport' | 'sportpl';
   subreddit?: string;
   score?: number;
   comments?: number;

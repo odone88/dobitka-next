@@ -12,12 +12,14 @@ export async function GET() {
     getRedditHot(8),
   ]);
 
-  const f = feeds.status === 'fulfilled' ? feeds.value : { bbc: [], guardian: [], weszlo: [] };
+  const f = feeds.status === 'fulfilled' ? feeds.value : { bbc: [], guardian: [], weszlo: [], tvpsport: [], sportpl: [] };
 
   return NextResponse.json({
     bbc: f.bbc,
     guardian: f.guardian,
     weszlo: f.weszlo,
+    tvpsport: f.tvpsport,
+    sportpl: f.sportpl,
     tifo: tifo.status === 'fulfilled' ? tifo.value : [],
     reddit: reddit.status === 'fulfilled' ? reddit.value : [],
     updatedAt: new Date().toISOString(),

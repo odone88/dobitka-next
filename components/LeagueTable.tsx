@@ -20,6 +20,7 @@ const ZONES: Record<string, { ucl: number; ucl_q?: number; uel: number; uecl?: n
   BL1: { ucl: 4,              uel: 5,  uecl: 6,  playoff: 16, rel: 17 },
   FL1: { ucl: 3, ucl_q: 4,   uel: 5,  uecl: 6,  playoff: 16, rel: 17 },
   CL:  { ucl: 8,              uel: 16, rel: 99 },
+  PPL: { ucl: 1,              uel: 2,  uecl: 3,  playoff: 15, rel: 16 },
 };
 
 type ZoneType = 'ucl' | 'ucl_q' | 'uel' | 'uecl' | 'playoff' | 'rel' | 'safe';
