@@ -110,11 +110,11 @@ export default async function HomePage() {
           <TodayMatches initialMatches={initialMatches} ssrLoaded />
         </section>
 
-        {/* MAIN GRID */}
+        {/* MAIN GRID — on mobile: sidebar (newsy) BEFORE tables */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
 
           {/* LEFT COLUMN */}
-          <div className="space-y-6 min-w-0 order-1">
+          <div className="space-y-6 min-w-0 order-2 lg:order-1">
 
             <LazySection>
               <section id="ucl" className="scroll-mt-16">
@@ -147,8 +147,8 @@ export default async function HomePage() {
             </LazySection>
           </div>
 
-          {/* SIDEBAR */}
-          <aside className="space-y-5 order-2">
+          {/* SIDEBAR — on mobile shows BEFORE tables (order-1) */}
+          <aside className="space-y-5 order-1 lg:order-2">
 
             <LazySection>
               <section id="newsy" className="scroll-mt-16">

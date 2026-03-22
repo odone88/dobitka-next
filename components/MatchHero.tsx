@@ -38,15 +38,16 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
   }, []);
 
   useEffect(() => {
-    // If SSR loaded data (even empty), skip first fetch — just poll
-    if (ssrLoaded) {
+    // If SSR loaded data AND we actually have matches, skip first fetch
+    if (ssrLoaded && initialMatches.length > 0) {
       const id = setInterval(fetchData, 90_000);
       return () => clearInterval(id);
     }
+    // SSR was empty or not loaded — fetch immediately
     fetchData();
     const id = setInterval(fetchData, 90_000);
     return () => clearInterval(id);
-  }, [fetchData, ssrLoaded]);
+  }, [fetchData, ssrLoaded, initialMatches.length]);
 
   // Score change detection
   useEffect(() => {

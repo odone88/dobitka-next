@@ -5,6 +5,7 @@ import type { Match, MatchGoal } from '@/types';
 import { getLeague } from '@/config/leagues';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { getFavoriteIds, matchInvolvesFavorite } from '@/lib/favorites';
 
 const LEAGUE_ACCENT: Record<string, string> = {
   CL:  'border-l-blue-500',
@@ -305,11 +306,13 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
   useEffect(() => {
     const isToday = selectedDate === new Date().toISOString().slice(0, 10);
 
-    if (ssrLoadedRef.current && isToday) {
+    // Only skip first fetch if SSR gave us actual data
+    if (ssrLoadedRef.current && isToday && matches.length > 0) {
       ssrLoadedRef.current = false;
       const id = setInterval(() => fetchData(selectedDate), 90_000);
       return () => clearInterval(id);
     }
+    ssrLoadedRef.current = false;
 
     fetchData(selectedDate);
     if (isToday) {
@@ -354,6 +357,13 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
       return new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime();
     });
   }
+
+  // Favorites
+  const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+  useEffect(() => { setFavoriteIds(getFavoriteIds()); }, []);
+  const favoriteMatches = favoriteIds.length > 0
+    ? matches.filter((m) => matchInvolvesFavorite(m.homeTeamId, m.awayTeamId, favoriteIds))
+    : [];
 
   const liveCount = matches.filter(isLive).length;
   const scheduledCount = matches.filter((m) => m.status === 'SCHEDULED' || m.status === 'TIMED').length;
@@ -420,15 +430,42 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
         </div>
       )}
 
+      {/* Favorite matches — pinned on top */}
+      {favoriteMatches.length > 0 && (
+        <div className="rounded-xl overflow-hidden border-2 border-primary/30 bg-gradient-to-r from-primary/[0.06] to-card shadow-sm">
+          <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border-b border-primary/20">
+            <span className="text-sm" aria-hidden="true">❤️</span>
+            <span className="text-[11px] font-black uppercase tracking-widest text-primary">Twoje drużyny</span>
+            <span className="text-[10px] text-muted-foreground ml-auto score-display font-bold">{favoriteMatches.length}</span>
+          </div>
+          {favoriteMatches.map((m) => <MatchRow key={`fav-${m.id}`} match={m} />)}
+        </div>
+      )}
+
       {/* Match list */}
       <div className={cn(
         'transition-opacity duration-200',
         switching ? 'opacity-30' : 'opacity-100'
       )}>
         {sortedLeagues.length === 0 ? (
-          <div className="py-10 text-center space-y-2">
-            <p className="text-[15px] text-muted-foreground font-display">Brak meczów na ten dzień</p>
-            <p className="text-[12px] text-muted-foreground">Wybierz inny dzień lub sprawdź tabelę poniżej.</p>
+          <div className="py-10 text-center space-y-3">
+            <span className="text-4xl" aria-hidden="true">⚽</span>
+            <p className="text-[15px] text-foreground font-display font-bold">Brak meczów na ten dzień</p>
+            <p className="text-[12px] text-muted-foreground">Sprawdź inny dzień lub przejdź do <a href="/archive" className="text-primary hover:underline">archiwum</a>.</p>
+            <div className="flex justify-center gap-2 pt-2">
+              {[-1, 1, 2].map((offset) => {
+                const d = new Date();
+                d.setDate(d.getDate() + offset);
+                const iso = d.toISOString().slice(0, 10);
+                const label = offset === -1 ? 'Wczoraj' : offset === 1 ? 'Jutro' : d.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric' });
+                return (
+                  <button key={offset} onClick={() => handleDateChange(iso)}
+                    className="px-3 py-1.5 rounded-lg border border-border text-[11px] font-bold text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors cursor-pointer">
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         ) : (
           <div className="rounded-xl overflow-hidden border border-border bg-card shadow-sm">
