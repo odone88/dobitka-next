@@ -1,41 +1,9 @@
-import { cache } from 'react';
 import { TeamDetailView } from '@/components/TeamDetail';
-import { FOOTBALL_DATA_KEY } from '@/config/sources';
 import { notFound } from 'next/navigation';
 
 interface Props {
   params: Promise<{ id: string }>;
 }
-
-interface TeamMeta {
-  name: string;
-  shortName: string;
-  crest: string;
-  venue: string;
-  founded: number;
-  address: string;
-}
-
-const fetchTeamMeta = cache(async (id: string): Promise<TeamMeta | null> => {
-  try {
-    const res = await fetch(`https://api.football-data.org/v4/teams/${id}`, {
-      headers: { 'X-Auth-Token': FOOTBALL_DATA_KEY },
-      next: { revalidate: 86400 },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return {
-      name: data.name ?? '',
-      shortName: data.shortName ?? data.tla ?? '',
-      crest: data.crest ?? '',
-      venue: data.venue ?? '',
-      founded: data.founded ?? 0,
-      address: data.address ?? '',
-    };
-  } catch {
-    return null;
-  }
-});
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
@@ -44,20 +12,16 @@ export async function generateMetadata({ params }: Props) {
     return { title: 'Nie znaleziono -- DOBITKA' };
   }
 
-  const meta = await fetchTeamMeta(id);
-  const name = meta?.name;
   return {
-    title: name ? `${name} -- DOBITKA` : `Druzyna #${id} -- DOBITKA`,
-    description: name
-      ? `${name} -- profil, skład, wyniki, forma. Portal pilkarski DOBITKA.`
-      : 'Profil druzyny, skład, wyniki, forma -- DOBITKA',
-    openGraph: name
-      ? {
-          title: `${name} -- DOBITKA`,
-          description: `${name} -- profil, skład, wyniki, forma`,
-          images: meta?.crest ? [{ url: meta.crest, width: 256, height: 256 }] : [],
-        }
-      : undefined,
+    title: `Druzyna #${id} -- DOBITKA`,
+    description: 'Profil druzyny, sklad, wyniki, forma -- DOBITKA',
+    openGraph: {
+      title: `Druzyna -- DOBITKA`,
+      description: 'Profil druzyny, sklad, wyniki, forma',
+      siteName: 'DOBITKA',
+      locale: 'pl_PL',
+      type: 'website',
+    },
   };
 }
 
@@ -69,30 +33,7 @@ export default async function TeamPage({ params }: Props) {
     notFound();
   }
 
-  const meta = await fetchTeamMeta(id);
-
-  // JSON-LD SportsTeam schema
-  const jsonLd = meta
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'SportsTeam',
-        name: meta.name,
-        alternateName: meta.shortName,
-        logo: meta.crest,
-        url: `https://dobitka.pl/team/${id}`,
-        sport: 'Football',
-        location: meta.venue
-          ? {
-              '@type': 'StadiumOrArena',
-              name: meta.venue,
-              address: meta.address || undefined,
-            }
-          : undefined,
-        foundingDate: meta.founded ? String(meta.founded) : undefined,
-      }
-    : null;
-
-  // Breadcrumb JSON-LD
+  // Breadcrumb JSON-LD (generic, no API call needed)
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -106,7 +47,7 @@ export default async function TeamPage({ params }: Props) {
       {
         '@type': 'ListItem',
         position: 2,
-        name: meta?.name ?? `Druzyna #${id}`,
+        name: `Druzyna #${id}`,
         item: `https://dobitka.pl/team/${id}`,
       },
     ],
@@ -114,13 +55,7 @@ export default async function TeamPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* JSON-LD */}
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      )}
+      {/* Breadcrumb JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
@@ -167,7 +102,7 @@ export default async function TeamPage({ params }: Props) {
             <span className="mx-1">/</span>
           </li>
           <li className="text-foreground truncate max-w-[200px]">
-            {meta?.shortName ?? meta?.name ?? `Druzyna #${id}`}
+            Druzyna
           </li>
         </ol>
       </nav>
