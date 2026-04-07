@@ -237,7 +237,7 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
               </div>
             )}
           </div>
-          {team.website && (
+          {team.website && team.website.startsWith('http') && (
             <a href={team.website} target="_blank" rel="noopener noreferrer"
                className="text-[11px] text-primary hover:text-primary transition-colors mt-3 inline-block">
               {team.website} ↗

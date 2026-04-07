@@ -281,18 +281,18 @@ export function MatchDetailView({ matchId, initialMatch = null }: { matchId: str
     try {
       const res = await fetch(`/api/match/${matchId}`);
       if (!res.ok) {
-        if (!match) setError(true);
+        if (!matchRef.current) setError(true);
         return;
       }
       const data = await res.json();
       setMatch(data);
       matchRef.current = data;
     } catch {
-      if (!match) setError(true);
+      if (!matchRef.current) setError(true);
     } finally {
       setLoading(false);
     }
-  }, [matchId, match]);
+  }, [matchId]);
 
   useEffect(() => {
     // If we have SSR data, skip initial fetch — just poll for live

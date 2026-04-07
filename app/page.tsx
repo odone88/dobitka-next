@@ -10,8 +10,11 @@ import { QuotesSection } from '@/components/QuotesSection';
 import { HistoricalMatchBlock, FactsBlock } from '@/components/DailyBlocks';
 import { LiveToastContainer } from '@/components/LiveToast';
 import { DobitkaDnia } from '@/components/DobitkaDnia';
-import { HomeClient } from '@/components/HomeClient';
+import { HomeClient, HeaderDate } from '@/components/HomeClient';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LazySection } from '@/components/LazySection';
+import { TopScorers } from '@/components/TopScorers';
+import { WeekendResults } from '@/components/WeekendResults';
 import { LEAGUES } from '@/config/leagues';
 import { getLiveMatches, getTodayMatches } from '@/lib/data-sources/football-data';
 import { cn } from '@/lib/utils';
@@ -63,10 +66,7 @@ export default async function HomePage() {
   const leagues = LEAGUES.filter((l) => leagueOrder.includes(l.code))
     .sort((a, b) => leagueOrder.indexOf(a.code) - leagueOrder.indexOf(b.code));
 
-  // Compute date inside async function so ISR revalidation gets fresh date
-  const todayStr = new Date().toLocaleDateString('pl-PL', {
-    weekday: 'long', day: 'numeric', month: 'long',
-  });
+  // Date is rendered client-side to avoid hydration mismatch with ISR cache
 
   // Server-side fetch — no skeleton for above-the-fold content
   const initialMatches = await fetchInitialMatches();
@@ -85,10 +85,7 @@ export default async function HomePage() {
                 DOBITKA
               </h1>
             </a>
-            <div className="hidden sm:flex flex-col">
-              <span className="text-[11px] text-muted-foreground capitalize font-medium leading-tight">{todayStr}</span>
-              <span className="text-[9px] text-primary/50 font-bold uppercase tracking-widest leading-tight">Twój serwis piłkarski</span>
-            </div>
+            <HeaderDate />
           </div>
           <HomeClient />
         </div>
@@ -97,18 +94,29 @@ export default async function HomePage() {
       <main className="max-w-screen-xl mx-auto px-4 py-5 space-y-6">
 
         {/* SMART BANNER — SSR with initial data */}
-        <section id="live" className="scroll-mt-16" aria-live="polite" aria-atomic="false">
-          <MatchHero initialMatches={initialMatches} ssrLoaded />
-        </section>
+        <ErrorBoundary section="banner">
+          <section id="live" className="scroll-mt-16" aria-live="polite" aria-atomic="false">
+            <MatchHero initialMatches={initialMatches} ssrLoaded />
+          </section>
+        </ErrorBoundary>
+
+        {/* WEEKEND RESULTS — Mon/Tue only */}
+        <ErrorBoundary section="wyniki weekendu">
+          <WeekendResults />
+        </ErrorBoundary>
 
         {/* DOBITKA DNIA */}
-        <DobitkaDnia />
+        <ErrorBoundary section="predykcje">
+          <DobitkaDnia />
+        </ErrorBoundary>
 
         {/* MECZE DNIA — SSR with initial data */}
-        <section id="mecze" className="scroll-mt-16">
-          <SectionLabel text="Mecze dnia" accent />
-          <TodayMatches initialMatches={initialMatches} ssrLoaded />
-        </section>
+        <ErrorBoundary section="mecze dnia">
+          <section id="mecze" className="scroll-mt-16">
+            <SectionLabel text="Mecze dnia" accent />
+            <TodayMatches initialMatches={initialMatches} ssrLoaded />
+          </section>
+        </ErrorBoundary>
 
         {/* MAIN GRID — on mobile: sidebar (newsy) BEFORE tables */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
@@ -150,18 +158,20 @@ export default async function HomePage() {
           {/* SIDEBAR — on mobile shows BEFORE tables (order-1) */}
           <aside className="space-y-5 order-1 lg:order-2">
 
-            <LazySection>
-              <section id="newsy" className="scroll-mt-16">
-                <SectionLabel text="Newsy" />
-                <Card>
-                  <CardContent className="pt-4">
-                    <Suspense fallback={<Skel rows={4} />}>
-                      <NewsFeed />
-                    </Suspense>
-                  </CardContent>
-                </Card>
-              </section>
-            </LazySection>
+            <ErrorBoundary section="newsy">
+              <LazySection>
+                <section id="newsy" className="scroll-mt-16">
+                  <SectionLabel text="Newsy" />
+                  <Card>
+                    <CardContent className="pt-4">
+                      <Suspense fallback={<Skel rows={4} />}>
+                        <NewsFeed />
+                      </Suspense>
+                    </CardContent>
+                  </Card>
+                </section>
+              </LazySection>
+            </ErrorBoundary>
 
             <section>
               <SectionLabel text="Głosy futbolu" />
@@ -171,6 +181,17 @@ export default async function HomePage() {
                 </CardContent>
               </Card>
             </section>
+
+            <LazySection>
+              <section>
+                <SectionLabel text="Król strzelców" accent />
+                <Card>
+                  <CardContent className="pt-4">
+                    <TopScorers />
+                  </CardContent>
+                </Card>
+              </section>
+            </LazySection>
 
             <section>
               <SectionLabel text="Dziś w piłce" />

@@ -1,9 +1,15 @@
+import { cache } from 'react';
 import { MatchDetailView } from '@/components/MatchDetail';
 import { getMatchFull } from '@/lib/data-sources/football-data';
 
 interface Props {
   params: Promise<{ id: string }>;
 }
+
+// React cache deduplicates across generateMetadata + page render
+const getMatchCached = cache(async (matchId: number) => {
+  return getMatchFull(matchId);
+});
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
@@ -12,14 +18,31 @@ export async function generateMetadata({ params }: Props) {
     return { title: 'Mecz — DOBITKA' };
   }
 
-  const match = await getMatchFull(matchId);
+  const match = await getMatchCached(matchId);
   if (!match) {
     return { title: `Mecz #${id} — DOBITKA` };
   }
 
+  const scoreText = match.homeScore !== null ? ` ${match.homeScore}:${match.awayScore}` : '';
+  const scoreParam = match.homeScore !== null ? `${match.homeScore}:${match.awayScore}` : '';
+  const ogUrl = `https://dobitka-next.vercel.app/api/og?home=${encodeURIComponent(match.homeTeam)}&away=${encodeURIComponent(match.awayTeam)}&score=${encodeURIComponent(scoreParam)}&comp=${encodeURIComponent(match.competition)}&status=${match.status}`;
+
   return {
-    title: `${match.homeTeam} vs ${match.awayTeam} — DOBITKA`,
-    description: `${match.competition}${match.homeScore !== null ? ` | ${match.homeScore}:${match.awayScore}` : ''} — DOBITKA`,
+    title: `${match.homeTeam} vs ${match.awayTeam}${scoreText} — DOBITKA`,
+    description: `${match.competition}${scoreText} — DOBITKA`,
+    openGraph: {
+      title: `${match.homeTeam} vs ${match.awayTeam}${scoreText}`,
+      description: `${match.competition} — DOBITKA`,
+      siteName: 'DOBITKA',
+      locale: 'pl_PL',
+      type: 'website',
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${match.homeTeam} vs ${match.awayTeam}${scoreText}`,
+      images: [ogUrl],
+    },
   };
 }
 
@@ -27,8 +50,8 @@ export default async function MatchPage({ params }: Props) {
   const { id } = await params;
   const matchId = parseInt(id, 10);
 
-  // SSR fetch — match detail renders immediately, no skeleton
-  const initialMatch = !isNaN(matchId) ? await getMatchFull(matchId) : null;
+  // SSR fetch — deduplicated with generateMetadata via React cache
+  const initialMatch = !isNaN(matchId) ? await getMatchCached(matchId) : null;
 
   // JSON-LD SportsEvent structured data for SEO
   const jsonLd = initialMatch ? {
@@ -61,7 +84,7 @@ export default async function MatchPage({ params }: Props) {
       {jsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
         />
       )}
       <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-xl">

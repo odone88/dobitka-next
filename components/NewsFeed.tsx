@@ -97,7 +97,7 @@ function TifoCard({ item }: { item: NewsItem }) {
           {item.title}
         </p>
         <span className="text-[11px] text-purple-400 font-bold uppercase tracking-wide">
-          🎬 Tifo Football · {formatDistanceToNow(item.publishedAt)}
+          🎬 {item.description || 'Tifo Football'} · {formatDistanceToNow(item.publishedAt)}
         </span>
       </div>
     </a>

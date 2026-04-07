@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Serif_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 // Editorial display — nagłówki, tytuły sekcji
@@ -24,8 +25,14 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "DOBITKA — codzienny przegląd piłki",
   description: "Wyniki live, tabele, strzelcy, newsy z BBC/Guardian/Weszło/Reddit — codziennie, bezkompromisowo.",
+  manifest: "/manifest.json",
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>",
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
   },
   openGraph: {
     title: "DOBITKA — codzienny przegląd piłki",
@@ -50,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pl" className="dark">
       <body className={`${dmSerif.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased bg-background min-h-screen`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );

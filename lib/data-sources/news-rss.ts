@@ -23,13 +23,13 @@ const RSS_SOURCES: RssSource[] = [
   {
     id: 'tvpsport',
     name: 'TVP Sport',
-    url: 'https://sport.tvp.pl/rss/pilka-nozna.xml',
+    url: 'https://sport.tvp.pl/rss/pilkanozna.xml',
     source: 'tvpsport' as NewsItem['source'],
   },
   {
     id: 'sportpl',
     name: 'Sport.pl Piłka Nożna',
-    url: 'https://www.sport.pl/rss/pilka-nozna.xml',
+    url: 'https://sport.pl/rss/sport.xml',
     source: 'sportpl' as NewsItem['source'],
   },
 ];
@@ -39,7 +39,10 @@ async function fetchRss(src: RssSource, limit: number): Promise<NewsItem[]> {
     headers: { 'User-Agent': 'dobitka-dashboard/2.0 (+https://dobitka-next.vercel.app)' },
     next: { revalidate: 900 },
   });
-  if (!res.ok) throw new Error(`${src.name} RSS ${res.status}`);
+  if (!res.ok) {
+    console.error(`[DOBITKA] ${src.name} RSS failed: HTTP ${res.status}`);
+    throw new Error(`${src.name} RSS ${res.status}`);
+  }
   const text = await res.text();
   return parseRss(text, src, limit);
 }
@@ -98,6 +101,8 @@ function stripCdata(s: string): string {
 
 function htmlDecode(str: string): string {
   return str
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)))
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
     .replace(/<[^>]+>/g, '').trim();

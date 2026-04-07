@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Match } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { getEditorialLine } from '@/lib/match-comments';
 
 function isLive(m: Match) {
   return m.status === 'LIVE' || m.status === 'IN_PLAY' || m.status === 'PAUSED';
@@ -129,6 +130,17 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
             </a>
           ))}
         </div>
+
+        {/* Editorial line for the most interesting live match */}
+        {liveMatches.length > 0 && (
+          <p className="px-5 pb-3 text-[11px] text-muted-foreground italic">
+            {getEditorialLine(
+              liveMatches[0].homeTeam, liveMatches[0].awayTeam,
+              liveMatches[0].homeScore, liveMatches[0].awayScore,
+              liveMatches[0].status, liveMatches[0].utcDate, liveMatches[0].id
+            )}
+          </p>
+        )}
       </div>
     );
   }
@@ -182,6 +194,17 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
             );
           })}
         </div>
+
+        {/* Editorial line for the top result */}
+        {top.length > 0 && (
+          <p className="px-5 pb-3 text-[11px] text-muted-foreground italic">
+            {getEditorialLine(
+              top[0].homeTeam, top[0].awayTeam,
+              top[0].homeScore, top[0].awayScore,
+              top[0].status, top[0].utcDate, top[0].id
+            )}
+          </p>
+        )}
       </div>
     );
   }
@@ -227,5 +250,23 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
     );
   }
 
-  return null;
+  // ─── MODE 4: BRAK MECZÓW — date banner ─────────────────────────
+  const todayStr = new Date().toLocaleDateString('pl-PL', {
+    weekday: 'long', day: 'numeric', month: 'long',
+  });
+
+  return (
+    <div className="rounded-2xl border border-border bg-gradient-to-r from-primary/[0.04] to-card overflow-hidden">
+      <div className="px-5 py-6 flex items-center justify-between">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Dzisiaj</p>
+          <p className="font-display text-xl text-foreground capitalize">{todayStr}</p>
+          <p className="text-[12px] text-muted-foreground mt-1">Brak meczów w głównych ligach. Sprawdź archiwum lub wróć później.</p>
+        </div>
+        <a href="/archive" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary/80 transition-colors flex-shrink-0">
+          Archiwum &rarr;
+        </a>
+      </div>
+    </div>
+  );
 }

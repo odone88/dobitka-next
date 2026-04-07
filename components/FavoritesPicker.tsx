@@ -54,7 +54,13 @@ export function FavoritesPicker({ isOpen, onClose, onChanged }: Props) {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleDone} />
 
       {/* Modal */}
-      <div className="relative bg-card border border-border rounded-2xl max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl animate-fade-in">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Wybierz ulubione drużyny"
+        onKeyDown={(e) => { if (e.key === 'Escape') handleDone(); }}
+        className="relative bg-card border border-border rounded-2xl max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl animate-fade-in"
+      >
         {/* Header */}
         <div className="p-5 pb-3 border-b border-border">
           <h2 className="font-display text-xl text-primary">Moje drużyny</h2>

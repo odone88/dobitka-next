@@ -22,10 +22,10 @@ interface Prediction {
 }
 
 // Proste pozycje druzyn ze standings (cache w pamieci na czas requestu)
-async function getTeamPositions(): Promise<Map<string, { pos: number; form: string; goalsFor: number; goalsAgainst: number; league: string }>> {
+async function getTeamPositions(): Promise<Map<string, { pos: number; form: string; goalsFor: number; goalsAgainst: number; played: number; league: string }>> {
   // Analizujemy wszystkie dostepne ligi (football-data.org free tier)
-  const leagues = ['PL', 'PD', 'SA', 'BL1', 'FL1', 'BSA', 'PPL', 'DED', 'ELC', 'CLI'];
-  const map = new Map<string, { pos: number; form: string; goalsFor: number; goalsAgainst: number; league: string }>();
+  const leagues = ['PL', 'PD', 'SA', 'BL1', 'FL1', 'BSA', 'PPL', 'DED', 'ELC'];
+  const map = new Map<string, { pos: number; form: string; goalsFor: number; goalsAgainst: number; played: number; league: string }>();
 
   const results = await Promise.allSettled(
     leagues.map((code) => getStandings(code))
@@ -41,6 +41,7 @@ async function getTeamPositions(): Promise<Map<string, { pos: number; form: stri
         form: row.form ?? '',
         goalsFor: row.goalsFor,
         goalsAgainst: row.goalsAgainst,
+        played: row.played,
         league: leagues[i],
       };
       // Indeksuj po pelnej nazwie I shortName (mecze uzywaja shortName)
@@ -55,7 +56,7 @@ async function getTeamPositions(): Promise<Map<string, { pos: number; form: stri
 }
 
 // Scoring engine — prosty ale efektywny
-function scorePredictions(matches: Match[], positions: Map<string, { pos: number; form: string; goalsFor: number; goalsAgainst: number; league: string }>): Prediction[] {
+function scorePredictions(matches: Match[], positions: Map<string, { pos: number; form: string; goalsFor: number; goalsAgainst: number; played: number; league: string }>): Prediction[] {
   const predictions: Prediction[] = [];
 
   for (const match of matches) {
@@ -93,9 +94,9 @@ function scorePredictions(matches: Match[], positions: Map<string, { pos: number
     const awayPos = away.pos;
     const posDiff = awayPos - homePos; // >0 = gospodarz wyżej
 
-    // Srednia goli
-    const homeGamesPlayed = Math.max(1, (home.goalsFor + home.goalsAgainst) / 3);
-    const awayGamesPlayed = Math.max(1, (away.goalsFor + away.goalsAgainst) / 3);
+    // Srednia goli — uzywamy faktycznej liczby meczow z tabeli
+    const homeGamesPlayed = Math.max(1, home.played);
+    const awayGamesPlayed = Math.max(1, away.played);
     const homeGoalsPerGame = home.goalsFor / homeGamesPlayed;
     const awayGoalsPerGame = away.goalsFor / awayGamesPlayed;
     const homeConcedePerGame = home.goalsAgainst / homeGamesPlayed;

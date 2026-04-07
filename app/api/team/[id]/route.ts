@@ -12,7 +12,7 @@ export async function GET(
 ) {
   const { id } = await params;
   const teamId = parseInt(id, 10);
-  if (isNaN(teamId)) {
+  if (isNaN(teamId) || teamId < 1 || teamId > 999999) {
     return NextResponse.json({ error: 'Invalid team ID' }, { status: 400 });
   }
 

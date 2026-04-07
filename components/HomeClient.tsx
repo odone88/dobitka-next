@@ -1,6 +1,27 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { FavoritesPicker, useFavorites } from '@/components/FavoritesPicker';
+import { SearchBar } from '@/components/SearchBar';
+
+export function HeaderDate() {
+  const [dateStr, setDateStr] = useState('');
+
+  useEffect(() => {
+    setDateStr(new Date().toLocaleDateString('pl-PL', {
+      weekday: 'long', day: 'numeric', month: 'long',
+    }));
+  }, []);
+
+  if (!dateStr) return null;
+
+  return (
+    <div className="hidden sm:flex flex-col">
+      <span className="text-[11px] text-muted-foreground capitalize font-medium leading-tight">{dateStr}</span>
+      <span className="text-[9px] text-primary/50 font-bold uppercase tracking-widest leading-tight">Twój serwis piłkarski</span>
+    </div>
+  );
+}
 
 export function HomeClient() {
   const { favoriteIds, showPicker, setShowPicker, handleChanged } = useFavorites();
@@ -16,11 +37,15 @@ export function HomeClient() {
         <span className="text-border hidden sm:inline" aria-hidden="true">|</span>
         <a href="/archive" className="hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1 hidden sm:inline">Archiwum</a>
 
+        {/* Search */}
+        <SearchBar />
+
         {/* Favorites — dyskretny przycisk */}
         <button
           onClick={() => setShowPicker(true)}
           className="relative ml-1 p-1.5 rounded-lg hover:bg-white/[0.05] transition-colors cursor-pointer"
           title="Moje drużyny"
+          aria-label="Moje drużyny"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill={favoriteIds.length > 0 ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                className={favoriteIds.length > 0 ? 'text-primary' : 'text-muted-foreground'}>

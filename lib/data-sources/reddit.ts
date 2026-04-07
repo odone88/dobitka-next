@@ -1,9 +1,8 @@
 import type { NewsItem } from '@/types';
 
-export async function getRedditHot(limit = 8): Promise<NewsItem[]> {
+async function fetchSubreddit(subreddit: string, limit: number): Promise<NewsItem[]> {
   try {
-    // Use old.reddit.com which is more permissive with server-side fetches
-    const res = await fetch('https://old.reddit.com/r/soccer/hot.json?limit=15&raw_json=1', {
+    const res = await fetch(`https://old.reddit.com/r/${subreddit}/hot.json?limit=${limit}&raw_json=1`, {
       headers: {
         'User-Agent': 'dobitka:v1.0.0 (football dashboard)',
         'Accept': 'application/json',
@@ -22,7 +21,7 @@ export async function getRedditHot(limit = 8): Promise<NewsItem[]> {
         title: p.data.title as string,
         url: `https://reddit.com${p.data.permalink}`,
         source: 'reddit' as const,
-        subreddit: 'r/soccer',
+        subreddit: `r/${subreddit}`,
         score: p.data.score as number,
         comments: p.data.num_comments as number,
         publishedAt: new Date((p.data.created_utc as number) * 1000).toISOString(),
@@ -31,4 +30,17 @@ export async function getRedditHot(limit = 8): Promise<NewsItem[]> {
   } catch {
     return [];
   }
+}
+
+export async function getRedditHot(limit = 8): Promise<NewsItem[]> {
+  const [soccer, ekstra] = await Promise.allSettled([
+    fetchSubreddit('soccer', 12),
+    fetchSubreddit('Ekstraklasa', 5),
+  ]);
+
+  const soccerPosts = soccer.status === 'fulfilled' ? soccer.value : [];
+  const ekstraPosts = ekstra.status === 'fulfilled' ? ekstra.value : [];
+
+  // Merge: ekstraklasa first (Polish portal), then r/soccer
+  return [...ekstraPosts, ...soccerPosts].slice(0, limit);
 }

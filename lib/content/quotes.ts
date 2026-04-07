@@ -646,6 +646,20 @@ const QUOTE_POOL: Quote[] = [
  */
 export function getDailyQuotes(count = 4, priorityTags: string[] = []): Quote[] {
   const day = Math.floor(Date.now() / 86400000);
+  const MAX_PER_AUTHOR = 1;
+
+  function dedupByAuthor(candidates: Quote[], limit: number): Quote[] {
+    const result: Quote[] = [];
+    const authorCount = new Map<string, number>();
+    for (const q of candidates) {
+      const c = authorCount.get(q.author) ?? 0;
+      if (c >= MAX_PER_AUTHOR) continue;
+      authorCount.set(q.author, c + 1);
+      result.push(q);
+      if (result.length >= limit) break;
+    }
+    return result;
+  }
 
   if (priorityTags.length > 0) {
     // Score quotes by tag overlap
@@ -658,14 +672,14 @@ export function getDailyQuotes(count = 4, priorityTags: string[] = []): Quote[] 
       if (b.overlap !== a.overlap) return b.overlap - a.overlap;
       return ((a.idx + day) % QUOTE_POOL.length) - ((b.idx + day) % QUOTE_POOL.length);
     });
-    return scored.slice(0, count).map((s) => s.q);
+    return dedupByAuthor(scored.map((s) => s.q), count);
   }
 
-  // Default: rotate through pool
+  // Default: rotate through pool, max 1 per author
   const start = (day * count) % QUOTE_POOL.length;
-  const result: Quote[] = [];
-  for (let i = 0; i < count; i++) {
-    result.push(QUOTE_POOL[(start + i) % QUOTE_POOL.length]);
+  const candidates: Quote[] = [];
+  for (let i = 0; i < QUOTE_POOL.length; i++) {
+    candidates.push(QUOTE_POOL[(start + i) % QUOTE_POOL.length]);
   }
-  return result;
+  return dedupByAuthor(candidates, count);
 }

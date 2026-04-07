@@ -25,7 +25,7 @@ const LEAGUE_PRIORITY: Record<string, number> = {
   CL: 0, ELC: 1,
   PPL: 2,
   PL: 3, PD: 4, SA: 5, BL1: 6, FL1: 7,
-  DED: 8, BSA: 9, CLI: 10,
+  DED: 8, BSA: 9,
 };
 
 function isLive(m: Match) {
@@ -188,6 +188,14 @@ function MatchRow({ match }: { match: Match }) {
             <span className="inline-flex px-2 py-0.5 rounded bg-muted text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
               Koniec
             </span>
+          ) : match.status === 'POSTPONED' ? (
+            <span className="inline-flex px-2 py-0.5 rounded bg-amber/20 text-[9px] font-bold text-amber uppercase tracking-wider">
+              Przełożony
+            </span>
+          ) : match.status === 'CANCELLED' ? (
+            <span className="inline-flex px-2 py-0.5 rounded bg-destructive/20 text-[9px] font-bold text-destructive uppercase tracking-wider">
+              Odwołany
+            </span>
           ) : (
             <span className="text-[13px] score-display text-foreground font-bold">{time}</span>
           )}
@@ -242,8 +250,9 @@ function MatchRow({ match }: { match: Match }) {
           {canExpand && (
             <button
               onClick={handleExpand}
+              aria-label={expanded ? 'Zwiń strzelców' : 'Pokaż strzelców'}
               className={cn(
-                'w-6 h-6 flex items-center justify-center rounded-full text-muted-foreground transition-all hover:text-foreground hover:bg-accent',
+                'w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground transition-all hover:text-foreground hover:bg-accent',
                 expanded ? 'rotate-180 bg-accent' : ''
               )}
             >
@@ -323,8 +332,9 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
 
   function handleDateChange(date: string) {
     if (date === selectedDate) return;
+    setSwitching(true);
     setSelectedDate(date);
-    fetchData(date, true);
+    // useEffect handles the actual fetch — no double request
   }
 
   // ─── SMART MATCH PRIORITY ──────────────────────────────────────

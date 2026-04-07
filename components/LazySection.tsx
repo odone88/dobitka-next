@@ -30,7 +30,7 @@ export function LazySection({ children, className, fallback }: {
   }, []);
 
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} className={className} style={!visible ? { minHeight: '100px' } : undefined}>
       {visible ? children : (fallback ?? null)}
     </div>
   );

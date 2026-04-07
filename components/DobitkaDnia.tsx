@@ -162,7 +162,27 @@ export function DobitkaDnia() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading || predictions.length === 0) return null;
+  if (loading) {
+    return (
+      <section className="scroll-mt-16 space-y-3">
+        <h2 className="flex items-center gap-3">
+          <span className="font-display text-[13px] font-normal tracking-wide text-primary">Dobitka dnia</span>
+          <span className="flex-1 border-t border-border" aria-hidden="true" />
+        </h2>
+        <div className="space-y-3">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="rounded-xl border border-border p-4 space-y-2 animate-pulse">
+              <div className="h-4 w-3/4 bg-muted rounded" />
+              <div className="h-3 w-1/2 bg-muted rounded" />
+              <div className="h-1.5 w-full bg-muted rounded-full" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (predictions.length === 0) return null;
 
   return (
     <section id="dobitka" className="scroll-mt-16 space-y-3">

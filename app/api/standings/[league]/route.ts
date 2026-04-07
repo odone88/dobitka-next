@@ -4,11 +4,19 @@ import { computeInsights, TOTAL_ROUNDS } from '@/lib/insights/scenarios';
 
 export const revalidate = 3600; // 1h
 
+const VALID_LEAGUES = new Set(['PL', 'PD', 'SA', 'BL1', 'FL1', 'BSA', 'PPL', 'DED', 'ELC', 'CL']);
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ league: string }> }
 ) {
   const { league } = await params;
+
+  // Validate league code to prevent arbitrary API calls
+  if (!VALID_LEAGUES.has(league)) {
+    return NextResponse.json({ error: 'Invalid league code' }, { status: 400 });
+  }
+
   const [standings, scorers] = await Promise.all([
     getStandings(league),
     getTopScorers(league, 5),

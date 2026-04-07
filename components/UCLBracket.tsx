@@ -132,7 +132,7 @@ export function UCLBracket() {
           {error ? 'Nie udało się załadować drabinki LM' : 'Przerwa w rozgrywkach Ligi Mistrzów'}
         </p>
         <p className="text-[12px] text-muted-foreground">
-          {error ? 'Sprawdź za chwilę.' : 'Następna runda wkrótce — dane pojawia sie automatycznie.'}
+          {error ? 'Sprawdź za chwilę.' : 'Następna runda wkrótce — dane pojawią się automatycznie.'}
         </p>
       </div>
     );

@@ -1,5 +1,6 @@
 import type { Match, MatchGoal, MatchDetail, Referee, H2HData, H2HMatch, StandingRow, LeagueStandings, Scorer } from '@/types';
 import { FOOTBALL_DATA_KEY } from '@/config/sources';
+import { cachedFetch } from '@/lib/cache';
 
 const BASE = 'https://api.football-data.org/v4';
 const HEADERS = { 'X-Auth-Token': FOOTBALL_DATA_KEY };
@@ -42,13 +43,16 @@ async function fdFetch(path: string, cacheSec = 120) {
     if (cached && Date.now() - cached.ts < MEM_TTL) {
       return cached.data;
     }
+    console.error(`[DOBITKA] football-data ${path}: HTTP ${res.status}`);
     throw new Error(`football-data ${path}: ${res.status}`);
   } catch (err) {
     // Network error — try mem cache before giving up
     const cached = memCache.get(cacheKey);
     if (cached && Date.now() - cached.ts < MEM_TTL) {
+      console.warn(`[DOBITKA] Using stale cache for ${path}`);
       return cached.data;
     }
+    console.error(`[DOBITKA] football-data ${path} failed:`, err instanceof Error ? err.message : err);
     throw err;
   }
 }
@@ -98,6 +102,10 @@ async function fetchMatchesForDate(targetDate: string, cacheSec: number): Promis
 
 // ─── STANDINGS ───────────────────────────────────────────────────────────────
 export async function getStandings(leagueCode: string): Promise<LeagueStandings | null> {
+  return cachedFetch(`standings:${leagueCode}`, () => fetchStandingsRaw(leagueCode), 3600);
+}
+
+async function fetchStandingsRaw(leagueCode: string): Promise<LeagueStandings | null> {
   try {
     const data = await fdFetch(`/competitions/${leagueCode}/standings`);
     const table: StandingRow[] = (data.standings?.[0]?.table ?? []).map((row: Record<string, unknown>) => ({
@@ -131,6 +139,10 @@ export async function getStandings(leagueCode: string): Promise<LeagueStandings 
 
 // ─── TOP SCORERS ─────────────────────────────────────────────────────────────
 export async function getTopScorers(leagueCode: string, limit = 5): Promise<Scorer[]> {
+  return cachedFetch(`scorers:${leagueCode}:${limit}`, () => fetchTopScorersRaw(leagueCode, limit), 3600);
+}
+
+async function fetchTopScorersRaw(leagueCode: string, limit: number): Promise<Scorer[]> {
   try {
     const data = await fdFetch(`/competitions/${leagueCode}/scorers?limit=${limit}`);
     return (data.scorers ?? []).map((s: Record<string, unknown>) => ({
