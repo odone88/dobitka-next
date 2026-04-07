@@ -78,14 +78,17 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('mecze');
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    fetch(`/api/team/${teamId}`)
+    setLoading(true);
+    setError(false);
+    fetch(`/api/team/${teamId}`, { cache: 'no-cache' })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then(setTeam)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [teamId]);
+  }, [teamId, retryCount]);
 
   if (loading) {
     return (
@@ -103,16 +106,22 @@ export function TeamDetailView({ teamId }: { teamId: string }) {
 
   if (error || !team) {
     return (
-      <div className="py-16 text-center">
+      <div className="py-16 text-center space-y-3">
         <p className="text-[16px] font-display text-muted-foreground">
-          Nie znaleziono druzyny
+          Dane druzyny chwilowo niedostepne
         </p>
-        <a
-          href="/"
-          className="text-[13px] text-primary hover:underline mt-2 inline-block"
-        >
-          &larr; Strona glowna
-        </a>
+        <p className="text-[12px] text-muted-foreground">Serwer przetwarza zapytania. Sprobuj za chwile.</p>
+        <div className="flex items-center justify-center gap-3 mt-3">
+          <button
+            onClick={() => setRetryCount(c => c + 1)}
+            className="px-5 py-2 bg-primary text-primary-foreground rounded-lg text-[12px] font-bold hover:bg-primary/90 transition-colors cursor-pointer"
+          >
+            Sprobuj ponownie
+          </button>
+          <a href="/" className="text-[12px] text-muted-foreground hover:text-primary transition-colors">
+            Strona glowna
+          </a>
+        </div>
       </div>
     );
   }

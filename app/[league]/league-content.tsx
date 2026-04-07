@@ -176,11 +176,14 @@ export function LeagueContent({ code, slug }: LeagueContentProps) {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(false);
 
-    fetch(`/api/standings/${code}`)
+    fetch(`/api/standings/${code}`, { cache: 'no-cache' })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -199,15 +202,24 @@ export function LeagueContent({ code, slug }: LeagueContentProps) {
       });
 
     return () => { cancelled = true; };
-  }, [code]);
+  }, [code, retryCount]);
 
   if (loading) return <LeagueSkeleton />;
 
   if (error || !data?.standings) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Nie udalo sie zaladowac danych. Sprobuj ponownie pozniej.</p>
-      </div>
+      <Card className="border-dashed">
+        <CardContent className="py-12 text-center space-y-3">
+          <p className="text-[15px] font-display text-muted-foreground">Dane chwilowo niedostepne</p>
+          <p className="text-[12px] text-muted-foreground">Serwer przetwarza zapytania. Sprobuj za chwile.</p>
+          <button
+            onClick={() => setRetryCount(c => c + 1)}
+            className="mt-2 px-5 py-2 bg-primary text-primary-foreground rounded-lg text-[12px] font-bold hover:bg-primary/90 transition-colors cursor-pointer"
+          >
+            Sprobuj ponownie
+          </button>
+        </CardContent>
+      </Card>
     );
   }
 
