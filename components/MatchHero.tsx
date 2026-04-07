@@ -93,12 +93,12 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
           {liveMatches.length} {liveMatches.length === 1 ? 'mecz na żywo' : liveMatches.length < 5 ? 'mecze na żywo' : 'meczów na żywo'}
         </div>
 
-        <div className="px-4 py-4 space-y-1">
+        <div className="px-4 py-2 space-y-0">
           {liveMatches.map((m) => (
             <Link
               key={m.id}
               href={`/match/${m.id}`}
-              className="group flex items-center gap-3 hover:bg-white/[0.05] rounded-xl px-3 py-2.5 -mx-1 transition-all"
+              className="group flex items-center gap-3 hover:bg-white/[0.05] rounded-xl px-3 py-1.5 -mx-1 transition-all"
             >
               {/* Home */}
               <div className="flex-1 flex items-center gap-2.5 justify-end min-w-0">
@@ -165,7 +165,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
           </svg>
           Najlepsze wyniki dnia
         </div>
-        <div className="p-4 space-y-1">
+        <div className="px-4 py-2 space-y-0">
           {top.map((m) => {
             const homeWin = m.homeScore! > m.awayScore!;
             const awayWin = m.awayScore! > m.homeScore!;
@@ -173,7 +173,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
               <Link
                 key={m.id}
                 href={`/match/${m.id}`}
-                className="group flex items-center gap-3 hover:bg-accent/50 rounded-xl px-3 py-2.5 -mx-1 transition-all"
+                className="group flex items-center gap-3 hover:bg-accent/50 rounded-xl px-3 py-1.5 -mx-1 transition-all"
               >
                 <div className="flex-1 flex items-center gap-2 justify-end min-w-0">
                   <span className={cn('text-[13px] truncate', homeWin ? 'font-bold text-foreground' : 'text-muted-foreground')}>
@@ -228,7 +228,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
           </svg>
           Najbliższy mecz
         </div>
-        <div className="px-5 py-4 flex items-center gap-4">
+        <div className="px-5 py-2.5 flex items-center gap-4">
           <div className="flex items-center gap-3">
             <Crest src={next.homeCrest} name={next.homeTeam} size={32} />
             <span className="font-bold text-[16px] text-foreground">{next.homeTeam}</span>
@@ -258,10 +258,10 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
 
   return (
     <div className="rounded-2xl border border-border bg-gradient-to-r from-primary/[0.04] to-card overflow-hidden">
-      <div className="px-5 py-6 flex items-center justify-between">
+      <div className="px-5 py-3 flex items-center justify-between">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Dzisiaj</p>
-          <p className="font-display text-xl text-foreground capitalize">{todayStr}</p>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">Dzisiaj</p>
+          <p className="font-display text-lg text-foreground capitalize">{todayStr}</p>
           <p className="text-[12px] text-muted-foreground mt-1">Brak meczów w głównych ligach. Sprawdź archiwum lub wróć później.</p>
         </div>
         <Link href="/archive" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary/80 transition-colors flex-shrink-0">

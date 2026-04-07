@@ -74,32 +74,59 @@ type TabId = 'mecze' | 'info';
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function TeamDetailView({ teamId }: { teamId: string }) {
+  const MAX_RETRIES = 3;
   const [team, setTeam] = useState<TeamData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('mecze');
   const [retryCount, setRetryCount] = useState(0);
+  const [autoRetrying, setAutoRetrying] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     setError(false);
-    fetch(`/api/team/${teamId}`, { cache: 'no-cache' })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then(setTeam)
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
+    setAutoRetrying(false);
+
+    const doFetch = async (attempt: number): Promise<void> => {
+      try {
+        const res = await fetch(`/api/team/${teamId}`, { cache: 'no-cache' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        if (!cancelled) { setTeam(json); setLoading(false); setAutoRetrying(false); }
+      } catch {
+        if (cancelled) return;
+        if (attempt < MAX_RETRIES) {
+          setAutoRetrying(true);
+          await new Promise(r => setTimeout(r, 2000 * Math.pow(2, attempt)));
+          if (!cancelled) return doFetch(attempt + 1);
+        } else {
+          setError(true);
+          setLoading(false);
+          setAutoRetrying(false);
+        }
+      }
+    };
+
+    doFetch(0);
+    return () => { cancelled = true; };
   }, [teamId, retryCount]);
 
   if (loading) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-28 w-full rounded-xl" />
-        <div className="flex gap-2">
-          <Skeleton className="h-10 w-24 rounded-lg" />
-          <Skeleton className="h-10 w-24 rounded-lg" />
+      <div>
+        <div className="space-y-4">
+          <Skeleton className="h-28 w-full rounded-xl" />
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-24 rounded-lg" />
+            <Skeleton className="h-10 w-24 rounded-lg" />
+          </div>
+          <Skeleton className="h-48 w-full rounded-xl" />
+          <Skeleton className="h-32 w-full rounded-xl" />
         </div>
-        <Skeleton className="h-48 w-full rounded-xl" />
-        <Skeleton className="h-32 w-full rounded-xl" />
+        {autoRetrying && (
+          <p className="text-center text-[12px] text-muted-foreground mt-3 animate-pulse">Ladowanie danych...</p>
+        )}
       </div>
     );
   }

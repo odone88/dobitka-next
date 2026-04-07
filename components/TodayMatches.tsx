@@ -180,7 +180,7 @@ function MatchRow({ match }: { match: Match }) {
       )}
     >
       {/* Main row */}
-      <Link href={`/match/${match.id}`} className="flex items-center px-3 py-3.5 gap-2">
+      <Link href={`/match/${match.id}`} className="flex items-center px-3 py-1.5 gap-2">
         {/* Time / Status */}
         <div className="w-[56px] flex-shrink-0 text-center">
           {live ? (
@@ -221,7 +221,7 @@ function MatchRow({ match }: { match: Match }) {
           {hasScore ? (
             <span className={cn(
               'score-display font-black inline-block',
-              live ? 'text-[22px] text-destructive' : 'text-[18px] text-foreground'
+              live ? 'text-[24px] text-destructive' : 'text-[20px] text-foreground'
             )}>
               {match.homeScore}<span className={cn('mx-0.5', live ? 'text-destructive/40' : 'text-muted-foreground')}>:</span>{match.awayScore}
             </span>
@@ -393,7 +393,7 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
         ) : (
           <div className="rounded-xl border border-border overflow-hidden bg-card">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-3 py-3.5 border-b border-border last:border-0">
+              <div key={i} className="flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-0">
                 <Skeleton className="h-4 w-10" />
                 <div className="flex-1 flex items-center justify-end gap-2">
                   <Skeleton className="h-3.5 w-20" />
@@ -488,7 +488,7 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
                 <div key={code}>
                   {/* League header */}
                   <div className={cn(
-                    'flex items-center gap-2.5 px-3 py-2.5 border-b border-border',
+                    'flex items-center gap-2.5 px-3 py-1.5 border-b border-border',
                     hasLive ? 'bg-gradient-to-r from-destructive/[0.12] to-transparent' : 'bg-accent/30',
                     leagueIdx > 0 && 'border-t border-border'
                   )}>
@@ -510,8 +510,11 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
                       )}
                     </div>
                     {hasLive && (
-                      <span className="ml-1 inline-flex items-center gap-1 px-1.5 py-0.5 bg-destructive/20 rounded text-[8px] font-black text-destructive uppercase tracking-wider">
-                        <span className="w-1.5 h-1.5 rounded-full bg-destructive live-dot" />
+                      <span className="ml-1 inline-flex items-center gap-1 px-2 py-0.5 bg-destructive rounded text-[9px] font-black text-white uppercase tracking-wider shadow-sm shadow-destructive/30">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+                        </span>
                         Live
                       </span>
                     )}

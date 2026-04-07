@@ -104,38 +104,51 @@ function TabelaSkeleton() {
 
 // ─── MAIN CLIENT COMPONENT ─────────────────────────────────────────────────
 export function TabelaContent({ code }: TabelaContentProps) {
+  const MAX_RETRIES = 3;
   const [data, setData] = useState<ApiResponse | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
+  const [autoRetrying, setAutoRetrying] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(false);
+    setAutoRetrying(false);
 
-    fetch(`/api/standings/${code}`, { cache: 'no-cache' })
-      .then((res) => {
+    const doFetch = async (attempt: number): Promise<void> => {
+      try {
+        const res = await fetch(`/api/standings/${code}`, { cache: 'no-cache' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((json: ApiResponse) => {
-        if (!cancelled) {
-          setData(json);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
+        const json: ApiResponse = await res.json();
+        if (!cancelled) { setData(json); setLoading(false); setAutoRetrying(false); }
+      } catch {
+        if (cancelled) return;
+        if (attempt < MAX_RETRIES) {
+          setAutoRetrying(true);
+          await new Promise(r => setTimeout(r, 2000 * Math.pow(2, attempt)));
+          if (!cancelled) return doFetch(attempt + 1);
+        } else {
           setError(true);
           setLoading(false);
+          setAutoRetrying(false);
         }
-      });
+      }
+    };
 
+    doFetch(0);
     return () => { cancelled = true; };
   }, [code, retryCount]);
 
-  if (loading) return <TabelaSkeleton />;
+  if (loading) return (
+    <div>
+      <TabelaSkeleton />
+      {autoRetrying && (
+        <p className="text-center text-[12px] text-muted-foreground mt-3 animate-pulse">Ladowanie danych...</p>
+      )}
+    </div>
+  );
 
   if (error || !data?.standings) {
     return (
