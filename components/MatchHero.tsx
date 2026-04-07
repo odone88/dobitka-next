@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import type { Match } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -94,7 +95,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
 
         <div className="px-4 py-4 space-y-1">
           {liveMatches.map((m) => (
-            <a
+            <Link
               key={m.id}
               href={`/match/${m.id}`}
               className="group flex items-center gap-3 hover:bg-white/[0.05] rounded-xl px-3 py-2.5 -mx-1 transition-all"
@@ -127,7 +128,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
               </div>
 
               <span className="text-[9px] font-bold text-muted-foreground uppercase flex-shrink-0 hidden sm:block">{m.competitionCode}</span>
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -169,7 +170,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
             const homeWin = m.homeScore! > m.awayScore!;
             const awayWin = m.awayScore! > m.homeScore!;
             return (
-              <a
+              <Link
                 key={m.id}
                 href={`/match/${m.id}`}
                 className="group flex items-center gap-3 hover:bg-accent/50 rounded-xl px-3 py-2.5 -mx-1 transition-all"
@@ -190,7 +191,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
                   </span>
                 </div>
                 <span className="text-[9px] font-bold text-muted-foreground uppercase flex-shrink-0 hidden sm:block">{m.competitionCode}</span>
-              </a>
+              </Link>
             );
           })}
         </div>
@@ -217,7 +218,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
     const isToday = new Date(next.utcDate).toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10);
 
     return (
-      <a
+      <Link
         href={`/match/${next.id}`}
         className="group block rounded-2xl border border-border bg-gradient-to-r from-primary/[0.06] to-card overflow-hidden card-elevated hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all"
       >
@@ -246,7 +247,7 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
             {next.competitionCode}
           </span>
         </div>
-      </a>
+      </Link>
     );
   }
 
@@ -263,9 +264,9 @@ export function MatchHero({ initialMatches = [], ssrLoaded = false }: { initialM
           <p className="font-display text-xl text-foreground capitalize">{todayStr}</p>
           <p className="text-[12px] text-muted-foreground mt-1">Brak meczów w głównych ligach. Sprawdź archiwum lub wróć później.</p>
         </div>
-        <a href="/archive" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary/80 transition-colors flex-shrink-0">
+        <Link href="/archive" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary/80 transition-colors flex-shrink-0">
           Archiwum &rarr;
-        </a>
+        </Link>
       </div>
     </div>
   );

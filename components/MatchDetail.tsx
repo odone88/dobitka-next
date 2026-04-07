@@ -156,7 +156,7 @@ function EventsTimeline({ goals, homeTeamId }: { goals: MatchGoal[]; homeTeamId:
                 <div className={cn('flex-1 min-w-0', isHome ? 'text-left' : 'text-left')}>
                   <span className="text-[13px] font-bold text-foreground">{goal.scorer}</span>
                   {goal.type === 'PENALTY' && (
-                    <span className="text-[10px] text-amber ml-1">(karny)</span>
+                    <span className="text-[10px] text-amber-500 ml-1">(karny)</span>
                   )}
                   {goal.type === 'OWN_GOAL' && (
                     <span className="text-[10px] text-destructive ml-1">(samobojczy)</span>
@@ -270,11 +270,54 @@ function MatchInfo({ match }: { match: MatchDetail }) {
   );
 }
 
+/* ─── Tab navigation ─────────────────────────────────────────────── */
+type TabId = 'events' | 'h2h' | 'info';
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: 'events', label: 'Zdarzenia' },
+  { id: 'h2h', label: 'H2H' },
+  { id: 'info', label: 'Informacje' },
+];
+
+function MatchTabs({ active, onChange, hasGoals, hasH2H }: {
+  active: TabId;
+  onChange: (tab: TabId) => void;
+  hasGoals: boolean;
+  hasH2H: boolean;
+}) {
+  return (
+    <div className="flex border-b border-border">
+      {TABS.map((tab) => {
+        if (tab.id === 'events' && !hasGoals) return null;
+        if (tab.id === 'h2h' && !hasH2H) return null;
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onChange(tab.id)}
+            className={cn(
+              'px-4 py-2.5 text-[12px] font-bold uppercase tracking-wider transition-colors cursor-pointer relative',
+              active === tab.id
+                ? 'text-primary'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            {tab.label}
+            {active === tab.id && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-t" />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ─── Main MatchDetailView ───────────────────────────────────────── */
 export function MatchDetailView({ matchId, initialMatch = null }: { matchId: string; initialMatch?: MatchDetail | null }) {
   const [match, setMatch] = useState<MatchDetail | null>(initialMatch);
   const [loading, setLoading] = useState(!initialMatch);
   const [error, setError] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabId>('events');
   const matchRef = useRef<MatchDetail | null>(initialMatch);
 
   const fetchMatch = useCallback(async () => {
@@ -295,30 +338,33 @@ export function MatchDetailView({ matchId, initialMatch = null }: { matchId: str
   }, [matchId]);
 
   useEffect(() => {
-    // If we have SSR data, skip initial fetch — just poll for live
-    if (initialMatch) {
-      const id = setInterval(() => {
-        if (matchRef.current && isLive(matchRef.current.status)) {
-          fetchMatch();
-        }
-      }, 60_000);
-      return () => clearInterval(id);
+    if (!initialMatch) {
+      fetchMatch();
     }
 
-    fetchMatch();
     const id = setInterval(() => {
       if (matchRef.current && isLive(matchRef.current.status)) {
         fetchMatch();
       }
     }, 60_000);
     return () => clearInterval(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchMatch, initialMatch]);
+
+  // Auto-select first available tab
+  useEffect(() => {
+    if (!match) return;
+    const hasGoals = match.goals.length > 0;
+    const hasH2H = !!match.head2head && match.head2head.lastMatches.length > 0;
+    if (activeTab === 'events' && !hasGoals) {
+      setActiveTab(hasH2H ? 'h2h' : 'info');
+    }
+  }, [match, activeTab]);
 
   if (loading) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-48 w-full rounded-xl" />
+        <Skeleton className="h-10 w-full rounded" />
         <Skeleton className="h-32 w-full rounded-xl" />
       </div>
     );
@@ -329,23 +375,44 @@ export function MatchDetailView({ matchId, initialMatch = null }: { matchId: str
       <div className="py-16 text-center">
         <p className="text-[16px] font-display text-muted-foreground">Nie znaleziono meczu</p>
         <a href="/" className="text-[13px] text-primary hover:underline mt-2 inline-block">
-          ← Wstecz do strony głównej
+          ← Wstecz do strony glownej
         </a>
       </div>
     );
   }
 
+  const hasGoals = match.goals.length > 0;
+  const hasH2H = !!match.head2head && match.head2head.lastMatches.length > 0;
+
   return (
     <div className="space-y-4">
       <ScoreHeader match={match} />
-      <EventsTimeline goals={match.goals} homeTeamId={match.homeTeamId} />
-      <H2HSection h2h={match.head2head} homeTeam={match.homeTeam} awayTeam={match.awayTeam} />
-      <MatchInfo match={match} />
+
+      {/* Tabs */}
+      <MatchTabs
+        active={activeTab}
+        onChange={setActiveTab}
+        hasGoals={hasGoals}
+        hasH2H={hasH2H}
+      />
+
+      {/* Tab content */}
+      <div className="animate-fade-in" key={activeTab}>
+        {activeTab === 'events' && hasGoals && (
+          <EventsTimeline goals={match.goals} homeTeamId={match.homeTeamId} />
+        )}
+        {activeTab === 'h2h' && (
+          <H2HSection h2h={match.head2head} homeTeam={match.homeTeam} awayTeam={match.awayTeam} />
+        )}
+        {activeTab === 'info' && (
+          <MatchInfo match={match} />
+        )}
+      </div>
 
       {/* Link do powrotu */}
       <div className="text-center py-4">
         <a href="/" className="text-[12px] text-muted-foreground hover:text-primary transition-colors">
-          ← Wstecz do strony głównej
+          ← Wstecz do strony glownej
         </a>
       </div>
     </div>

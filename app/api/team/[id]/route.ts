@@ -12,7 +12,7 @@ export async function GET(
 ) {
   const { id } = await params;
   const teamId = parseInt(id, 10);
-  if (isNaN(teamId) || teamId < 1 || teamId > 999999) {
+  if (isNaN(teamId) || teamId < 1 || teamId > 99999) {
     return NextResponse.json({ error: 'Invalid team ID' }, { status: 400 });
   }
 
@@ -23,7 +23,7 @@ export async function GET(
         headers: HEADERS,
         next: { revalidate: 86400 },
       }),
-      fetch(`${BASE}/teams/${teamId}/matches?status=SCHEDULED&limit=3`, {
+      fetch(`${BASE}/teams/${teamId}/matches?status=SCHEDULED&limit=5`, {
         headers: HEADERS,
         next: { revalidate: 3600 },
       }).catch(() => null),
@@ -59,6 +59,8 @@ export async function GET(
             id: m.id,
             homeTeam: (ht?.shortName as string) ?? (ht?.name as string) ?? '',
             awayTeam: (at?.shortName as string) ?? (at?.name as string) ?? '',
+            homeCrest: (ht?.crest as string) ?? '',
+            awayCrest: (at?.crest as string) ?? '',
             homeScore,
             awayScore,
             date: m.utcDate,
@@ -73,13 +75,15 @@ export async function GET(
     let upcomingMatches: unknown[] = [];
     if (matchesRes?.ok) {
       const matchesData = await matchesRes.json();
-      upcomingMatches = (matchesData.matches ?? []).slice(0, 3).map((m: Record<string, unknown>) => {
+      upcomingMatches = (matchesData.matches ?? []).slice(0, 5).map((m: Record<string, unknown>) => {
         const ht = m.homeTeam as Record<string, unknown>;
         const at = m.awayTeam as Record<string, unknown>;
         return {
           id: m.id,
           homeTeam: (ht?.shortName as string) ?? (ht?.name as string) ?? '',
           awayTeam: (at?.shortName as string) ?? (at?.name as string) ?? '',
+          homeCrest: (ht?.crest as string) ?? '',
+          awayCrest: (at?.crest as string) ?? '',
           date: m.utcDate,
           competition: ((m.competition as Record<string, unknown>)?.name as string) ?? '',
         };

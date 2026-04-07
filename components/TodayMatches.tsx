@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import type { Match, MatchGoal } from '@/types';
 import { getLeague } from '@/config/leagues';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -179,7 +180,7 @@ function MatchRow({ match }: { match: Match }) {
       )}
     >
       {/* Main row */}
-      <a href={`/match/${match.id}`} className="flex items-center px-3 py-3.5 gap-2">
+      <Link href={`/match/${match.id}`} className="flex items-center px-3 py-3.5 gap-2">
         {/* Time / Status */}
         <div className="w-[56px] flex-shrink-0 text-center">
           {live ? (
@@ -262,7 +263,7 @@ function MatchRow({ match }: { match: Match }) {
             </button>
           )}
         </div>
-      </a>
+      </Link>
 
       {/* Goal scorers */}
       {expanded && loadingGoals && (
@@ -461,7 +462,7 @@ export function TodayMatches({ initialMatches = [], ssrLoaded = false }: { initi
           <div className="py-10 text-center space-y-3">
             <span className="text-4xl" aria-hidden="true">⚽</span>
             <p className="text-[15px] text-foreground font-display font-bold">Brak meczów na ten dzień</p>
-            <p className="text-[12px] text-muted-foreground">Sprawdź inny dzień lub przejdź do <a href="/archive" className="text-primary hover:underline">archiwum</a>.</p>
+            <p className="text-[12px] text-muted-foreground">Sprawdź inny dzień lub przejdź do <Link href="/archive" className="text-primary hover:underline">archiwum</Link>.</p>
             <div className="flex justify-center gap-2 pt-2">
               {[-1, 1, 2].map((offset) => {
                 const d = new Date();

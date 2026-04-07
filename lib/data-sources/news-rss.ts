@@ -20,18 +20,8 @@ const RSS_SOURCES: RssSource[] = [
     url: 'https://www.theguardian.com/football/rss',
     source: 'guardian' as NewsItem['source'],
   },
-  {
-    id: 'tvpsport',
-    name: 'TVP Sport',
-    url: 'https://sport.tvp.pl/rss/pilkanozna.xml',
-    source: 'tvpsport' as NewsItem['source'],
-  },
-  {
-    id: 'sportpl',
-    name: 'Sport.pl Piłka Nożna',
-    url: 'https://sport.pl/rss/sport.xml',
-    source: 'sportpl' as NewsItem['source'],
-  },
+  // TVP Sport and Sport.pl removed their RSS feeds (404 since ~2026-03)
+  // Re-add when they restore them or find replacement Polish sports RSS
 ];
 
 async function fetchRss(src: RssSource, limit: number): Promise<NewsItem[]> {
@@ -83,15 +73,13 @@ export async function getNewsFeeds(): Promise<{
     fetchRss(RSS_SOURCES[0], 8),   // bbc
     fetchRss(RSS_SOURCES[1], 8),   // guardian
     getWeszloFeed(8),              // weszlo
-    fetchRss(RSS_SOURCES[2], 8),   // tvpsport
-    fetchRss(RSS_SOURCES[3], 8),   // sportpl
   ]);
   return {
     bbc: results[0].status === 'fulfilled' ? results[0].value : [],
     guardian: results[1].status === 'fulfilled' ? results[1].value : [],
     weszlo: results[2].status === 'fulfilled' ? results[2].value : [],
-    tvpsport: results[3].status === 'fulfilled' ? results[3].value : [],
-    sportpl: results[4].status === 'fulfilled' ? results[4].value : [],
+    tvpsport: [],  // RSS feed removed by TVP
+    sportpl: [],   // RSS feed removed by Sport.pl
   };
 }
 

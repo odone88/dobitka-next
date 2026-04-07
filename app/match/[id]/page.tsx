@@ -102,7 +102,7 @@ export default async function MatchPage({ params }: Props) {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-6">
+      <main className="max-w-3xl mx-auto px-4 py-6 pb-bottom-nav lg:pb-6">
         <MatchDetailView matchId={id} initialMatch={initialMatch} />
       </main>
     </div>

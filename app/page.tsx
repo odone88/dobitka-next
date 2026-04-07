@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MatchHero } from '@/components/MatchHero';
@@ -15,6 +16,9 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LazySection } from '@/components/LazySection';
 import { TopScorers } from '@/components/TopScorers';
 import { WeekendResults } from '@/components/WeekendResults';
+import { Sidebar } from '@/components/Sidebar';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { FavoriteMatches } from '@/components/FavoriteMatches';
 import { LEAGUES } from '@/config/leagues';
 import { getLiveMatches, getTodayMatches } from '@/lib/data-sources/football-data';
 import { cn } from '@/lib/utils';
@@ -79,19 +83,25 @@ export default async function HomePage() {
       <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-xl">
         <div className="max-w-screen-xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <a href="/" className="flex items-center gap-2.5 group">
+            <Link href="/" className="flex items-center gap-2.5 group">
               <span className="text-xl" aria-hidden="true">⚽</span>
               <h1 className="font-display text-2xl tracking-tight text-primary transition-all group-hover:text-primary/80">
                 DOBITKA
               </h1>
-            </a>
+            </Link>
             <HeaderDate />
           </div>
-          <HomeClient />
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <HomeClient />
+          </div>
         </div>
       </header>
 
-      <main className="max-w-screen-xl mx-auto px-4 py-5 space-y-6">
+      <div className="max-w-screen-xl mx-auto px-4 py-5 flex gap-6">
+        <Sidebar />
+
+      <main className="flex-1 min-w-0 space-y-6 pb-bottom-nav lg:pb-0">
 
         {/* SMART BANNER — SSR with initial data */}
         <ErrorBoundary section="banner">
@@ -108,6 +118,11 @@ export default async function HomePage() {
         {/* DOBITKA DNIA */}
         <ErrorBoundary section="predykcje">
           <DobitkaDnia />
+        </ErrorBoundary>
+
+        {/* TWOJE MECZE — ulubione druzyny */}
+        <ErrorBoundary section="twoje mecze">
+          <FavoriteMatches initialMatches={initialMatches} />
         </ErrorBoundary>
 
         {/* MECZE DNIA — SSR with initial data */}
@@ -218,18 +233,27 @@ export default async function HomePage() {
         <footer className="text-[11px] text-muted-foreground pb-6 space-y-1">
           <p>
             <span className="text-muted-foreground font-semibold">Źródła:</span>{' '}
-            football-data.org &middot; TheSportsDB &middot; BBC Sport &middot; The Guardian &middot; Weszło.com &middot; TVP Sport &middot; Sport.pl &middot; Tifo Football
+            football-data.org &middot; TheSportsDB &middot; BBC Sport &middot; The Guardian &middot; Weszło.com &middot; Tifo Football
           </p>
           <p>Live: 90s &middot; UCL: 5min &middot; Tabele: 2h &middot; Newsy: 15min</p>
           <div className="flex items-center gap-3 mt-1">
-            <a href="/archive" className="text-primary/70 hover:text-primary font-bold uppercase tracking-widest text-[9px] transition-colors">
-              Archiwum meczów →
-            </a>
+            <Link href="/archive" className="text-primary/70 hover:text-primary font-bold uppercase tracking-widest text-[9px] transition-colors">
+              Archiwum
+            </Link>
+            <span className="text-border">|</span>
+            <Link href="/gdzie-ogladac" className="text-primary/70 hover:text-primary font-bold uppercase tracking-widest text-[9px] transition-colors">
+              Gdzie ogladac
+            </Link>
+            <span className="text-border">|</span>
+            <Link href="/wyniki-na-zywo" className="text-primary/70 hover:text-primary font-bold uppercase tracking-widest text-[9px] transition-colors">
+              Live
+            </Link>
             <span className="text-border">|</span>
             <span className="text-primary/60 font-bold uppercase tracking-widest text-[9px]">DOBITKA &mdash; codziennie, bezkompromisowo</span>
           </div>
         </footer>
       </main>
+      </div>
     </div>
   );
 }

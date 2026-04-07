@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { FavoritesPicker, useFavorites } from '@/components/FavoritesPicker';
 import { SearchBar } from '@/components/SearchBar';
 
@@ -35,7 +36,7 @@ export function HomeClient() {
         <a href="#tabele" className="tab-underline hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1 hidden sm:inline">Tabele</a>
         <a href="#newsy"  className="tab-underline hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1">Newsy</a>
         <span className="text-border hidden sm:inline" aria-hidden="true">|</span>
-        <a href="/archive" className="hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1 hidden sm:inline">Archiwum</a>
+        <Link href="/archive" className="hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-colors py-1 px-1 hidden sm:inline">Archiwum</Link>
 
         {/* Search */}
         <SearchBar />

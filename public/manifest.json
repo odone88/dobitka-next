@@ -7,16 +7,49 @@
   "background_color": "#1a1a2e",
   "theme_color": "#22c55e",
   "orientation": "portrait",
+  "categories": ["sports", "news"],
+  "lang": "pl",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/icon",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon?size=192",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icon?size=512",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/apple-icon",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "apple touch icon"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Wyniki na zywo",
+      "short_name": "Live",
+      "url": "/wyniki-na-zywo",
+      "description": "Mecze rozgrywane teraz"
+    },
+    {
+      "name": "Ekstraklasa",
+      "short_name": "EKL",
+      "url": "/ekstraklasa",
+      "description": "Tabela i mecze Ekstraklasy"
+    },
+    {
+      "name": "Premier League",
+      "short_name": "PL",
+      "url": "/premier-league",
+      "description": "Tabela i mecze Premier League"
     }
   ]
 }

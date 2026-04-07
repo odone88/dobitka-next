@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Serif_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { BottomNav } from "@/components/BottomNav";
 import "./globals.css";
 
 // Editorial display — nagłówki, tytuły sekcji
@@ -52,11 +53,22 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover' as const,
+  themeColor: '#22c55e',
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pl" className="dark">
+    <html lang="pl" className="dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `try{if(localStorage.getItem('dobitka-theme')==='light')document.documentElement.classList.remove('dark')}catch(e){}` }} />
+      </head>
       <body className={`${dmSerif.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased bg-background min-h-screen`}>
         {children}
+        <BottomNav />
         <Analytics />
       </body>
     </html>
